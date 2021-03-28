@@ -4,6 +4,7 @@ import pygame
 import pygame.freetype
 
 import game.load as load
+from game.utils import Text, Button
 
 class Loop:
     def __init__(self, screen, scene, scenedict):
@@ -55,47 +56,6 @@ class Game(Scene):
     def update(self, loop):
         self.screen.blit(self.image, (0,0))
 
-pygame.freetype.init()
-font = pygame.freetype.Font(load.handle_path("lora/Lora-Bold.ttf"))
-
-def render_text(text, size=16, color=(255,255,255)):
-    return font.render(text, size=size, fgcolor=color)
-
-def draw_text(screen, text, location, size=16, color=(255,255,255), centered=False):
-    im, size = render_text(text, size, color)
-    if centered:
-        screen.blit(im, (location[0]-size[2]/2, location[1]))
-    else:
-        screen.blit(im, (location[0], location[1]))
-
-class Text:
-    def __init__(self, text, location, size=16, color=(255,255,255), centered=False):
-        self.text = text
-        self.location = location
-        self.image = render_text(text, size, color)[0]
-        self.centered = centered
-
-        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
-        if self.centered:
-            self.rect.x = self.location[0] - self.image.get_width() / 2
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-
-
-class Button(Text):
-    def __init__(self, text, location, size=16, color=(255,255,255), centered=False):
-        super().__init__(text, location, size, color, centered)
-        self.clicked = False
-
-    def draw(self, screen):
-        super().draw(screen)
-        self.clicked = False
-        for event in Button.loop.get_events():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.rect.collidepoint(event.pos):
-                    self.clicked = True
-
 class MainMenu(Scene):
     def __init__(self, screen):
         self.screen = screen
@@ -109,7 +69,6 @@ class MainMenu(Scene):
         if self.b.clicked:
             loop.switch_scene("game")
         
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
@@ -118,8 +77,9 @@ def main():
     game = Game(screen)
     menu = MainMenu(screen)
     scenedict = {"game": game, "menu": menu}
-    loop = Loop(screen, menu, scenedict)
-    Button.loop = loop #important
+    startscene = menu # switch around for debugging, default is "menu"
+    loop = Loop(screen, startscene, scenedict)
+    Button.loop = loop
     loop.start()
 
     
