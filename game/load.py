@@ -2,8 +2,13 @@ import os
 
 import pygame
 
-path = "data"
+PATH = "data"
+
+def handle_path(filepath):
+    filepath = os.path.split(filepath)
+    filepath = os.path.join(PATH, *filepath)
+    return filepath
 
 def image(filepath):
-    filepath = os.path.join(path, filepath)
+    filepath = handle_path(filepath)
     return pygame.image.load(filepath)
