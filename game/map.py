@@ -6,13 +6,16 @@ import game.load as load
 
 # Abstract class fot every thhing on the grid
 class Tile(ABC):
-    def __init__(self, tilemap, x, y):
+    #passes in x and y pos
+    def __init__(self, x, y):
         pass
     
+    #renders at screen pos (Not tile grid pos)
     def render(self, screen, x, y):
         if self.image != None:
             screen.blit(self.image, (x, y))
     
+    #stuff that needs to happen after map creation
     def link(self, tilemap, x, y):
         pass
 
@@ -24,7 +27,7 @@ class Road(Tile):
     image = pygame.Surface((40,40))
     image.fill((64,64,64))
     
-    def __init__(self, tilemap, x, y):
+    def __init__(self, x, y):
         self.next = None
     
     #recursively sets next pointers for roads
@@ -43,7 +46,7 @@ class End(Tile):
     def setnext(self, tilemap, gx, gy):
         for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
             tile = tilemap[gx+ox,gy+oy]
-            if (type(tile) == Road and tile.next == None):
+            if (type(tile) in (Road, Start) and tile.next == None):
                 tile.setnext(self, tilemap, gx+ox, gy+oy)
 
 class Start(Road):
@@ -64,15 +67,17 @@ class TileMap():
         self.map = []
         self.xdim = surf.get_width()
         self.ydim = surf.get_height()
+        self.starts = []
         for x in range(self.xdim):
             row = []
             for y in range(self.ydim):
                 color = surf.get_at((x,y))[0:3]
-                try:
-                    row.append(TileMap.colormap[color](self, x, y))
-                except KeyError:
+                if color in self.colormap:
+                    row.append(TileMap.colormap[color](x, y))
+                    if (type(row[-1]) == Start): self.starts.append(row[-1])
+                else:
                     print(f"warning, no tile conversion for color={color}")
-                    row.append(NoTile(self, x, y))
+                    row.append(NoTile(x, y))
             self.map.append(row);
         
         for x in range(self.xdim):

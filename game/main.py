@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 
 import game.load as load
-from game.map import TileMap
+from game.map import TileMap, Start, Road
 from game.utils import Text, Button
 
 class Loop:
@@ -21,7 +21,8 @@ class Loop:
             self.events.clear()
             self.requested_cursor = None
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if (event.type == pygame.QUIT
+                or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):
                     self.end_game()
                 self.events.append(event)
 
@@ -67,6 +68,11 @@ class Game(Scene):
         self.image = load.image("zombie.png").convert_alpha()
         
         self.tmap = TileMap(load.image("map.png"))
+        for tile in self.tmap.starts:
+            while type(tile) in (Start,Road):
+                # print (tile)
+                tile = tile.next
+            # print ()
         
     def update(self, loop):
         self.screen.blit(self.image, (900,20))
