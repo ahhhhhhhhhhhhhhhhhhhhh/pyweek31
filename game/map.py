@@ -34,6 +34,9 @@ class Goal(Tile):
     
     # decides path for road tiles
     def __init__(self, tilemap, gx, gy):
+        pass
+    
+    def setnext(self, newnext, tilemap, x, y):
         for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
             tile = tilemap[gx+ox,gy+oy]
             if (type(tile) == Road and tile.next == None):
@@ -63,7 +66,12 @@ class TileMap():
             for y in range(self.ydim):
                 self.map[x][y].render(screen, x, y)
     
-    def __getitem__(self, x, y):
-        return self.map[x][y]
-    
+    def __getitem__(self, tup):
+        print(tup)
+        print(self.map)
+        x,y = tup
+        if x >= 0 and x < self.xdim and y >= 0 and y < self.ydim:
+            return self.map[x][y]
+        else:
+            return None
         
