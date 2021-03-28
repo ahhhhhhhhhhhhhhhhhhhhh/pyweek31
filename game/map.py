@@ -1,36 +1,37 @@
-import game.load as load
 from abc import ABC
+
+import pygame
+
+import game.load as load
 
 # Abstract class fot every thhing on the grid
 class Tile(ABC):
-    scale = 20
-    
     def __init__(self, tilemap, x, y):
         pass
     
     def render(self, screen, x, y):
         if self.image != None:
-            screen.blit(self.image, (x*self.scale, y*self.scale))
+            screen.blit(self.image, (x, y))
 
 class NoTile(Tile):
-    color = (255,255,255);
-    image = None
+    image = pygame.Surface((40,40))
+    image.fill((255,255,255))
 
 class Road(Tile):
-    color = (64,64,64);
-    image = load.image("road.png")
+    image = pygame.Surface((40,40))
+    image.fill((64,64,64))
     
     def __init__(self, tilemap, x, y):
         self.next = None
     
-    #recursiivley sets next pointers for roads
+    #recursively sets next pointers for roads
     def setnext(self, newnext, tilemap, x, y):
         self.next = newnext
-        Goal.setnext(self, newnext, tilemap, x, y)
+        Start.setnext(self, newnext, tilemap, x, y)
 
-class Goal(Tile):
-    color = (255, 0, 0)
-    image = load.image("goal.png")
+class Start(Tile):
+    image = pygame.Surface((40,40))
+    image.fill((255,0,0))
     
     # decides path for road tiles
     def __init__(self, tilemap, gx, gy):
@@ -44,7 +45,12 @@ class Goal(Tile):
                 
 
 class TileMap():
-    tilelib = [NoTile, Road, Goal]
+    tilelib = [NoTile, Road, Start]
+    SCALE = 40
+    colormap = {(255,0,0): Start,
+                (64,64,64): Road,
+                (255,255,255): NoTile}
+    
     def __init__(self, surf):
         self.map = []
         self.xdim = surf.get_width()
@@ -52,19 +58,18 @@ class TileMap():
         for x in range(self.xdim):
             row = []
             for y in range(self.ydim):
-                color = surf.get_at((x,y))
-                for tiletype in self.tilelib:
-                    if tiletype.color == color:
-                        row.append(tiletype(self, x, y));
-                        break;
-                else:
+                color = surf.get_at((x,y))[0:3]
+                try:
+                    row.append(TileMap.colormap[color](self, x, y))
+                except KeyError:
+                    print(f"warning, no tile conversion for color={color}")
                     row.append(NoTile(self, x, y))
             self.map.append(row);
-    
-    def render(self, screen):
+   
+    def render(self, screen, offset=[0,0]):
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].render(screen, x, y)
+                self.map[x][y].render(screen, offset[0]+x*TileMap.SCALE, offset[1]+y*TileMap.SCALE)
     
     def __getitem__(self, tup):
         print(tup)

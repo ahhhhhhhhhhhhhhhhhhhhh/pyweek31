@@ -6,6 +6,7 @@ import pygame.freetype
 import game.load as load
 from game.map import TileMap
 from game.utils import Text, Button
+
 class Loop:
     def __init__(self, screen, scene, scenedict):
         self.scene = scene
@@ -68,15 +69,15 @@ class Game(Scene):
         self.tmap = TileMap(load.image("map.png"))
         
     def update(self, loop):
-        self.screen.blit(self.image, (0,0))
-        self.tmap.render(self.screen)
+        self.screen.blit(self.image, (900,20))
+        self.tmap.render(self.screen, [60,60])
         
 
 class MainMenu(Scene):
     def __init__(self, screen):
         self.screen = screen
-        self.t = Text("hello world", [640, 40], 48, centered=True)
-        self.b = Button("this is a button", [640, 110], 32, centered=True)
+        self.t = Text("John Brawn", [640, 40], 48, centered=True)
+        self.b = Button("Play if you dare...", [640, 110], 32, centered=True)
 
     def update(self, loop):
         self.t.draw(self.screen)
@@ -97,6 +98,3 @@ def main():
     loop = Loop(screen, startscene, scenedict)
     Button.loop = loop
     loop.start()
-
-    
-        
