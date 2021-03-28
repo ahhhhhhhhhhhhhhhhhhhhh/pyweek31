@@ -17,7 +17,7 @@ class Loop:
                     self.end_game()
 
 
-            self.screen.fill((0,0,0))
+            self.screen.fill((0,128,0))
             self.scene.update(self)
             pygame.display.flip()
             self.clock.tick(144)
@@ -47,6 +47,7 @@ class Game(Scene):
 def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
+    pygame.display.set_caption("John Brawn")
 
     game = Game(screen)
     loop = Loop(screen, game)
