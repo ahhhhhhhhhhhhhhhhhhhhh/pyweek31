@@ -4,6 +4,7 @@ import pygame
 import pygame.freetype
 
 import game.load as load
+from game.map import TileMap
 
 class Loop:
     def __init__(self, screen, scene, scenedict):
@@ -51,9 +52,15 @@ class Game(Scene):
     def __init__(self, screen):
         self.screen = screen
         self.image = load.image("zombie.png").convert_alpha()
+        
+        self.tmap = TileMap(load.image("map.png"))
+        
+        
     
     def update(self, loop):
         self.screen.blit(self.image, (0,0))
+        self.tmap.render(self.screen)
+        
 
 pygame.freetype.init()
 font = pygame.freetype.Font(load.handle_path("lora/Lora-Bold.ttf"))
@@ -114,7 +121,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
     pygame.display.set_caption("John Brawn")
-
+    
     game = Game(screen)
     menu = MainMenu(screen)
     scenedict = {"game": game, "menu": menu}

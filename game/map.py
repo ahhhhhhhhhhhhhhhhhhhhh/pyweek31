@@ -1,14 +1,17 @@
-
-def loadimage(path):
-    pass
+import game.load as load
+from abc import ABC
 
 # Abstract class fot every thhing on the grid
 class Tile(ABC):
     scale = 20
-    def __init__(self, map, x, y):
+    
+    def __init__(self, tilemap, x, y):
         pass
+    
     def render(self, screen, x, y):
-        if (self.image):
+        print("gdfg")
+        if self.image != None:
+            print("fyfhgfh")
             screen.blit(self.image, (x*self.scale, y*self.scale))
 
 class NoTile(Tile):
@@ -17,22 +20,30 @@ class NoTile(Tile):
 
 class Road(Tile):
     color = (0,0,0);
-    image = loadimage("images/road.png")
-    def __init__(self, map, x, y):
+    image = load.image("road.png")
+    
+    def __init__(self, tilemap, x, y):
         self.next = None
-
-    def setnext(self, newnext, map, x, y):
-        for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
-            
+    
+    #recursiivley sets next pointers for roads
+    def setnext(self, newnext, tilemap, x, y):
+        self.next = newnext
+        Goal.setnext(self, newnext, tilemap, x, y)
 
 class Goal(Tile):
     color = (255, 255, 0)
-    def __init__(self, map, gx, gy):
-        
+    image = load.image("goal.png")
+    
+    # decides path for road tiles
+    def __init__(self, tilemap, gx, gy):
+        for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
+            tile = tilemap[x+ox,y+oy]
+            if (type(tile) == Road and tile.next == None):
+                tile.setnext(self, tilemap, x+ox, y+oy)
                 
 
 class TileMap():
-    tilelib = [NoTile, Road]
+    tilelib = [NoTile, Road, Goal]
     def __init__(self, surf):
         self.map = []
         self.xdim = surf.get_width()
@@ -41,9 +52,12 @@ class TileMap():
             row = []
             for y in range(self.ydim):
                 color = surf.get_at((x,y))
-                for tiletype in tilelib:
+                for tiletype in self.tilelib:
                     if tiletype.color == color:
-                        row.append(tiletype());
+                        row.append(tiletype(self, x, y));
+                        break;
+                    else:
+                        row.append(NoTile(self, x, y))
             self.map.append(row);
     
     def render(self, screen):
@@ -53,10 +67,5 @@ class TileMap():
     
     def __getitem__(self, x, y):
         return self.map[x][y]
-    
-    def link(self):
-        for x in range(self.xdim):
-            for y in range(self.ydim):
-                pass
     
         
