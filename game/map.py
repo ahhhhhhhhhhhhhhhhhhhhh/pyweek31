@@ -9,9 +9,7 @@ class Tile(ABC):
         pass
     
     def render(self, screen, x, y):
-        print("gdfg")
         if self.image != None:
-            print("fyfhgfh")
             screen.blit(self.image, (x*self.scale, y*self.scale))
 
 class NoTile(Tile):
@@ -19,7 +17,7 @@ class NoTile(Tile):
     image = None
 
 class Road(Tile):
-    color = (0,0,0);
+    color = (64,64,64);
     image = load.image("road.png")
     
     def __init__(self, tilemap, x, y):
@@ -31,13 +29,13 @@ class Road(Tile):
         Goal.setnext(self, newnext, tilemap, x, y)
 
 class Goal(Tile):
-    color = (255, 255, 0)
+    color = (255, 0, 0)
     image = load.image("goal.png")
     
     # decides path for road tiles
     def __init__(self, tilemap, gx, gy):
         for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
-            tile = tilemap[x+ox,y+oy]
+            tile = tilemap[gx+ox,gy+oy]
             if (type(tile) == Road and tile.next == None):
                 tile.setnext(self, tilemap, x+ox, y+oy)
                 
