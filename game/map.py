@@ -12,6 +12,9 @@ class Tile(ABC):
     def render(self, screen, x, y):
         if self.image != None:
             screen.blit(self.image, (x, y))
+    
+    def link(self, tilemap, x, y):
+        pass
 
 class NoTile(Tile):
     image = pygame.Surface((40,40))
@@ -27,27 +30,33 @@ class Road(Tile):
     #recursively sets next pointers for roads
     def setnext(self, newnext, tilemap, x, y):
         self.next = newnext
-        Start.setnext(self, newnext, tilemap, x, y)
+        End.setnext(self, tilemap, x, y)
 
-class Start(Tile):
+class End(Tile):
     image = pygame.Surface((40,40))
     image.fill((255,0,0))
     
     # decides path for road tiles
-    def __init__(self, tilemap, gx, gy):
-        pass
+    def link(self, tilemap, gx, gy):
+        self.setnext(tilemap, gx, gy)
     
-    def setnext(self, newnext, tilemap, x, y):
+    def setnext(self, tilemap, gx, gy):
         for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
             tile = tilemap[gx+ox,gy+oy]
             if (type(tile) == Road and tile.next == None):
-                tile.setnext(self, tilemap, x+ox, y+oy)
-                
+                tile.setnext(self, tilemap, gx+ox, gy+oy)
+
+class Start(Road):
+    image = pygame.Surface((40, 40))
+    image.fill((0,255,0))
+    
+    def setnext(self, newnext, tilemap, x, y):
+        self.next = newnext
 
 class TileMap():
-    tilelib = [NoTile, Road, Start]
     SCALE = 40
     colormap = {(255,0,0): Start,
+                (0,38,255): End,
                 (64,64,64): Road,
                 (255,255,255): NoTile}
     
@@ -65,6 +74,10 @@ class TileMap():
                     print(f"warning, no tile conversion for color={color}")
                     row.append(NoTile(self, x, y))
             self.map.append(row);
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
+                self.map[x][y].link(self, x, y)
    
     def render(self, screen, offset=[0,0]):
         for x in range(self.xdim):
@@ -72,8 +85,6 @@ class TileMap():
                 self.map[x][y].render(screen, offset[0]+x*TileMap.SCALE, offset[1]+y*TileMap.SCALE)
     
     def __getitem__(self, tup):
-        print(tup)
-        print(self.map)
         x,y = tup
         if x >= 0 and x < self.xdim and y >= 0 and y < self.ydim:
             return self.map[x][y]
