@@ -67,8 +67,6 @@ class Game(Scene):
         
         self.tmap = TileMap(load.image("map.png"))
         
-        
-    
     def update(self, loop):
         self.screen.blit(self.image, (0,0))
         self.tmap.render(self.screen)
@@ -91,7 +89,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
     pygame.display.set_caption("John Brawn")
-    
+
     game = Game(screen)
     menu = MainMenu(screen)
     scenedict = {"game": game, "menu": menu}

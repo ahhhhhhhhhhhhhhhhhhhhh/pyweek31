@@ -57,8 +57,8 @@ class TileMap():
                     if tiletype.color == color:
                         row.append(tiletype(self, x, y));
                         break;
-                    else:
-                        row.append(NoTile(self, x, y))
+                else:
+                    row.append(NoTile(self, x, y))
             self.map.append(row);
     
     def render(self, screen):
