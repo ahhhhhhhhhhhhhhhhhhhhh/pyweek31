@@ -34,6 +34,7 @@ class Button(Text):
     def __init__(self, text, location, size=16, color=(255,255,255), centered=False):
         super().__init__(text, location, size, color, centered)
         self.clicked = False
+        self.hovered = False
 
     def draw(self, screen):
         super().draw(screen)
@@ -42,3 +43,9 @@ class Button(Text):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.rect.collidepoint(event.pos):
                     self.clicked = True
+
+        self.hovered = False
+        if self.rect.collidepoint(pygame.mouse.get_pos()):
+            self.hovered = True
+            Button.loop.request_cursor(pygame.SYSTEM_CURSOR_HAND)
+

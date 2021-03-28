@@ -13,10 +13,12 @@ class Loop:
         self.clock = pygame.time.Clock()
         self.scenedict = scenedict
         self.events = []
+        self.requested_cursor = None
 
     def start(self):
         while True:
             self.events.clear()
+            self.requested_cursor = None
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.end_game()
@@ -24,6 +26,7 @@ class Loop:
 
             self.screen.fill((0,128,0))
             self.scene.update(self)
+            self.handle_cursor()
             pygame.display.flip()
             self.clock.tick(144)
 
@@ -40,6 +43,15 @@ class Loop:
 
     def get_events(self):
         return self.events
+
+    def request_cursor(self, cursor):
+        self.requested_cursor = cursor
+
+    def handle_cursor(self):
+        if self.requested_cursor:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             
 class Scene(ABC):
     def __init__(self, screen):
