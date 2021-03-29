@@ -4,7 +4,7 @@ import pygame
 
 import game.load as load
 
-SCALE = 40
+SCALE = 50
 
 # Abstract class fot every thing on the grid
 class Tile(ABC):
@@ -27,7 +27,7 @@ class NoTile(Tile):
     #image.fill((255,255,255))
 
 class Road(Tile):
-    image = pygame.Surface((40,40))
+    image = pygame.Surface((SCALE,SCALE))
     image.fill((64,64,64))
     
     def __init__(self, x, y):
@@ -39,7 +39,7 @@ class Road(Tile):
         End.setnext(self, tilemap, x, y)
 
 class End(Tile):
-    image = pygame.Surface((40,40))
+    image = pygame.Surface((SCALE,SCALE))
     image.fill((0,38,255))
     
     # decides path for road tiles
@@ -53,7 +53,7 @@ class End(Tile):
                 tile.setnext(self, tilemap, gx+ox, gy+oy)
 
 class Start(Road):
-    image = pygame.Surface((40, 40))
+    image = pygame.Surface((SCALE, SCALE))
     image.fill((255,0,0))
     
     def setnext(self, newnext, tilemap, x, y):
@@ -63,7 +63,7 @@ class House(Tile):
     pass
 
 def ready_tiles():
-    House.image = load.image("smallhouse.png")
+    House.image = load.image("smallhouse50.png")
     House.image = pygame.transform.scale(House.image, (SCALE, SCALE))
     House.image = House.image.convert_alpha()
 
