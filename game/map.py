@@ -56,6 +56,14 @@ class Start(Road):
     def setnext(self, newnext, tilemap, x, y):
         self.next = newnext
 
+class NoBlocking(Tile):
+    def render(self, screen, x, y):
+        pass
+
+class Tower(Tile):
+    image = pygame.Surface((10, 10))
+    image.fill((255,0,0))
+
 class TileMap():
     SCALE = 40
     colormap = {(255,0,0): Start,
@@ -81,7 +89,7 @@ class TileMap():
                     row.append(NoTile(x, y))
             self.map.append(row)
 
-
+        self.blocking = [[NoBlocking(x,y) for y in range(self.ydim)] for x in range(self.xdim)]
         
         for x in range(self.xdim):
             for y in range(self.ydim):
@@ -94,6 +102,7 @@ class TileMap():
             for y in range(self.ydim):
                 coords = self.tile_to_screen_coords([x,y])
                 self.map[x][y].render(screen, coords[0], coords[1])
+                self.blocking[x][y].render(screen, coords[0], coords[1])
     
     def __getitem__(self, tup):
         x,y = tup

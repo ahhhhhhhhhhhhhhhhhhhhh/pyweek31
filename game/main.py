@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 
 import game.load as load
-from game.map import TileMap, Start, Road
+from game.map import TileMap, Start, Road, Tower, NoBlocking
 from game.utils import Text, Button
 
 class Loop:
@@ -90,8 +90,15 @@ class Game(Scene):
         if self.mouse_press_start:
             mouse_pos = pygame.mouse.get_pos()
             selected_tile = self.tmap.screen_to_tile_coords(mouse_pos)
-            if selected_tile:
-                print("selected", selected_tile)    
+            
+            if selected_tile and self.can_build(selected_tile):  
+                print("building tower", selected_tile)
+
+                coords = self.tmap.tile_to_screen_coords(selected_tile)
+                self.tmap.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
+
+    def can_build(self, tile):
+        return isinstance(self.tmap.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.tmap.map[tile[0]][tile[1]], Road)
             
         
 
