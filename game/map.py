@@ -68,6 +68,7 @@ class TileMap():
         self.xdim = surf.get_width()
         self.ydim = surf.get_height()
         self.starts = []
+
         for x in range(self.xdim):
             row = []
             for y in range(self.ydim):
@@ -78,16 +79,21 @@ class TileMap():
                 else:
                     print(f"warning, no tile conversion for color={color}")
                     row.append(NoTile(x, y))
-            self.map.append(row);
+            self.map.append(row)
+
+
         
         for x in range(self.xdim):
             for y in range(self.ydim):
                 self.map[x][y].link(self, x, y)
    
     def render(self, screen, offset=[0,0]):
+        self.current_offset = offset
+
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].render(screen, offset[0]+x*TileMap.SCALE, offset[1]+y*TileMap.SCALE)
+                coords = self.tile_to_screen_coords([x,y])
+                self.map[x][y].render(screen, coords[0], coords[1])
     
     def __getitem__(self, tup):
         x,y = tup
@@ -95,4 +101,18 @@ class TileMap():
             return self.map[x][y]
         else:
             return None
+
+    # returns what tile a given screen position is in 
+    def screen_to_tile_coords(self, pos):
+        tile = [(pos[0] - self.current_offset[0]) / self.SCALE, (pos[1] - self.current_offset[1]) / self.SCALE]
+
+        if tile[0] >= 0 and tile[0] < self.xdim and tile[1] >= 0 and tile[1] < self.ydim:
+            return [int(tile[0]), int(tile[1])]
+        else:
+            return False
+
+    # returns top corner pos of tile on the screen for rendering
+    def tile_to_screen_coords(self, tile):
+        return [self.current_offset[0] + tile[0] * self.SCALE, self.current_offset[1] + tile[1] * self.SCALE]
+
         

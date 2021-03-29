@@ -89,11 +89,8 @@ class Game(Scene):
 
         if self.mouse_press_start:
             mouse_pos = pygame.mouse.get_pos()
-            selected_tile = [(mouse_pos[0] - self.tmap_offset[0]) / self.tmap.SCALE, (mouse_pos[1] - self.tmap_offset[1]) / self.tmap.SCALE]
-
-            if selected_tile[0] >= 0 and selected_tile[0] < self.tmap.xdim and selected_tile[1] >= 0 and selected_tile[1] < self.tmap.ydim:
-                selected_tile = [int(selected_tile[0]), int(selected_tile[1])]
-
+            selected_tile = self.tmap.screen_to_tile_coords(mouse_pos)
+            if selected_tile:
                 print("selected", selected_tile)    
             
         
