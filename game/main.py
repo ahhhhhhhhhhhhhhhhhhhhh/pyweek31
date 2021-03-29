@@ -54,6 +54,7 @@ class Loop:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
             
 class Scene(ABC):
     def __init__(self, screen):
@@ -73,10 +74,28 @@ class Game(Scene):
                 # print (tile)
                 tile = tile.next
             # print ()
+
+        self.mouse_pressed = pygame.mouse.get_pressed()[0] # if mouse left button is down this update
+        self.mouse_press_start = False # if mouse left button press started this update
+
+        self.tmap_offset = [60,60]
         
     def update(self, loop):
         self.screen.blit(self.image, (900,20))
-        self.tmap.render(self.screen, [60,60])
+        self.tmap.render(self.screen, self.tmap_offset)
+
+        self.mouse_press_start = pygame.mouse.get_pressed()[0] and not self.mouse_pressed
+        self.mouse_pressed = pygame.mouse.get_pressed()[0]
+
+        if self.mouse_press_start:
+            mouse_pos = pygame.mouse.get_pos()
+            selected_tile = [(mouse_pos[0] - self.tmap_offset[0]) / self.tmap.SCALE, (mouse_pos[1] - self.tmap_offset[1]) / self.tmap.SCALE]
+
+            if selected_tile[0] >= 0 and selected_tile[0] < self.tmap.xdim and selected_tile[1] >= 0 and selected_tile[1] < self.tmap.ydim:
+                selected_tile = [int(selected_tile[0]), int(selected_tile[1])]
+
+                print("selected", selected_tile)    
+            
         
 
 class MainMenu(Scene):

@@ -4,7 +4,7 @@ import pygame
 
 import game.load as load
 
-# Abstract class fot every thhing on the grid
+# Abstract class fot every thing on the grid
 class Tile(ABC):
     #passes in x and y pos
     def __init__(self, x, y):
