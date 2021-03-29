@@ -68,7 +68,6 @@ class Scene(ABC):
 class Game(Scene):
     def __init__(self, screen):
         self.screen = screen
-        self.image = load.image("zombie.png").convert_alpha()
         
         self.tmap = TileMap(load.image("map.png"))
         for tile in self.tmap.starts:
@@ -77,20 +76,10 @@ class Game(Scene):
                 tile = tile.next
             # print ()
 
-        self.mouse_pressed = pygame.mouse.get_pressed()[0] # if mouse left button is down this update
-        self.mouse_press_start = False # if mouse left button press started this update
-
         self.tmap_offset = [60,60]
         
     def update(self, loop):
-        self.screen.blit(self.image, (900,20))
         self.tmap.render(self.screen, self.tmap_offset)
-
-        #self.mouse_press_start = pygame.mouse.get_pressed()[0] and not self.mouse_pressed
-        #self.mouse_pressed = pygame.mouse.get_pressed()[0]
-
-        #if self.mouse_press_start:
-            #mouse_pos = pygame.mouse.get_pos()
 
         for event in loop.get_events():
             if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False):
