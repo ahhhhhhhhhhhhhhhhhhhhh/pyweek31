@@ -89,7 +89,7 @@ class Game(Scene):
         self.tmap.render(self.screen, self.tmap_offset)
 
         for event in loop.get_events():
-            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False):
+            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
                 event.used = True
                 selected_tile = self.tmap.screen_to_tile_coords(event.pos)
                 

@@ -53,7 +53,7 @@ class Button(Text):
         super().draw(screen)
         self.clicked = False
         for event in Button.loop.get_events():
-            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False):
+            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
                 if self.rect.collidepoint(event.pos):
                     self.clicked = True
                     event.used = True
