@@ -17,6 +17,7 @@ class Loop:
         self.scenedict = scenedict
         self.events = []
         self.requested_cursor = None
+        self.fps_text = Text("", [10,10])
 
     def start(self):
         while True:
@@ -29,8 +30,13 @@ class Loop:
                 self.events.append(event)
 
             self.screen.fill((0,128,0))
+
+            # this is where the magic happens
             self.scene.update(self)
             self.handle_cursor()
+            self.fps_text.update_text(str(round(self.clock.get_fps())))
+            self.fps_text.draw(self.screen)
+            
             pygame.display.flip()
             self.clock.tick(144)
 

@@ -21,6 +21,7 @@ class Text:
         self.location = location
         self.image = render_text(text, size, color)[0]
         self.centered = centered
+        self.settings = (size, color)
 
         self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
         if self.centered:
@@ -28,6 +29,13 @@ class Text:
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
+
+    def update_text(self, newtext):
+        self.image = render_text(newtext, *self.settings)[0]
+
+        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
+        if self.centered:
+            self.rect.x = self.location[0] - self.image.get_width() / 2        
 
 
 class Button(Text):
