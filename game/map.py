@@ -63,7 +63,7 @@ class House(Tile):
     pass
 
 def ready_tiles():
-    House.image = load.image("house.png")
+    House.image = load.image("smallhouse.png")
     House.image = pygame.transform.scale(House.image, (SCALE, SCALE))
     House.image = House.image.convert_alpha()
 
