@@ -36,7 +36,11 @@ class Text:
 
         self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
         if self.centered:
-            self.rect.x = self.location[0] - self.image.get_width() / 2        
+            self.rect.x = self.location[0] - self.image.get_width() / 2
+
+    def update_color(self, newcolor):
+        self.settings = (self.settings[0], newcolor)
+        self.update_text(self.text)
 
 
 class Button(Text):

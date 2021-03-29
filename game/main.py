@@ -17,7 +17,7 @@ class Loop:
         self.events = []
         self.requested_cursor = None
         self.ticktime = 0
-        self.fps_text = Text("", [10,10])
+        self.fps_text = Text("", [10,10], color=(0,0,0))
 
     def start(self):
         while True:
@@ -106,23 +106,33 @@ class Game(Scene):
 class MainMenu(Scene):
     def __init__(self, screen):
         self.screen = screen
-        self.t = Text("John Brawn", [640, 40], 48, centered=True)
-        self.b = Button("Play if you dare...", [640, 110], 32, centered=True)
+        self.t = Text("John Brawn", [840, 40], 64, centered=True)
+        self.b = Button("[Play if you dare...]", [840, 130], 32, centered=True)
+        self.b.washovered = False
 
         self.zombie = load.image("zombie.png").convert_alpha()
+        self.officer = load.image("officer.png").convert_alpha()
+        self.house = load.image("house.png").convert_alpha()
         self.i = 0
 
     def update(self, loop):
+        self.i += 1.5 * loop.get_ticktime()
+        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        self.screen.blit(self.house, [-240,-270])
+        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+
         self.t.draw(self.screen)
         self.b.draw(self.screen)
 
-        self.i += 1.5 * loop.get_ticktime()
-        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
-        self.screen.blit(rotated, rotated.get_rect(center=(300,200)))
-        self.screen.blit(rotated, rotated.get_rect(center=(980,200)))
-
         if self.b.clicked:
             loop.switch_scene("game")
+
+        if self.b.hovered:
+            self.b.update_color((128,255,0))
+            self.b.washovered = True
+        elif self.b.washovered:
+            self.b.update_color((255,255,255))
 
         
 def main():
