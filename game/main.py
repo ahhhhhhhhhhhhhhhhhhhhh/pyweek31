@@ -117,6 +117,7 @@ class MainMenu(Scene):
         
 def main():
     pygame.init()
+    pygame.mixer.init(buffer=512)
     screen = pygame.display.set_mode([1280, 720])
     pygame.display.set_caption("John Brawn")
     ready_tiles()
