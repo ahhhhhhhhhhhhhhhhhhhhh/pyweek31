@@ -3,6 +3,8 @@ from abc import ABC
 import pygame
 import pygame.freetype
 
+import math
+
 import game.load as load
 from game.map import TileMap, Start, Road, Tower, NoBlocking, ready_tiles
 from game.utils import Text, Button
@@ -108,12 +110,21 @@ class MainMenu(Scene):
         self.t = Text("John Brawn", [640, 40], 48, centered=True)
         self.b = Button("Play if you dare...", [640, 110], 32, centered=True)
 
+        self.zombie = load.image("zombie.png").convert_alpha()
+        self.i = 0
+
     def update(self, loop):
         self.t.draw(self.screen)
         self.b.draw(self.screen)
 
+        self.i += 0.01
+        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        self.screen.blit(rotated, (200,50))
+        self.screen.blit(rotated, (800,50))
+
         if self.b.clicked:
             loop.switch_scene("game")
+
         
 def main():
     pygame.init()
