@@ -84,24 +84,27 @@ class Game(Scene):
         self.screen.blit(self.image, (900,20))
         self.tmap.render(self.screen, self.tmap_offset)
 
-        self.mouse_press_start = pygame.mouse.get_pressed()[0] and not self.mouse_pressed
-        self.mouse_pressed = pygame.mouse.get_pressed()[0]
+        #self.mouse_press_start = pygame.mouse.get_pressed()[0] and not self.mouse_pressed
+        #self.mouse_pressed = pygame.mouse.get_pressed()[0]
 
-        if self.mouse_press_start:
-            mouse_pos = pygame.mouse.get_pos()
-            selected_tile = self.tmap.screen_to_tile_coords(mouse_pos)
-            
-            if selected_tile and self.can_build(selected_tile):  
-                print("building tower", selected_tile)
+        #if self.mouse_press_start:
+            #mouse_pos = pygame.mouse.get_pos()
 
-                coords = self.tmap.tile_to_screen_coords(selected_tile)
-                self.tmap.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
+        for event in loop.get_events():
+            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False):
+                event.used = True
+                selected_tile = self.tmap.screen_to_tile_coords(event.pos)
+                
+                if selected_tile and self.can_build(selected_tile):  
+                    print("building tower", selected_tile)
+
+                    coords = self.tmap.tile_to_screen_coords(selected_tile)
+                    self.tmap.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
 
     def can_build(self, tile):
         return isinstance(self.tmap.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.tmap.map[tile[0]][tile[1]], Road)
-            
-        
 
+            
 class MainMenu(Scene):
     def __init__(self, screen):
         self.screen = screen
