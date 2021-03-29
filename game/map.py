@@ -1,4 +1,6 @@
 from abc import ABC
+import random
+random.seed(10)
 
 import pygame
 
@@ -60,10 +62,12 @@ class Start(Road):
 class House(Tile):
     pass
 
+class HouseVariant1(House):
+    pass
+
 def ready_tiles():
-    House.image = load.image("smallhouse50.png")
-    House.image = pygame.transform.scale(House.image, (SCALE, SCALE))
-    House.image = House.image.convert_alpha()
+    House.image = load.image("smallhouse50.png").convert_alpha()
+    HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
 
 class NoBlocking(Tile):
     def render(self, screen, x, y):
@@ -74,11 +78,15 @@ class Tower(Tile):
     image.fill((255,0,0))
 
 class TileMap():
-    colormap = {(255,0,0): Start,
-                (0,38,255): End,
-                (64,64,64): Road,
-                (255,255,255): NoTile,
-                (0, 127, 70): House}
+    colormap = {(255,0,0): [Start],
+                (0,38,255): [End],
+                (64,64,64): [Road],
+                (255,255,255): [NoTile],
+                (0, 127, 70): [House, HouseVariant1]}
+
+    def _tile_from_color(self, color):
+        ret = TileMap.colormap[color]
+        return random.choice(ret)
     
     def __init__(self, surf):
         self.map = []
@@ -91,7 +99,7 @@ class TileMap():
             for y in range(self.ydim):
                 color = surf.get_at((x,y))[0:3]
                 if color in self.colormap:
-                    row.append(TileMap.colormap[color](x, y))
+                    row.append(self._tile_from_color(color)(x, y))
                     if (type(row[-1]) == Start): self.starts.append(row[-1])
                 else:
                     print(f"warning, no tile conversion for color={color}")
