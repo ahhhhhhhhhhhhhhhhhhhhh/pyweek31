@@ -4,6 +4,8 @@ import pygame
 
 import game.load as load
 
+SCALE = 40
+
 # Abstract class fot every thing on the grid
 class Tile(ABC):
     #passes in x and y pos
@@ -20,8 +22,9 @@ class Tile(ABC):
         pass
 
 class NoTile(Tile):
-    image = pygame.Surface((40,40))
-    image.fill((255,255,255))
+    image = None
+    #image = pygame.Surface((40,40))
+    #image.fill((255,255,255))
 
 class Road(Tile):
     image = pygame.Surface((40,40))
@@ -37,7 +40,7 @@ class Road(Tile):
 
 class End(Tile):
     image = pygame.Surface((40,40))
-    image.fill((255,0,0))
+    image.fill((0,38,255))
     
     # decides path for road tiles
     def link(self, tilemap, gx, gy):
@@ -51,10 +54,18 @@ class End(Tile):
 
 class Start(Road):
     image = pygame.Surface((40, 40))
-    image.fill((0,255,0))
+    image.fill((255,0,0))
     
     def setnext(self, newnext, tilemap, x, y):
         self.next = newnext
+
+class House(Tile):
+    pass
+
+def ready_tiles():
+    House.image = load.image("house.png")
+    House.image = pygame.transform.scale(House.image, (SCALE, SCALE))
+    House.image = House.image.convert_alpha()
 
 class NoBlocking(Tile):
     def render(self, screen, x, y):
@@ -65,11 +76,11 @@ class Tower(Tile):
     image.fill((255,0,0))
 
 class TileMap():
-    SCALE = 40
     colormap = {(255,0,0): Start,
                 (0,38,255): End,
                 (64,64,64): Road,
-                (255,255,255): NoTile}
+                (255,255,255): NoTile,
+                (0, 127, 70): House}
     
     def __init__(self, surf):
         self.map = []
@@ -113,7 +124,7 @@ class TileMap():
 
     # returns what tile a given screen position is in 
     def screen_to_tile_coords(self, pos):
-        tile = [(pos[0] - self.current_offset[0]) / self.SCALE, (pos[1] - self.current_offset[1]) / self.SCALE]
+        tile = [(pos[0] - self.current_offset[0]) / SCALE, (pos[1] - self.current_offset[1]) / SCALE]
 
         if tile[0] >= 0 and tile[0] < self.xdim and tile[1] >= 0 and tile[1] < self.ydim:
             return [int(tile[0]), int(tile[1])]
@@ -122,6 +133,6 @@ class TileMap():
 
     # returns top corner pos of tile on the screen for rendering
     def tile_to_screen_coords(self, tile):
-        return [self.current_offset[0] + tile[0] * self.SCALE, self.current_offset[1] + tile[1] * self.SCALE]
+        return [self.current_offset[0] + tile[0] * SCALE, self.current_offset[1] + tile[1] * SCALE]
 
         

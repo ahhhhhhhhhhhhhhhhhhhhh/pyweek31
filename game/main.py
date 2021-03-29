@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 
 import game.load as load
-from game.map import TileMap, Start, Road, Tower, NoBlocking
+from game.map import TileMap, Start, Road, Tower, NoBlocking, ready_tiles
 from game.utils import Text, Button
 
 class Loop:
@@ -119,6 +119,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
     pygame.display.set_caption("John Brawn")
+    ready_tiles()
 
     game = Game(screen)
     menu = MainMenu(screen)
