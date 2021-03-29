@@ -1,7 +1,6 @@
 from abc import ABC
 
 import pygame
-import pygame.freetype
 
 import math
 
@@ -17,6 +16,7 @@ class Loop:
         self.scenedict = scenedict
         self.events = []
         self.requested_cursor = None
+        self.ticktime = 0
         self.fps_text = Text("", [10,10])
 
     def start(self):
@@ -38,7 +38,7 @@ class Loop:
             self.fps_text.draw(self.screen)
             
             pygame.display.flip()
-            self.clock.tick(144)
+            self.ticktime = self.clock.tick(144) / 1000
 
     def switch_scene(self, new_scene):
         # new_scene is a Scene subclass or a string key
@@ -63,6 +63,9 @@ class Loop:
         else:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
+    def get_ticktime(self):
+        return self.ticktime
+
             
 class Scene(ABC):
     def __init__(self, screen):
@@ -78,9 +81,7 @@ class Game(Scene):
         self.tmap = TileMap(load.image("map.png"))
         for tile in self.tmap.starts:
             while type(tile) in (Start,Road):
-                # print (tile)
                 tile = tile.next
-            # print ()
 
         self.tmap_offset = [60,60]
         
@@ -115,10 +116,10 @@ class MainMenu(Scene):
         self.t.draw(self.screen)
         self.b.draw(self.screen)
 
-        self.i += 0.01
+        self.i += 1.5 * loop.get_ticktime()
         rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
-        self.screen.blit(rotated, (200,50))
-        self.screen.blit(rotated, (800,50))
+        self.screen.blit(rotated, rotated.get_rect(center=(300,200)))
+        self.screen.blit(rotated, rotated.get_rect(center=(980,200)))
 
         if self.b.clicked:
             loop.switch_scene("game")

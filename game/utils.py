@@ -1,4 +1,5 @@
 import pygame
+import pygame.freetype
 
 import game.load as load
 
