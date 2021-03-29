@@ -16,7 +16,3 @@ def image(filepath):
 def sound(filepath):
     filepath = handle_path(filepath)
     return pygame.mixer.Sound(filepath)
-
-def music(filepath):
-    filepath = handle_path(filepath)
-    return pygame.mixer.music.load(filepath)
