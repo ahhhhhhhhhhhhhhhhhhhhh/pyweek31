@@ -5,7 +5,7 @@ import pygame
 import math
 
 import game.load as load
-from game.map import TileMap, Start, Road, Tower, NoBlocking, ready_tiles
+from game.map import TileMap, Start, Road, ready_tiles
 from game.utils import Text, Button
 
 class Loop:
@@ -74,11 +74,14 @@ class Scene(ABC):
     def update(self, loop):
         pass
 
+
 class Game(Scene):
     def __init__(self, screen):
         self.screen = screen
         
         self.tmap = TileMap(load.image("map.png"))
+
+        #should this be the tilemap itself?
         for tile in self.tmap.starts:
             while type(tile) in (Start,Road):
                 tile = tile.next
@@ -87,20 +90,6 @@ class Game(Scene):
         
     def update(self, loop):
         self.tmap.render(self.screen, self.tmap_offset)
-
-        for event in loop.get_events():
-            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                event.used = True
-                selected_tile = self.tmap.screen_to_tile_coords(event.pos)
-                
-                if selected_tile and self.can_build(selected_tile):  
-                    print("building tower", selected_tile)
-
-                    coords = self.tmap.tile_to_screen_coords(selected_tile)
-                    self.tmap.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
-
-    def can_build(self, tile):
-        return isinstance(self.tmap.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.tmap.map[tile[0]][tile[1]], Road)
 
             
 class MainMenu(Scene):
@@ -147,5 +136,9 @@ def main():
     scenedict = {"game": game, "menu": menu}
     startscene = menu # switch around for debugging, default is "menu"
     loop = Loop(screen, startscene, scenedict)
+
+    # populate "need to know" classes with loop reference
     Button.loop = loop
+    TileMap.loop = loop
+    
     loop.start()

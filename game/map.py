@@ -23,8 +23,6 @@ class Tile(ABC):
 
 class NoTile(Tile):
     image = None
-    #image = pygame.Surface((40,40))
-    #image.fill((255,255,255))
 
 class Road(Tile):
     image = pygame.Surface((SCALE,SCALE))
@@ -105,6 +103,14 @@ class TileMap():
         for x in range(self.xdim):
             for y in range(self.ydim):
                 self.map[x][y].link(self, x, y)
+
+
+        self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
+        self.selector_open.fill((0,0,255))
+        self.selector_open.set_alpha(128)
+        self.selector_closed = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
+        self.selector_closed.fill((255,0,0))
+        self.selector_closed.set_alpha(128)
    
     def render(self, screen, offset=[0,0]):
         self.current_offset = offset
@@ -114,6 +120,24 @@ class TileMap():
                 coords = self.tile_to_screen_coords([x,y])
                 self.map[x][y].render(screen, coords[0], coords[1])
                 self.blocking[x][y].render(screen, coords[0], coords[1])
+
+        selected_tile = self.screen_to_tile_coords(pygame.mouse.get_pos())
+        if selected_tile:
+            coords = self.tile_to_screen_coords(selected_tile)
+            canbuild = self.can_build(selected_tile)
+
+            if canbuild:
+                screen.blit(self.selector_open, coords)
+            else:
+                screen.blit(self.selector_closed, coords)
+            
+            for event in TileMap.loop.get_events():
+                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
+                    event.used = True
+                    
+                    if canbuild:  
+                        print("building tower", selected_tile)
+                        self.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
     
     def __getitem__(self, tup):
         x,y = tup
@@ -135,4 +159,6 @@ class TileMap():
     def tile_to_screen_coords(self, tile):
         return [self.current_offset[0] + tile[0] * SCALE, self.current_offset[1] + tile[1] * SCALE]
 
+    def can_build(self, tile):
+        return isinstance(self.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.map[tile[0]][tile[1]], Road)
         
