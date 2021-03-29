@@ -79,7 +79,7 @@ class Game(Scene):
     def __init__(self, screen):
         self.screen = screen
         
-        self.tmap = TileMap(load.image("map.png"))
+        self.tmap = TileMap(load.image("map1_bg.png"), load.image("map1_blocking.png"))
 
         #should this be the tilemap itself?
         for tile in self.tmap.starts:

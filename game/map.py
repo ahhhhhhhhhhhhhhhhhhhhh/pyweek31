@@ -88,12 +88,28 @@ class TileMap():
         ret = TileMap.colormap[color]
         return random.choice(ret)
     
-    def __init__(self, surf):
+    def __init__(self, map_surf, blocking_surf):
         self.map = []
-        self.xdim = surf.get_width()
-        self.ydim = surf.get_height()
+        self.blocking = []
+        self.xdim = map_surf.get_width()
+        self.ydim = map_surf.get_height()
         self.starts = []
 
+        self.build_map(self.map, map_surf, NoTile)
+        self.build_map(self.blocking, blocking_surf, NoBlocking)
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
+                self.map[x][y].link(self, x, y)
+
+        self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
+        self.selector_open.fill((0,0,255))
+        self.selector_open.set_alpha(128)
+        self.selector_closed = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
+        self.selector_closed.fill((255,0,0))
+        self.selector_closed.set_alpha(128)
+
+    def build_map(self, map, surf, default_tile):
         for x in range(self.xdim):
             row = []
             for y in range(self.ydim):
@@ -103,22 +119,8 @@ class TileMap():
                     if (type(row[-1]) == Start): self.starts.append(row[-1])
                 else:
                     print(f"warning, no tile conversion for color={color}")
-                    row.append(NoTile(x, y))
-            self.map.append(row)
-
-        self.blocking = [[NoBlocking(x,y) for y in range(self.ydim)] for x in range(self.xdim)]
-        
-        for x in range(self.xdim):
-            for y in range(self.ydim):
-                self.map[x][y].link(self, x, y)
-
-
-        self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
-        self.selector_open.fill((0,0,255))
-        self.selector_open.set_alpha(128)
-        self.selector_closed = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
-        self.selector_closed.fill((255,0,0))
-        self.selector_closed.set_alpha(128)
+                    row.append(default_tile(x, y))
+            map.append(row)
    
     def render(self, screen, offset=[0,0]):
         self.current_offset = offset
