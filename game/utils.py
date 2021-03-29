@@ -62,4 +62,3 @@ class Button(Text):
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             self.hovered = True
             Button.loop.request_cursor(pygame.SYSTEM_CURSOR_HAND)
-

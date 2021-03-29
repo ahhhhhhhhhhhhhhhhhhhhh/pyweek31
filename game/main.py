@@ -98,6 +98,8 @@ class MainMenu(Scene):
         self.t = Text("John Brawn", [840, 40], 64, centered=True)
         self.b = Button("[Play if you dare...]", [840, 130], 32, centered=True)
         self.b.washovered = False
+        self.sb = Button("Settings", [840, 190], 32, centered=True)
+        self.sb.washovered = False
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -113,6 +115,7 @@ class MainMenu(Scene):
 
         self.t.draw(self.screen)
         self.b.draw(self.screen)
+        self.sb.draw(self.screen)
 
         if self.b.clicked:
             loop.switch_scene("game")
@@ -122,6 +125,34 @@ class MainMenu(Scene):
             self.b.washovered = True
         elif self.b.washovered:
             self.b.update_color((255,255,255))
+        
+        if self.sb.clicked:
+            loop.switch_scene("settings")
+
+        if self.sb.hovered:
+            self.sb.update_color((128,255,0))
+            self.sb.washovered = True
+        elif self.sb.washovered:
+            self.sb.update_color((255,255,255))
+
+class Settings(Scene):
+    def __init__(self, screen):
+        self.screen = screen
+        self.t = Text("Settings", [840, 40], 64, centered=True)
+
+        self.zombie = load.image("zombie.png").convert_alpha()
+        self.officer = load.image("officer.png").convert_alpha()
+        self.house = load.image("house.png").convert_alpha()
+        self.i = 0
+
+    def update(self, loop):
+        self.i += 1.5 * loop.get_ticktime()
+        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        self.screen.blit(self.house, [-240,-270])
+        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+
+        self.t.draw(self.screen)
 
         
 def main():
@@ -133,7 +164,8 @@ def main():
 
     game = Game(screen)
     menu = MainMenu(screen)
-    scenedict = {"game": game, "menu": menu}
+    settings = Settings(screen)
+    scenedict = {"game": game, "menu": menu, "settings": settings}
     startscene = menu # switch around for debugging, default is "menu"
     loop = Loop(screen, startscene, scenedict)
 
