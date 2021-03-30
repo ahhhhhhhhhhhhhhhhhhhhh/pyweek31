@@ -3,11 +3,13 @@ from abc import ABC
 import pygame
 
 import math
+import random
 
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles
 from game.utils import Text, Button
 from game.sound import SoundManager
+import game.entity as entity
 
 class Loop:
     def __init__(self, screen, scene, scenedict, soundManager):
@@ -86,15 +88,31 @@ class Game(Scene):
         
         self.tmap = TileMap(load.image("map1_bg.png"), load.image("map1_blocking.png"))
 
-        #should this be the tilemap itself?
-        for tile in self.tmap.starts:
-            while type(tile) in (Start,Road):
-                tile = tile.next
-
         self.tmap_offset = [60,60]
-        
+        self.zombies = []
+        self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+        self.lasttime = pygame.time.get_ticks()
+    
     def update(self, loop):
+        newtime = pygame.time.get_ticks()
+        deltatime = (newtime - self.lasttime) / 1000
+        if deltatime > 0.1:
+            deltatime = 0.1
+        self.lasttime = newtime
+        
+        if random.randint(0,100) == 0:
+            self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
         self.tmap.render(self.screen, self.tmap_offset)
+        
+        todel = []
+        for zombie in self.zombies:
+            zombie.timestep(deltatime)
+            zombie.render(self.screen, self.tmap_offset)
+            if zombie.tile == None:
+                todel.append(zombie)
+        
+        for zombie in todel:
+            self.zombies.remove(zombie)
 
             
 class MainMenu(Scene):

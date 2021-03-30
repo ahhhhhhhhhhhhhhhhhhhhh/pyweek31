@@ -31,6 +31,7 @@ class Road(Tile):
     image.fill((64,64,64))
     
     def __init__(self, x, y):
+        super().__init__(x, y)
         self.next = None
     
     #recursively sets next pointers for roads
@@ -145,7 +146,7 @@ class TileMap():
                 if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
                     event.used = True
                     
-                    if canbuild:  
+                    if canbuild:
                         print("building tower", selected_tile)
                         self.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
     
@@ -156,7 +157,7 @@ class TileMap():
         else:
             return None
 
-    # returns what tile a given screen position is in 
+    # returns what tile a given screen position is in
     def screen_to_tile_coords(self, pos):
         tile = [(pos[0] - self.current_offset[0]) / SCALE, (pos[1] - self.current_offset[1]) / SCALE]
 
