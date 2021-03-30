@@ -44,6 +44,7 @@ class Loop:
             
             pygame.display.flip()
             self.ticktime = self.clock.tick(144) / 1000
+            self.ticktime = min(self.ticktime, 0.1)
 
     def switch_scene(self, new_scene):
         # new_scene is a Scene subclass or a string key
