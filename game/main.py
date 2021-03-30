@@ -7,11 +7,11 @@ import math
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles
 from game.utils import Text, Button
-from game.sound import SoundManager
+from game.sound import MusicManager
 
 class Loop:
-    def __init__(self, screen, scene, scenedict, soundManager):
-        self.soundManager = soundManager
+    def __init__(self, screen, scene, scenedict, musicManager):
+        self.musicManager = musicManager
         self.scene = scene
         self.screen = screen
         self.clock = pygame.time.Clock()
@@ -35,7 +35,7 @@ class Loop:
 
             # this is where the magic happens
             self.scene.update(self)
-            self.soundManager.update(self)
+            self.musicManager.update(self)
 
             self.handle_cursor()
             self.fps_text.update_text(str(round(self.clock.get_fps())))
@@ -174,8 +174,8 @@ def main():
     settings = Settings(screen)
     scenedict = {"game": game, "menu": menu, "settings": settings}
     startscene = menu # switch around for debugging, default is "menu"
-    soundManager = SoundManager(startscene.id)
-    loop = Loop(screen, startscene, scenedict, soundManager)
+    musicManager = MusicManager(startscene.id)
+    loop = Loop(screen, startscene, scenedict, musicManager)
 
     # populate "need to know" classes with loop reference
     Button.loop = loop
