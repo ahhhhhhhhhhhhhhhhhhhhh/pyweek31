@@ -12,7 +12,7 @@ SCALE = 50
 class Tile(ABC):
     #passes in x and y pos
     def __init__(self, x, y):
-        pass
+        self.x, self.y = x, y
     
     #renders at screen pos (Not tile grid pos)
     def render(self, screen, x, y):
@@ -171,4 +171,4 @@ class TileMap():
 
     def can_build(self, tile):
         return isinstance(self.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.map[tile[0]][tile[1]], Road)
-        
+   
