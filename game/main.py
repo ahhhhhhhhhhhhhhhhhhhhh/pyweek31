@@ -91,14 +91,9 @@ class Game(Scene):
         self.tmap_offset = [60,60]
         self.zombies = []
         self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
-        self.lasttime = pygame.time.get_ticks()
     
     def update(self, loop):
-        newtime = pygame.time.get_ticks()
-        deltatime = (newtime - self.lasttime) / 1000
-        if deltatime > 0.1:
-            deltatime = 0.1
-        self.lasttime = newtime
+        deltatime = loop.get_ticktime()
         
         if random.randint(0,100) == 0:
             self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
