@@ -26,9 +26,37 @@ class Tile(ABC):
 class NoTile(Tile):
     image = None
 
-class Road(Tile):
-    image = pygame.Surface((SCALE,SCALE))
-    image.fill((64,64,64))
+# This class connects same tiles together
+# the images class constant should set a list of all possible connections
+# in the order:   -, '-, ---, -'-, -|-
+class Touching(Tile):
+    touchgroup = None
+    def link(self, tilemap, gx, gy):
+        dirs = []
+        for ox,oy in [(1,0),(0,-1),(-1,0),(0,1)]:
+            tile = tilemap[gx+ox,gy+oy]
+            issame = (not self.touchgroup and type(tile) == type(self)) or type(tile) in self.touchgroup
+            dirs.append('1' if issame else '0')
+        
+        for rot in range(4):
+            strdir = ''.join(dirs[rot:]) + ''.join(dirs[:rot])
+            
+            num = int(strdir[::-1], 2)
+            if num in (1,3,5,7,15):
+                img = self.images[(1,3,5,7,15).index(num)]
+                self.image = pygame.transform.rotate(img, 90*rot)
+                return
+
+class Road(Touching):
+    # image = pygame.Surface((SCALE,SCALE))
+    # image.fill((64,64,64))
+    images = [
+        load.image("road01.png"),
+        load.image("road03.png"),
+        load.image("road05.png"),
+        load.image("road07.png"),
+        load.image("road15.png"),
+    ]
     
     def __init__(self, x, y):
         super().__init__(x, y)
@@ -43,6 +71,7 @@ class End(Tile):
     image = pygame.Surface((SCALE,SCALE))
     image.fill((0,38,255))
     
+    
     # decides path for road tiles
     def link(self, tilemap, gx, gy):
         self.setnext(tilemap, gx, gy)
@@ -56,6 +85,7 @@ class End(Tile):
 class Start(Road):
     image = pygame.Surface((SCALE, SCALE))
     image.fill((255,0,0))
+    touchgroup = []
     
     def setnext(self, newnext, tilemap, x, y):
         self.next = newnext
@@ -65,6 +95,9 @@ class House(Tile):
 
 class HouseVariant1(House):
     pass
+
+
+Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
     pass
@@ -115,7 +148,7 @@ class TileMap():
                 color = surf.get_at((x,y))[0:3]
                 row.append(self._tile_from_color(color)(x, y))
                 if (type(row[-1]) == Start):
-                    self.starts.append(row[-1])      
+                    self.starts.append(row[-1])
             map.append(row)
    
     def render(self, screen, offset=[0,0]):
