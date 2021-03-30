@@ -7,9 +7,11 @@ import math
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles
 from game.utils import Text, Button
+from game.sound import SoundManager
 
 class Loop:
-    def __init__(self, screen, scene, scenedict):
+    def __init__(self, screen, scene, scenedict, soundManager):
+        self.soundManager = soundManager
         self.scene = scene
         self.screen = screen
         self.clock = pygame.time.Clock()
@@ -33,6 +35,8 @@ class Loop:
 
             # this is where the magic happens
             self.scene.update(self)
+            self.soundManager.update(self)
+
             self.handle_cursor()
             self.fps_text.update_text(str(round(self.clock.get_fps())))
             self.fps_text.draw(self.screen)
@@ -77,6 +81,7 @@ class Scene(ABC):
 
 class Game(Scene):
     def __init__(self, screen):
+        self.id = "game"
         self.screen = screen
         
         self.tmap = TileMap(load.image("map1_bg.png"), load.image("map1_blocking.png"))
@@ -94,6 +99,7 @@ class Game(Scene):
             
 class MainMenu(Scene):
     def __init__(self, screen):
+        self.id = "menu"
         self.screen = screen
         self.t = Text("John Brawn", [840, 40], 64, centered=True)
         self.b = Button("[Play if you dare...]", [840, 130], 32, centered=True)
@@ -137,6 +143,7 @@ class MainMenu(Scene):
 
 class Settings(Scene):
     def __init__(self, screen):
+        self.id = "settings"
         self.screen = screen
         self.t = Text("Settings", [840, 40], 64, centered=True)
 
@@ -167,7 +174,8 @@ def main():
     settings = Settings(screen)
     scenedict = {"game": game, "menu": menu, "settings": settings}
     startscene = menu # switch around for debugging, default is "menu"
-    loop = Loop(screen, startscene, scenedict)
+    soundManager = SoundManager(startscene.id)
+    loop = Loop(screen, startscene, scenedict, soundManager)
 
     # populate "need to know" classes with loop reference
     Button.loop = loop
