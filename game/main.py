@@ -1,13 +1,14 @@
 from abc import ABC
+import math
+import random
 
 import pygame
 
-import math
-
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles
+from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
 from game.utils import Text, Button
 from game.sound import MusicManager
+import game.entity as entity
 
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
@@ -43,6 +44,7 @@ class Loop:
             
             pygame.display.flip()
             self.ticktime = self.clock.tick(144) / 1000
+            self.ticktime = min(self.ticktime, 0.1)
 
     def switch_scene(self, new_scene):
         # new_scene is a Scene subclass or a string key
@@ -84,18 +86,115 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
         
-        self.tmap = TileMap(load.image("map1_bg.png"), load.image("map1_blocking.png"))
-
-        #should this be the tilemap itself?
-        for tile in self.tmap.starts:
-            while type(tile) in (Start,Road):
-                tile = tile.next
+        self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
+        self.waves = entity.Waves("maps/map1_waves.txt")
 
         self.tmap_offset = [60,60]
-        
+        self.zombies = []
+        self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+
+        self.lives = 50
+        self.display_lives = Text("", [1100, 20], size=32)
+
+        self.towers = []
+        self.projectiles = []
+
+        self.selected_towertype = Tower
+        self.tower_button = Button("Build Basic Tower", [100, 600], 20)
+        self.fast_tower_button = Button("Build Fast Tower", [100, 650], 20)
+    
     def update(self, loop):
+        deltatime = loop.get_ticktime()
+        
+        # spawning zombies
+        if random.randint(0,100) in range(1,5):
+            self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
         self.tmap.render(self.screen, self.tmap_offset)
 
+        # updating lives text
+        self.display_lives.update_text("Lives: " + str(self.lives))
+        self.display_lives.draw(self.screen)
+
+        # updating tower buying buttons
+        self.tower_button.draw(self.screen)
+        self.fast_tower_button.draw(self.screen)
+
+        if self.tower_button.clicked:
+            self.selected_towertype = Tower
+        elif self.fast_tower_button.clicked:
+            self.selected_towertype = FastTower
+
+        # building towers
+        selected_tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
+        if selected_tile:
+            coords = self.tmap.tile_to_screen_coords(selected_tile)
+            canbuild = self.tmap.can_build(selected_tile)
+
+            if canbuild:
+                self.screen.blit(self.tmap.selector_open, coords)
+            else:
+                self.screen.blit(self.tmap.selector_closed, coords)
+            
+            for event in TileMap.loop.get_events():
+                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
+                    event.used = True
+                    
+                    if canbuild:
+                        print("building tower", selected_tile)
+                        new_tower = self.selected_towertype(coords[0], coords[1])
+                        self.tmap.blocking[selected_tile[0]][selected_tile[1]] = new_tower
+                        self.towers.append(new_tower)
+
+        # updating zombies and deleting zombies that reach end
+        to_del = []
+        for zombie in self.zombies:
+            zombie.timestep(deltatime)
+            zombie.render(self.screen, self.tmap_offset)
+            if zombie.tile == None:
+                to_del.append(zombie)
+                self.lives -= 1
+        for zombie in to_del:
+            self.zombies.remove(zombie)
+
+        # updating towers
+        for tower in self.towers:
+            tower_pos = tower.center_pos()
+            pygame.draw.circle(self.screen, (255,255,255), tower_pos, tower.max_range, width=1)
+            
+
+            if not tower.update(deltatime):
+                continue
+
+            in_range = []
+            for z in self.zombies:
+                z_pos = z.center_pos()
+                dist = math.sqrt((z_pos[0] - tower_pos[0]) ** 2 + (z_pos[1] - tower_pos[1]) ** 2)
+                if dist <= tower.max_range:
+                    in_range.append(z)
+
+            if len(in_range) == 0:
+                continue
+
+            # targets zombie closest to end
+            target = min(in_range, key=lambda z: z.dist())
+
+            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
+            tower.fire()
+            target.hit(tower.damage)
+            if target.is_dead():
+                self.zombies.remove(target)
+
+        # updating projectiles
+        to_del = []
+        for p in self.projectiles:
+            p.timestep(deltatime)
+            p.render(self.screen)
+            if p.is_done():
+                to_del.append(p)
+        for p in to_del:
+            self.projectiles.remove(p)
+            
+        
             
 class MainMenu(Scene):
     def __init__(self, screen):
