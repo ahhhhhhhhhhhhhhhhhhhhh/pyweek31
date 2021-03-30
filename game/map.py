@@ -100,7 +100,18 @@ class HouseVariant1(House):
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
-    pass
+    damage = 100
+    max_range = 200
+    fire_speed = 2
+
+    timer = 0
+
+    def update(self, deltatime):
+        self.timer -= deltatime
+        return timer < 0
+
+    def fire(self):
+        timer = fire_speed
 
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
@@ -159,24 +170,6 @@ class TileMap():
                 coords = self.tile_to_screen_coords([x,y])
                 self.map[x][y].render(screen, coords[0], coords[1])
                 self.blocking[x][y].render(screen, coords[0], coords[1])
-
-        selected_tile = self.screen_to_tile_coords(pygame.mouse.get_pos())
-        if selected_tile:
-            coords = self.tile_to_screen_coords(selected_tile)
-            canbuild = self.can_build(selected_tile)
-
-            if canbuild:
-                screen.blit(self.selector_open, coords)
-            else:
-                screen.blit(self.selector_closed, coords)
-            
-            for event in TileMap.loop.get_events():
-                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                    event.used = True
-                    
-                    if canbuild:
-                        print("building tower", selected_tile)
-                        self.blocking[selected_tile[0]][selected_tile[1]] = Tower(coords[0], coords[1])
     
     def __getitem__(self, tup):
         x,y = tup

@@ -5,7 +5,7 @@ import random
 import pygame
 
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles
+from game.map import TileMap, Start, Road, ready_tiles, Tower
 from game.utils import Text, Button
 from game.sound import SoundManager
 import game.entity as entity
@@ -95,17 +95,43 @@ class Game(Scene):
 
         self.lives = 50
         self.display_lives = Text("", [1100, 20], size=32)
+
+        self.towers = []
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
         
+        # spawning zombies
         if random.randint(0,100) == 0:
             self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
         self.tmap.render(self.screen, self.tmap_offset)
 
+        # updating lives text
         self.display_lives.update_text("Lives: " + str(self.lives))
         self.display_lives.draw(self.screen)
-        
+
+        # building towers
+        selected_tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
+        if selected_tile:
+            coords = self.tmap.tile_to_screen_coords(selected_tile)
+            canbuild = self.tmap.can_build(selected_tile)
+
+            if canbuild:
+                self.screen.blit(self.tmap.selector_open, coords)
+            else:
+                self.screen.blit(self.tmap.selector_closed, coords)
+            
+            for event in TileMap.loop.get_events():
+                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
+                    event.used = True
+                    
+                    if canbuild:
+                        print("building tower", selected_tile)
+                        new_tower = Tower(coords[0], coords[1])
+                        self.tmap.blocking[selected_tile[0]][selected_tile[1]] = new_tower
+                        self.towers.append(new_tower)
+
+        # updating zombies and deleting zombies that reach the end
         todel = []
         for zombie in self.zombies:
             zombie.timestep(deltatime)
@@ -116,6 +142,23 @@ class Game(Scene):
         for zombie in todel:
             self.lives -= 1
             self.zombies.remove(zombie)
+
+        # updating towers
+        for tower in self.towers:
+            in_range = []
+            for z in self.zombies:
+                z_pos = z.render_pos()
+                dist = math.sqrt((z_pos[0] - tower.x) ** 2 + (z_pos[1] - tower.y) ** 2)
+                if dist <= tower.max_range:
+                    in_range.append(z)
+
+            if len(in_range) == 0:
+                continue
+
+            # targets zombie closest to end
+            target = min(in_range, key=lambda z: z.dist())
+
+            pygame.draw.line(self.screen, (255,255,255), [tower.x, tower.y], target.render_pos())
             
 class MainMenu(Scene):
     def __init__(self, screen):

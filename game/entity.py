@@ -44,7 +44,7 @@ class ZombieBase:
     def render_pos(self):
         return self.last_render_pos
     
-    def distance(self):
+    def dist(self):
         return self.tile.next[self.goal][1]
 
 class Zombie(ZombieBase):
