@@ -20,11 +20,11 @@ class SoundManager:
             self.playMenuMusic()
 
     def playMenuMusic(self):
-        pygame.mixer.music.load(load.handle_path("sound_files/menuMusic.mp3"))
+        pygame.mixer.music.load(load.handle_path("sound_files/menuMusic.ogg"))
         pygame.mixer.music.play(-1)
 
     def playGameMusic(self):
-        pygame.mixer.music.load(load.handle_path("sound_files/gameMusic.mp3"))
+        pygame.mixer.music.load(load.handle_path("sound_files/gameMusic.ogg"))
         pygame.mixer.music.play(-1)
 
     def playButtonSound(self):
