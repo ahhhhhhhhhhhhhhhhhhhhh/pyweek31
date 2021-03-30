@@ -131,21 +131,26 @@ class Game(Scene):
                         self.tmap.blocking[selected_tile[0]][selected_tile[1]] = new_tower
                         self.towers.append(new_tower)
 
-        # updating zombies and deleting zombies that reach the end
-        todel = []
+        # updating zombies and deleting zombies that reach end
+        to_del = []
         for zombie in self.zombies:
             zombie.timestep(deltatime)
             zombie.render(self.screen, self.tmap_offset)
             if zombie.tile == None:
-                todel.append(zombie)
-        
-        for zombie in todel:
-            self.lives -= 1
+                to_del.append(zombie)
+                self.lives -= 1
+        for zombie in to_del:
             self.zombies.remove(zombie)
 
         # updating towers
         for tower in self.towers:
             tower_pos = tower.center_pos()
+            pygame.draw.circle(self.screen, (255,255,255), tower_pos, tower.max_range, width=1)
+            
+
+            if not tower.update(deltatime):
+                continue
+
             in_range = []
             for z in self.zombies:
                 z_pos = z.center_pos()
@@ -160,6 +165,12 @@ class Game(Scene):
             target = min(in_range, key=lambda z: z.dist())
 
             pygame.draw.line(self.screen, (255,255,255), tower_pos, target.center_pos())
+            tower.fire()
+            target.hit(tower.damage)
+            if target.is_dead():
+                self.zombies.remove(target)
+            
+        
             
 class MainMenu(Scene):
     def __init__(self, screen):

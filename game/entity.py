@@ -11,6 +11,7 @@ from game.map import Road, Start, SCALE
 class ZombieBase:
     image = None
     speed = 1
+    max_health = 100
     
     def __init__(self, tile):
         self.x, self.y = tile.x, tile.y
@@ -18,6 +19,11 @@ class ZombieBase:
         self.goal = random.choice(list(self.tile.next.keys()))
         self.dest = self.tile.next[self.goal][0]
         self.last_render_pos = []
+
+        self.health = self.max_health
+
+        self.max_health_bar_width = 35
+        self.update_health_bar()
     
     def timestep(self, deltatime):
         if (type(self.tile) in (Road, Start)):
@@ -40,6 +46,10 @@ class ZombieBase:
         ]
         self.last_render_pos = (self.x*SCALE + off[0], self.y*SCALE + off[1])
         screen.blit(self.image, self.last_render_pos)
+
+        self.update_health_bar()
+        center = self.center_pos()
+        screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - 25])
     
     def render_pos(self):
         return self.last_render_pos
@@ -49,6 +59,16 @@ class ZombieBase:
     
     def dist(self):
         return self.tile.next[self.goal][1]
+
+    def hit(self, damage):
+        self.health -= damage
+
+    def is_dead(self):
+        return self.health <= 0
+
+    def update_health_bar(self):
+        self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 5))
+        self.health_bar.fill((0, 255, 0))
 
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")

@@ -100,18 +100,18 @@ class HouseVariant1(House):
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
-    damage = 100
-    max_range = 200
-    fire_speed = 2
+    damage = 50
+    max_range = 175
+    fire_speed = 2  # how many seconds between shots
 
     timer = 0
 
     def update(self, deltatime):
         self.timer -= deltatime
-        return timer < 0
+        return self.timer < 0
 
     def fire(self):
-        timer = fire_speed
+        self.timer = self.fire_speed
 
     def center_pos(self):
         return [self.x + SCALE / 2, self.y + SCALE / 2]
