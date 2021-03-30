@@ -63,9 +63,9 @@ class Road(Touching):
         self.next = {}
     
     #recursively sets next pointers for roads
-    def setnext(self, newnext, tilemap, endgoal, x, y):
-        self.next[endgoal] = newnext
-        End.setnext(self, tilemap, endgoal, x, y)
+    def setnext(self, newnext, tilemap, endgoal, dist, x, y):
+        self.next[endgoal] = (newnext, dist)
+        End.setnext(self, tilemap, endgoal, dist, x, y)
 
 class End(Tile):
     image = pygame.Surface((SCALE,SCALE))
@@ -74,21 +74,21 @@ class End(Tile):
     
     # decides path for road tiles
     def link(self, tilemap, gx, gy):
-        self.setnext(tilemap, self, gx, gy)
+        self.setnext(tilemap, self, 0, gx, gy)
     
-    def setnext(self, tilemap, endgoal, gx, gy):
+    def setnext(self, tilemap, endgoal, dist, gx, gy):
         for ox,oy in [(-1,0),(0,-1),(1,0),(0,1)]:
             tile = tilemap[gx+ox,gy+oy]
             if (type(tile) in (Road, Start) and endgoal not in tile.next):
-                tile.setnext(self, tilemap, endgoal, gx+ox, gy+oy)
+                tile.setnext(self, tilemap, endgoal, dist+1, gx+ox, gy+oy)
 
 class Start(Road):
     image = pygame.Surface((SCALE, SCALE))
     image.fill((255,0,0))
     touchgroup = []
     
-    def setnext(self, newnext, tilemap, endgoal, x, y):
-        self.next[endgoal] = newnext
+    def setnext(self, newnext, tilemap, endgoal, dist, x, y):
+        self.next[endgoal] = (newnext, dist)
 
 class House(Tile):
     pass

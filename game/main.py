@@ -115,7 +115,6 @@ class Game(Scene):
         for zombie in todel:
             self.lives -= 1
             self.zombies.remove(zombie)
-
             
 class MainMenu(Scene):
     def __init__(self, screen):

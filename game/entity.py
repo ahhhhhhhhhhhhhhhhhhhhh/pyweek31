@@ -16,7 +16,8 @@ class ZombieBase:
         self.x, self.y = tile.x, tile.y
         self.tile = tile
         self.goal = random.choice(list(self.tile.next.keys()))
-        self.dest = self.tile.next[self.goal]
+        self.dest = self.tile.next[self.goal][0]
+        self.last_render_pos = []
     
     def timestep(self, deltatime):
         if (type(self.tile) in (Road, Start)):
@@ -26,7 +27,7 @@ class ZombieBase:
                 if type(self.tile) not in (Road, Start):
                     self.tile = None
                     return
-                self.dest = self.tile.next[self.goal]
+                self.dest = self.tile.next[self.goal][0]
             dist = ((self.dest.x - self.x)**2 + (self.dest.y - self.y)**2)**0.5
             if (dist <= 0): return
             self.x += (self.dest.x - self.x)/dist * self.speed * deltatime
@@ -37,8 +38,14 @@ class ZombieBase:
             off[0] + (SCALE - self.image.get_width())//2,
             off[1] + (SCALE - self.image.get_height())//2
         ]
-        screen.blit(self.image, (self.x*SCALE + off[0], self.y*SCALE + off[1]))
-
+        self.last_render_pos = (self.x*SCALE + off[0], self.y*SCALE + off[1])
+        screen.blit(self.image, self.last_render_pos)
+    
+    def render_pos(self):
+        return self.last_render_pos
+    
+    def distance(self):
+        return self.tile.next[self.goal][1]
 
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")
