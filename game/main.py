@@ -1,9 +1,8 @@
 from abc import ABC
-
-import pygame
-
 import math
 import random
+
+import pygame
 
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles
@@ -86,11 +85,15 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
         
-        self.tmap = TileMap(load.image("map1_bg.png"), load.image("map1_blocking.png"))
+        self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
+        self.waves = entity.Waves("maps/map1_waves.txt")
 
         self.tmap_offset = [60,60]
         self.zombies = []
         self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+
+        self.lives = 50
+        self.display_lives = Text("", [1100, 20], size=32)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -98,6 +101,9 @@ class Game(Scene):
         if random.randint(0,100) == 0:
             self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
         self.tmap.render(self.screen, self.tmap_offset)
+
+        self.display_lives.update_text("Lives: " + str(self.lives))
+        self.display_lives.draw(self.screen)
         
         todel = []
         for zombie in self.zombies:
@@ -107,6 +113,7 @@ class Game(Scene):
                 todel.append(zombie)
         
         for zombie in todel:
+            self.lives -= 1
             self.zombies.remove(zombie)
 
             

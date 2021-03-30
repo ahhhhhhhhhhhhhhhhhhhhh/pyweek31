@@ -1,11 +1,12 @@
 import random
+import json
+
+import pygame
 
 import game.load as load
 import game.utils as utils
-
 from game.map import Road, Start, SCALE
 
-import pygame
 
 class ZombieBase:
     image = None
@@ -38,6 +39,7 @@ class ZombieBase:
         ]
         screen.blit(self.image, (self.x*SCALE + off[0], self.y*SCALE + off[1]))
 
+
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")
     speed = 1
@@ -47,4 +49,26 @@ class FastZombie(ZombieBase):
     image = load.image("smallzombie.png")
     speed = 2
 
+
+class Waves:
+    zombiemap = {"zombie": Zombie,
+                 "fastzombie": FastZombie}
+
+    def __init__(self, filepath):
+        filepath = load.handle_path(filepath)
+
+        with open(filepath, "r") as file:
+            lines = file.readlines()
+
+        lines = [json.loads(line) for line in lines]
+        waves = []
+    
+        for i, line in enumerate(lines):
+            waves.append([])
+            for j in range(len(line)):
+                waves[i].append({})
+                for key in lines[i][j]:
+                    waves[i][j][Waves.zombiemap[key]] = lines[i][j][key]
+
+        print(waves)
     
