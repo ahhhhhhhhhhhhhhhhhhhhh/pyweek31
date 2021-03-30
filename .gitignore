@@ -1,1 +1,3 @@
 **/*.pyc
+data/persistence.json
+*.DS_Store

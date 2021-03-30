@@ -70,10 +70,6 @@ def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
 
-class NoBlocking(Tile):
-    def render(self, screen, x, y):
-        pass
-
 class Tower(Tile):
     image = pygame.Surface((10, 10))
     image.fill((255,0,0))
@@ -86,8 +82,10 @@ class TileMap():
                 (0, 127, 70): [House, HouseVariant1]}
 
     def _tile_from_color(self, color):
-        ret = TileMap.colormap[color]
-        return random.choice(ret)
+        if color in self.colormap:
+            ret = TileMap.colormap[color]
+            return random.choice(ret)
+        return NoTile
     
     def __init__(self, map_surf, blocking_surf):
         self.map = []
@@ -96,8 +94,8 @@ class TileMap():
         self.ydim = map_surf.get_height()
         self.starts = []
 
-        self.build_map(self.map, map_surf, NoTile)
-        self.build_map(self.blocking, blocking_surf, NoBlocking)
+        self.build_map(self.map, map_surf)
+        self.build_map(self.blocking, blocking_surf)
         
         for x in range(self.xdim):
             for y in range(self.ydim):
@@ -110,17 +108,14 @@ class TileMap():
         self.selector_closed.fill((255,0,0))
         self.selector_closed.set_alpha(128)
 
-    def build_map(self, map, surf, default_tile):
+    def build_map(self, map, surf):
         for x in range(self.xdim):
             row = []
             for y in range(self.ydim):
                 color = surf.get_at((x,y))[0:3]
-                if color in self.colormap:
-                    row.append(self._tile_from_color(color)(x, y))
-                    if (type(row[-1]) == Start): self.starts.append(row[-1])
-                else:
-                    print(f"warning, no tile conversion for color={color}")
-                    row.append(default_tile(x, y))
+                row.append(self._tile_from_color(color)(x, y))
+                if (type(row[-1]) == Start):
+                    self.starts.append(row[-1])      
             map.append(row)
    
     def render(self, screen, offset=[0,0]):
@@ -171,5 +166,5 @@ class TileMap():
         return [self.current_offset[0] + tile[0] * SCALE, self.current_offset[1] + tile[1] * SCALE]
 
     def can_build(self, tile):
-        return isinstance(self.blocking[tile[0]][tile[1]], NoBlocking) and not isinstance(self.map[tile[0]][tile[1]], Road)
+        return isinstance(self.blocking[tile[0]][tile[1]], NoTile) and not isinstance(self.map[tile[0]][tile[1]], Road)
    
