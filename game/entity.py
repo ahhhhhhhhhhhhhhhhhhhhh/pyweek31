@@ -35,12 +35,14 @@ class ZombieBase:
         screen.blit(self.image, (self.x*SCALE + off[0], self.y*SCALE + off[1]))
 
 class Zombie(ZombieBase):
-    image = pygame.transform.scale(load.image("zombie_.png"), (SCALE, SCALE*3//2))
+    #image = pygame.transform.scale(load.image("zombie_.png"), (SCALE, SCALE*3//2))
+    image = load.image("smallzombie.png")
     speed = 1
 
 
 class FastZombie(ZombieBase):
-    image = pygame.transform.scale(load.image("zombie_.png"), (SCALE, SCALE*3//2))
+    #image = pygame.transform.scale(load.image("zombie_.png"), (SCALE, SCALE*3//2))
+    image = load.image("smallzombie.png")
     speed = 2
 
     

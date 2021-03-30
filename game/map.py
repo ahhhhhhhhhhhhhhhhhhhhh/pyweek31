@@ -66,13 +66,13 @@ class House(Tile):
 class HouseVariant1(House):
     pass
 
+class Tower(Tile):
+    pass
+
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
-
-class Tower(Tile):
-    image = pygame.Surface((10, 10))
-    image.fill((255,0,0))
+    Tower.image = load.image("woodentower.png").convert_alpha()
 
 class TileMap():
     colormap = {(255,0,0): [Start],
