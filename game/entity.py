@@ -23,7 +23,7 @@ class ZombieBase:
                 self.tile = None
                 return
             dist = ((dest.x - self.x)**2 + (dest.y - self.y)**2)**0.5
-            if (dist < 0): return
+            if (dist <= 0): return
             self.x += (dest.x - self.x)/dist * self.speed * deltatime
             self.y += (dest.y - self.y)/dist * self.speed * deltatime
     
