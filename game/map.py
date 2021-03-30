@@ -103,6 +103,7 @@ class Tower(Tile):
     damage = 50
     max_range = 175
     fire_speed = 2  # how many seconds between shots
+    bullet_color = (255,255,255)
 
     timer = 0
 
@@ -115,6 +116,12 @@ class Tower(Tile):
 
     def center_pos(self):
         return [self.x + SCALE / 2, self.y + SCALE / 2]
+
+class FastTower(Tower):
+    damage = 35
+    fire_speed = 0.5
+    max_range = 120
+    bullet_color = (255, 0, 0)
 
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()

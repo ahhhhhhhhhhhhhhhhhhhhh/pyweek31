@@ -5,7 +5,7 @@ import random
 import pygame
 
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles, Tower
+from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
 from game.utils import Text, Button
 from game.sound import SoundManager
 import game.entity as entity
@@ -97,18 +97,32 @@ class Game(Scene):
         self.display_lives = Text("", [1100, 20], size=32)
 
         self.towers = []
+        self.projectiles = []
+
+        self.selected_towertype = Tower
+        self.tower_button = Button("Build Basic Tower", [100, 600], 20)
+        self.fast_tower_button = Button("Build Fast Tower", [100, 650], 20)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
         
         # spawning zombies
-        if random.randint(0,100) == 0:
+        if random.randint(0,100) in range(1,5):
             self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
         self.tmap.render(self.screen, self.tmap_offset)
 
         # updating lives text
         self.display_lives.update_text("Lives: " + str(self.lives))
         self.display_lives.draw(self.screen)
+
+        # updating tower buying buttons
+        self.tower_button.draw(self.screen)
+        self.fast_tower_button.draw(self.screen)
+
+        if self.tower_button.clicked:
+            self.selected_towertype = Tower
+        elif self.fast_tower_button.clicked:
+            self.selected_towertype = FastTower
 
         # building towers
         selected_tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
@@ -127,7 +141,7 @@ class Game(Scene):
                     
                     if canbuild:
                         print("building tower", selected_tile)
-                        new_tower = Tower(coords[0], coords[1])
+                        new_tower = self.selected_towertype(coords[0], coords[1])
                         self.tmap.blocking[selected_tile[0]][selected_tile[1]] = new_tower
                         self.towers.append(new_tower)
 
@@ -164,11 +178,21 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            pygame.draw.line(self.screen, (255,255,255), tower_pos, target.center_pos())
+            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
             tower.fire()
             target.hit(tower.damage)
             if target.is_dead():
                 self.zombies.remove(target)
+
+        # updating projectiles
+        to_del = []
+        for p in self.projectiles:
+            p.timestep(deltatime)
+            p.render(self.screen)
+            if p.is_done():
+                to_del.append(p)
+        for p in to_del:
+            self.projectiles.remove(p)
             
         
             

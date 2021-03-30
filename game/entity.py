@@ -101,4 +101,28 @@ class Waves:
                     waves[i][j][Waves.zombiemap[key]] = lines[i][j][key]
 
         print(waves)
+
+class ProjectileBase:
+    image = None
+    lifetime = 1 
+
+    def timestep(self, deltatime):
+        self.lifetime -= deltatime
+
+    def render(self, screen):
+        pass
+
+    def is_done(self):
+        return self.lifetime <= 0
+
+class BulletTrail(ProjectileBase):
+    lifetime = 0.1
+
+    def __init__(self, start, end, color):
+        self.start = start
+        self.end = end
+        self.color = color
+
+    def render(self, screen):
+        pygame.draw.line(screen, self.color, self.start, self.end, width=1)
     
