@@ -43,6 +43,9 @@ class ZombieBase:
     
     def render_pos(self):
         return self.last_render_pos
+
+    def center_pos(self):
+        return [self.last_render_pos[0] + self.image.get_width() / 2, self.last_render_pos[1] + self.image.get_height() / 2]
     
     def dist(self):
         return self.tile.next[self.goal][1]

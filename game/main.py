@@ -145,10 +145,11 @@ class Game(Scene):
 
         # updating towers
         for tower in self.towers:
+            tower_pos = tower.center_pos()
             in_range = []
             for z in self.zombies:
-                z_pos = z.render_pos()
-                dist = math.sqrt((z_pos[0] - tower.x) ** 2 + (z_pos[1] - tower.y) ** 2)
+                z_pos = z.center_pos()
+                dist = math.sqrt((z_pos[0] - tower_pos[0]) ** 2 + (z_pos[1] - tower_pos[1]) ** 2)
                 if dist <= tower.max_range:
                     in_range.append(z)
 
@@ -158,7 +159,7 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            pygame.draw.line(self.screen, (255,255,255), [tower.x, tower.y], target.render_pos())
+            pygame.draw.line(self.screen, (255,255,255), tower_pos, target.center_pos())
             
 class MainMenu(Scene):
     def __init__(self, screen):

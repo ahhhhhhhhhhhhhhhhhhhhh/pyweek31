@@ -113,6 +113,9 @@ class Tower(Tile):
     def fire(self):
         timer = fire_speed
 
+    def center_pos(self):
+        return [self.x + SCALE / 2, self.y + SCALE / 2]
+
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
