@@ -5,6 +5,7 @@ import game.load as load
 
 class MusicManager:
     def __init__(self, scene):
+        pygame.mixer.init(buffer=512)
         self.scene = scene
         self.sounds = [
             load.sound("sound_files/buttonSound.wav"),
