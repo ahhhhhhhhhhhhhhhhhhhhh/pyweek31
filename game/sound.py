@@ -2,8 +2,6 @@ import json
 import io
 import pygame
 import game.load as load
-import game.utils as utils
-
 
 class MusicManager:
     def __init__(self, scene):
