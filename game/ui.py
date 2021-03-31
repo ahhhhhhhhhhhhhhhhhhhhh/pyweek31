@@ -18,7 +18,7 @@ class TowerInfoPanel:
 
 		self.make_info_text()
 
-		self.upgrade_button = TextButton("Promote", [pos[0] + 100, pos[1] + 300], 25, centered=True)
+		self.make_upgrade_button()
 
 	# updates tower info text, needs to be called when tower is upgraded so info panel is accurate
 	def make_info_text(self):
@@ -29,6 +29,12 @@ class TowerInfoPanel:
 		self.range_text = Text("Range: " + str(self.tower.max_range), [self.pos[0] + 20, self.pos[1] + 75 + spacing], 20)
 		self.speed_text = Text("Fire Speed: " + str(self.tower.fire_speed), [self.pos[0] + 20, self.pos[1] + 75 + spacing * 2], 20)
 
+	def make_upgrade_button(self):
+		if not self.tower.is_max_level():
+			self.upgrade_button = TextButton("Promote", [self.pos[0] + 100, self.pos[1] + 300], 25, centered=True)
+		else:
+			self.upgrade_button = Text("Max Level", [self.pos[0] + 100, self.pos[1] + 300], 25, centered=True, color=(255, 204, 0))
+
 	def update(self):
 		if self.tower == None:
 			return
@@ -36,9 +42,7 @@ class TowerInfoPanel:
 		if not self.tower.is_max_level() and self.upgrade_button.clicked:
 			self.tower.upgrade()
 			self.make_info_text()
-
-			if self.tower.is_max_level():
-				self.upgrade_button = Text("Max Level", [self.pos[0] + 100, self.pos[1] + 300], 25, centered=True, color=(255, 204, 0))
+			self.make_upgrade_button()
 
 	def draw(self):
 		self.screen.blit(self.panel, self.pos)

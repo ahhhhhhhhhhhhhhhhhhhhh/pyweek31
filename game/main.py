@@ -107,8 +107,8 @@ class Game(Scene):
 
         self.build_mode = False
         self.selected_towertype = Tower
-        self.tower_button = TextButton("Build Basic Tower", [100, 600], 20)
-        self.fast_tower_button = TextButton("Build Fast Tower", [100, 650], 20)
+        self.tower_button = TextButton("Station Additional Officer", [40, 620], 25)
+        self.fast_tower_button = TextButton("Station Additional Fast Officer", [40, 660], 25)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
