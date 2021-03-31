@@ -53,6 +53,9 @@ class Loop:
         else:
             self.scene = self.scenedict[new_scene]
 
+    def get_scene(self, scene_key):
+        return self.scenedict[scene_key]
+
     def end_game(self):
         pygame.quit()
         raise SystemExit
@@ -214,6 +217,10 @@ class Game(Scene):
         for p in to_del:
             self.projectiles.remove(p)
 
+        # game end conditions
+        if self.lives < 1:
+            loop.get_scene("endscreen").set_won(False)
+            loop.switch_scene("endscreen")
             
 def draw_tower_info_panel(screen, tower, pos):
     panel = pygame.Surface((200, 400))
@@ -237,6 +244,30 @@ def draw_tower_info_panel(screen, tower, pos):
     # drawing range circle
     pygame.draw.circle(screen, (255,255,255), tower.center_pos(), tower.max_range, width=1)
     
+
+class EndScreen(Scene):
+    def __init__(self, screen):
+        self.screen = screen
+        self.id = "endscreen"
+        self.outcome_display = Text("", [640, 90], 90, centered=True)
+        self.exit_button = TextButton("[Exit to Menu]", [640, 400], 40, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [640, 470], 40, centered=True)
+
+    def update(self, loop):
+        self.outcome_display.draw(self.screen)
+        self.exit_button.draw(self.screen)
+        self.quit_button.draw(self.screen)
+
+        if self.exit_button.clicked:
+            loop.switch_scene("menu")
+        if self.quit_button.clicked:
+            loop.end_game()
+
+    def set_won(self, won):
+        if won:
+            self.outcome_display.update_text("You won!")
+        else:
+            self.outcome_display.update_text("You lost!")        
             
 class MainMenu(Scene):
     def __init__(self, screen):
@@ -299,7 +330,8 @@ def main():
     game = Game(screen)
     menu = MainMenu(screen)
     settings = Settings(screen)
-    scenedict = {"game": game, "menu": menu, "settings": settings}
+    endscreen = EndScreen(screen)
+    scenedict = {"game": game, "menu": menu, "settings": settings, "endscreen": endscreen}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)
