@@ -1,3 +1,5 @@
+import textwrap
+
 import pygame
 import pygame.freetype
 
@@ -134,3 +136,25 @@ class ToggleButton(Button):
 
         if self.clicked:
             self.active = not self.active
+
+# quick and dirty multiline text
+class LinedText:
+    def __init__(self, text, location, n_charwrap, spacing=1.5, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR):
+        self.text = text
+        self.location = location
+        self.spacing = spacing
+        self.images = [render_text(t, size, color)[0] for t in textwrap.wrap(text, n_charwrap)]        
+
+        #self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
+
+    def draw(self, screen):
+        x = self.location[0]
+        y = self.location[1]
+        for i, image in enumerate(self.images):
+            screen.blit(image, (x, y))
+            y += image.get_height() * self.spacing
+            
+
+    def update_location(self, newloc):
+        self.location = newloc
+        self.rect.topleft = newloc
