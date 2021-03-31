@@ -125,6 +125,8 @@ class BigHouse(MultiTile):
 class HouseVariant1(House):
     pass
 
+class BrickHouse(House):
+    pass
 
 Road.touchgroup = [Road, Start, End]
 
@@ -173,8 +175,9 @@ class FastTower(Tower):
 
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
-    BigHouse.image = load.image("garagehouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
+    BrickHouse.image = load.image("brickhouse.png").convert_alpha()
+    BigHouse.image = load.image("garagehouse.png").convert_alpha()
     Tower.base_image = load.image("box.png").convert_alpha()
     Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
 
@@ -198,7 +201,7 @@ class TileMap():
                 (0,38,255): [End],
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
-                (0, 127, 70): [House, HouseVariant1],
+                (0, 127, 70): [House, HouseVariant1, BrickHouse],
                 (0, 127, 127): [BigHouse]}
 
     def _tile_from_color(self, color):
