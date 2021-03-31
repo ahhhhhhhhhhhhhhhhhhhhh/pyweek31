@@ -5,7 +5,6 @@ random.seed(10)
 import pygame
 
 import game.load as load
-import game.utils as utils
 
 SCALE = 50
 
@@ -23,6 +22,30 @@ class Tile(ABC):
     #stuff that needs to happen after map creation
     def link(self, tilemap, x, y):
         pass
+
+def MultiTile(Tile):
+    xdim = 1
+    ydim = 1
+    
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.corner = False
+    
+    def link(self, tilemap, x, y):
+        distx = 0
+        while type(tilemap[x-distx, y]) == type(this):
+            distx += 1
+        
+        disty = 0
+        while type(tilemap[x, y-disty]) == type(this):
+            disty += 1
+        
+        if distx%xdim == 0 and disty%ydim:
+            self.corner = True
+    
+    def render(self, screen, x, y):
+        if self.corner:
+            super().render(screen, x, y)
 
 class NoTile(Tile):
     image = None
@@ -108,24 +131,9 @@ class Tower(Tile):
 
     timer = 0
 
-    def __init__(self, x, y):
-        super().__init__(x, y)
-        self.button = utils.ToggleButton([0,0,SCALE,SCALE])
-
     def update(self, deltatime):
         self.timer -= deltatime
         return self.timer < 0
-
-    # overloaded because the button needs to know the location
-    def render(self, screen, x, y):
-        if self.button.active:
-            tower_pos = self.center_pos()
-            pygame.draw.circle(screen, (255,255,255), tower_pos, self.max_range, width=1)
-    
-        if self.image != None:
-            screen.blit(self.image, (x, y))
-        self.button.update_location((x, y))
-        self.button.draw(screen)
 
     def fire(self):
         self.timer = self.fire_speed
