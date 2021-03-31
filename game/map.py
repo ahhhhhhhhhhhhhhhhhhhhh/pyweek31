@@ -128,6 +128,12 @@ class HouseVariant1(House):
 class BrickHouse(House):
     pass
 
+class Bush1(Tile):
+    pass
+
+class Bush2(Tile):
+    pass
+
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
@@ -178,6 +184,8 @@ def ready_tiles():
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
     BrickHouse.image = load.image("brickhouse.png").convert_alpha()
     BigHouse.image = load.image("garagehouse.png").convert_alpha()
+    Bush1.image = load.image("bush.png").convert_alpha()
+    Bush2.image = load.image("bush2.png").convert_alpha()
     Tower.base_image = load.image("box.png").convert_alpha()
     Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
 
@@ -193,7 +201,6 @@ class TileArray():
             return self.map[x][y]
         else:
             return None
-    
 
 
 class TileMap():
@@ -202,7 +209,8 @@ class TileMap():
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
                 (0, 127, 70): [House, HouseVariant1, BrickHouse],
-                (0, 127, 127): [BigHouse]}
+                (0, 127, 127): [BigHouse],
+                (255, 0, 220): [Bush1, Bush2]}
 
     def _tile_from_color(self, color):
         if color in self.colormap:
