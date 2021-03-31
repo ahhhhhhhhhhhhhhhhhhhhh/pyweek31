@@ -104,7 +104,7 @@ class Game(Scene):
         self.projectiles = []
 
         self.selected_tower = None
-        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
+        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
 
         self.build_mode = False
         self.selected_towertype = Tower
@@ -140,7 +140,7 @@ class Game(Scene):
 
         # updating tower info panel
         if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
         self.tower_info_panel.update()
         self.tower_info_panel.draw()
 

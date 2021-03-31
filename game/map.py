@@ -154,6 +154,8 @@ class Tower(Tile):
         super().__init__(x, y)
         self.damage # single access to set max level
 
+        self.info_image = load.image("officer.png")
+
     def update(self, deltatime):
         self.timer -= deltatime
         return self.timer < 0
