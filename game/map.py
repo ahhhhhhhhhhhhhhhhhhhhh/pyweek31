@@ -143,23 +143,15 @@ class Tower(Tile):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.button = utils.ToggleButton([0,0,SCALE,SCALE])
 
     def update(self, deltatime):
         self.timer -= deltatime
         return self.timer < 0
 
-    # overloaded because the button needs to know the location
     def render(self, screen, x, y):
-        if self.button.active:
-            tower_pos = self.center_pos()
-            pygame.draw.circle(screen, (255,255,255), tower_pos, self.max_range, width=1)
-    
         if self.base_image != None:
             screen.blit(self.base_image, (x, y))
             screen.blit(self.turret_image[self.turret_image_index], (x, y - 10))
-        self.button.update_location((x, y))
-        self.button.draw(screen)
 
     def fire(self, target):
         self.timer = self.fire_speed

@@ -98,6 +98,9 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
+        self.selected_tower = None
+
+        self.build_mode = False
         self.selected_towertype = Tower
         self.tower_button = TextButton("Build Basic Tower", [100, 600], 20)
         self.fast_tower_button = TextButton("Build Fast Tower", [100, 650], 20)
@@ -120,32 +123,49 @@ class Game(Scene):
         # updating tower buying buttons
         self.tower_button.draw(self.screen)
         self.fast_tower_button.draw(self.screen)
-
         if self.tower_button.clicked:
             self.selected_towertype = Tower
+            self.build_mode = True
         elif self.fast_tower_button.clicked:
             self.selected_towertype = FastTower
+            self.build_mode = True
 
-        # building towers
-        selected_tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
-        if selected_tile:
-            coords = self.tmap.tile_to_screen_coords(selected_tile)
-            canbuild = self.tmap.can_build(selected_tile)
+        draw_tower_info_panel(self.screen, self.selected_tower, (1050, 100))
+
+        tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
+
+
+        for event in TileMap.loop.get_events():
+            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
+                event.used = True
+
+                # building/selecting towers
+                if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower) and tile:
+                    self.build_mode = False
+                    self.selected_tower = self.tmap.blocking[tile[0]][tile[1]]
+                else:
+                    self.selected_tower = None
+
+                if self.build_mode and self.tmap.can_build(tile) and tile:
+                    print("building tower", tile)
+                    coords = self.tmap.tile_to_screen_coords(tile)
+                    new_tower = self.selected_towertype(coords[0], coords[1])
+                    self.tmap.blocking[tile[0]][tile[1]] = new_tower
+                    self.towers.append(new_tower)
+
+            # right click to exit build mode
+            elif event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 3:
+                self.build_mode = False
+
+        # highlights tiles if in build mode
+        if self.build_mode and tile:
+            coords = self.tmap.tile_to_screen_coords(tile)
+            canbuild = self.tmap.can_build(tile)
 
             if canbuild:
                 self.screen.blit(self.tmap.selector_open, coords)
             else:
                 self.screen.blit(self.tmap.selector_closed, coords)
-            
-            for event in TileMap.loop.get_events():
-                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                    event.used = True
-                    
-                    if canbuild:
-                        print("building tower", selected_tile)
-                        new_tower = self.selected_towertype(coords[0], coords[1])
-                        self.tmap.blocking[selected_tile[0]][selected_tile[1]] = new_tower
-                        self.towers.append(new_tower)
 
         # updating zombies and deleting zombies that reach end
         to_del = []
@@ -194,13 +214,14 @@ class Game(Scene):
         for p in to_del:
             self.projectiles.remove(p)
 
-        if len(self.towers) > 0:
-            draw_tower_info_panel(self.screen, self.towers[0], (1050, 100))
             
 def draw_tower_info_panel(screen, tower, pos):
     panel = pygame.Surface((200, 400))
     panel.fill((54, 54, 54))
     screen.blit(panel, pos)
+
+    if tower == None:
+        return
 
     title = Text(tower.name, [pos[0] + 100, pos[1] + 20], 30, centered=True)
     title.draw(screen) 
@@ -212,6 +233,9 @@ def draw_tower_info_panel(screen, tower, pos):
     range_text.draw(screen)
     speed_text = Text("Fire Speed: " + str(tower.fire_speed), [pos[0] + 20, pos[1] + 70 + spacing * 2], 20)
     speed_text.draw(screen)
+
+    # drawing range circle
+    pygame.draw.circle(screen, (255,255,255), tower.center_pos(), tower.max_range, width=1)
     
             
 class MainMenu(Scene):
