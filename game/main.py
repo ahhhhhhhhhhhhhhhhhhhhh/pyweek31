@@ -134,28 +134,28 @@ class Game(Scene):
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
+        if tile:
+            for event in TileMap.loop.get_events():
+                if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
+                    event.used = True
 
-        for event in TileMap.loop.get_events():
-            if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                event.used = True
+                    # building/selecting towers
+                    if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower):
+                        self.build_mode = False
+                        self.selected_tower = self.tmap.blocking[tile[0]][tile[1]]
+                    else:
+                        self.selected_tower = None
 
-                # building/selecting towers
-                if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower) and tile:
+                    if self.build_mode and self.tmap.can_build(tile):
+                        print("building tower", tile)
+                        coords = self.tmap.tile_to_screen_coords(tile)
+                        new_tower = self.selected_towertype(coords[0], coords[1])
+                        self.tmap.blocking[tile[0]][tile[1]] = new_tower
+                        self.towers.append(new_tower)
+
+                # right click to exit build mode
+                elif event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 3:
                     self.build_mode = False
-                    self.selected_tower = self.tmap.blocking[tile[0]][tile[1]]
-                else:
-                    self.selected_tower = None
-
-                if self.build_mode and self.tmap.can_build(tile) and tile:
-                    print("building tower", tile)
-                    coords = self.tmap.tile_to_screen_coords(tile)
-                    new_tower = self.selected_towertype(coords[0], coords[1])
-                    self.tmap.blocking[tile[0]][tile[1]] = new_tower
-                    self.towers.append(new_tower)
-
-            # right click to exit build mode
-            elif event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 3:
-                self.build_mode = False
 
         # highlights tiles if in build mode
         if self.build_mode and tile:
