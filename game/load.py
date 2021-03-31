@@ -16,3 +16,7 @@ def image(filepath):
 def sound(filepath):
     filepath = handle_path(filepath)
     return pygame.mixer.Sound(filepath)
+
+def path_exists(filepath):
+    path = handle_path(filepath)
+    return os.path.exists(path)

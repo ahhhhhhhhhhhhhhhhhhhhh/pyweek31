@@ -2,7 +2,9 @@ import pygame
 import pygame.freetype
 
 import game.load as load
+from game.sound import SoundEffectsManager as SoundManager
 
+soundManager = SoundManager()
 pygame.freetype.init()
 font = pygame.freetype.Font(load.handle_path("lora/Lora-Bold.ttf"))
 
@@ -57,6 +59,7 @@ class Button(Text):
                 if self.rect.collidepoint(event.pos):
                     self.clicked = True
                     event.used = True
+                    soundManager.playButtonSound()
 
         self.hovered = False
         if self.rect.collidepoint(pygame.mouse.get_pos()):
