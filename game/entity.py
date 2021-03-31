@@ -22,7 +22,7 @@ class ZombieBase:
 
         self.health = self.max_health
 
-        self.max_health_bar_width = 35
+        self.max_health_bar_width = 30
         self.update_health_bar()
     
     def timestep(self, deltatime):
@@ -49,7 +49,9 @@ class ZombieBase:
 
         self.update_health_bar()
         center = self.center_pos()
-        screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - 25])
+
+        if self.health < self.max_health:
+            screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - 20])
     
     def render_pos(self):
         return self.last_render_pos
@@ -67,7 +69,7 @@ class ZombieBase:
         return self.health <= 0
 
     def update_health_bar(self):
-        self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 5))
+        self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 3))
         self.health_bar.fill((0, 255, 0))
 
 class Zombie(ZombieBase):
