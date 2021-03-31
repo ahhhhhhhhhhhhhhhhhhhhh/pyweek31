@@ -6,7 +6,7 @@ import pygame
 
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
-from game.utils import Text, Button
+from game.utils import Text, TextButton
 from game.sound import MusicManager
 import game.entity as entity
 
@@ -91,7 +91,7 @@ class Game(Scene):
 
         self.tmap_offset = [60,60]
         self.zombies = []
-        self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+        #self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
 
         self.lives = 50
         self.display_lives = Text("", [1100, 20], size=32)
@@ -100,15 +100,21 @@ class Game(Scene):
         self.projectiles = []
 
         self.selected_towertype = Tower
-        self.tower_button = Button("Build Basic Tower", [100, 600], 20)
-        self.fast_tower_button = Button("Build Fast Tower", [100, 650], 20)
+        self.tower_button = TextButton("Build Basic Tower", [100, 600], 20)
+        self.fast_tower_button = TextButton("Build Fast Tower", [100, 650], 20)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
         
         # spawning zombies
-        if random.randint(0,100) in range(1,5):
-            self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+        # if random.randint(0,100) in range(1,5):
+        #    self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                self.waves.spawn_next(self.zombies, self.tmap)
+                
+            
         self.tmap.render(self.screen, self.tmap_offset)
 
         # updating lives text
@@ -159,9 +165,7 @@ class Game(Scene):
         # updating towers
         for tower in self.towers:
             tower_pos = tower.center_pos()
-            pygame.draw.circle(self.screen, (255,255,255), tower_pos, tower.max_range, width=1)
             
-
             if not tower.update(deltatime):
                 continue
 
@@ -201,9 +205,9 @@ class MainMenu(Scene):
         self.id = "menu"
         self.screen = screen
         self.t = Text("John Brawn", [840, 40], 64, centered=True)
-        self.b = Button("[Play if you dare...]", [840, 130], 32, centered=True)
+        self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
         self.b.washovered = False
-        self.sb = Button("Settings", [840, 190], 32, centered=True)
+        self.sb = TextButton("Settings", [840, 190], 32, centered=True)
         self.sb.washovered = False
 
         self.zombie = load.image("zombie.png").convert_alpha()
@@ -277,7 +281,7 @@ def main():
     loop = Loop(screen, startscene, scenedict, musicManager)
 
     # populate "need to know" classes with loop reference
-    Button.loop = loop
+    TextButton.loop = loop
     TileMap.loop = loop
     
     loop.start()

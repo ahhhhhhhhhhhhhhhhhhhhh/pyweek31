@@ -1,1 +1,4 @@
 [{"zombie": 5, "fastzombie": 5}, {"zombie": 10, "fastzombie": 0}]
+[{"zombie": 0, "fastzombie": 5}, {"zombie": 10, "fastzombie": 0}]
+[{"zombie": 0, "fastzombie": 5}, {"zombie": 10, "fastzombie": 1}]
+[{"zombie": 1, "fastzombie": 5}, {"zombie": 1, "fastzombie": 0}]

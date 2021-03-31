@@ -5,6 +5,7 @@ random.seed(10)
 import pygame
 
 import game.load as load
+import game.utils as utils
 
 SCALE = 50
 
@@ -107,9 +108,24 @@ class Tower(Tile):
 
     timer = 0
 
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.button = utils.ToggleButton([0,0,SCALE,SCALE])
+
     def update(self, deltatime):
         self.timer -= deltatime
         return self.timer < 0
+
+    # overloaded because the button needs to know the location
+    def render(self, screen, x, y):
+        if self.button.active:
+            tower_pos = self.center_pos()
+            pygame.draw.circle(screen, (255,255,255), tower_pos, self.max_range, width=1)
+    
+        if self.image != None:
+            screen.blit(self.image, (x, y))
+        self.button.update_location((x, y))
+        self.button.draw(screen)
 
     def fire(self):
         self.timer = self.fire_speed

@@ -100,7 +100,28 @@ class Waves:
                 for key in lines[i][j]:
                     waves[i][j][Waves.zombiemap[key]] = lines[i][j][key]
 
-        print(waves)
+        self.waves = waves
+        print(self.waves)
+
+    def get_next(self):
+        if self.waves:
+            return self.waves.pop(0)
+        return False
+
+    def get_finished(self):
+        return not self.waves
+
+    def _spawn_dict_at(self, zombielist, tmap, zdict, spawn):
+        for key in zdict:
+            for _ in range(zdict[key]):
+                zombielist.append(key(tmap.starts[spawn]))
+
+    def spawn_next(self, zombielist, tmap):
+        wave = self.get_next()
+        if wave:
+            for i, spawner_wave in enumerate(wave):
+                self._spawn_dict_at(zombielist, tmap, spawner_wave, i)
+        
 
 class ProjectileBase:
     image = None
