@@ -19,5 +19,4 @@ def sound(filepath):
 
 def path_exists(filepath):
     path = handle_path(filepath)
-    print(os.path.exists(path))
     return os.path.exists(path)
