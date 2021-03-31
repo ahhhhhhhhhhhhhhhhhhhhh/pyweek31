@@ -131,6 +131,7 @@ class BrickHouse(House):
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
+    name = "Officer"
     damage = 50
     max_range = 175
     fire_speed = 2  # how many seconds between shots
@@ -174,6 +175,7 @@ class Tower(Tile):
         return [self.x + SCALE / 2, self.y + SCALE / 2]
 
 class FastTower(Tower):
+    name = "Fast Officer"
     damage = 35
     fire_speed = 0.5
     max_range = 120
