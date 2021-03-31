@@ -244,9 +244,7 @@ class MainMenu(Scene):
         self.screen = screen
         self.t = Text("John Brawn", [840, 40], 64, centered=True)
         self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
-        self.b.washovered = False
         self.sb = TextButton("Settings", [840, 190], 32, centered=True)
-        self.sb.washovered = False
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -266,21 +264,9 @@ class MainMenu(Scene):
 
         if self.b.clicked:
             loop.switch_scene("game")
-
-        if self.b.hovered:
-            self.b.update_color((128,255,0))
-            self.b.washovered = True
-        elif self.b.washovered:
-            self.b.update_color((255,255,255))
-        
+ 
         if self.sb.clicked:
             loop.switch_scene("settings")
-
-        if self.sb.hovered:
-            self.sb.update_color((128,255,0))
-            self.sb.washovered = True
-        elif self.sb.washovered:
-            self.sb.update_color((255,255,255))
 
 class Settings(Scene):
     def __init__(self, screen):

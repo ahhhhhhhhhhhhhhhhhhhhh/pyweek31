@@ -8,10 +8,14 @@ soundManager = SoundManager()
 pygame.freetype.init()
 font = pygame.freetype.Font(load.handle_path("lora/Lora-Bold.ttf"))
 
-def render_text(text, size=16, color=(255,255,255)):
+DEFAULT_HOVERCOLOR = (128,255,0)
+DEFAULT_TEXTSIZE = 16
+DEFAULT_TEXTCOLOR = (255,255,255)
+
+def render_text(text, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR):
     return font.render(text, size=size, fgcolor=color)
 
-def draw_text(screen, text, location, size=16, color=(255,255,255), centered=False):
+def draw_text(screen, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
     im, size = render_text(text, size, color)
     if centered:
         screen.blit(im, (location[0]-size[2]/2, location[1]))
@@ -19,7 +23,7 @@ def draw_text(screen, text, location, size=16, color=(255,255,255), centered=Fal
         screen.blit(im, (location[0], location[1]))
 
 class Text:
-    def __init__(self, text, location, size=16, color=(255,255,255), centered=False):
+    def __init__(self, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
         self.text = text
         self.location = location
         self.image = render_text(text, size, color)[0]
@@ -49,10 +53,13 @@ class Text:
         self.rect.topleft = newloc
 
 class TextButton(Text):
-    def __init__(self, text, location, size=16, color=(255,255,255), centered=False):
+    def __init__(self, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
         super().__init__(text, location, size, color, centered)
         self.clicked = False
         self.hovered = False
+        self._washovered = False
+        self._hovercolor = DEFAULT_HOVERCOLOR
+        self._originalcolor = None
 
     def draw(self, screen):
         super().draw(screen)
@@ -69,9 +76,22 @@ class TextButton(Text):
             self.hovered = True
             TextButton.loop.request_cursor(pygame.SYSTEM_CURSOR_HAND)
 
+        # hover on
+        if self._hovercolor and self.hovered and not self._washovered:
+            self._washovered = True
+            self._originalcolor = self.settings[1]
+            self.update_color(self._hovercolor)
+        # hover off
+        if self._washovered and not self.hovered:
+            self._washovered = False
+            self.update_color(self._originalcolor)
+
     def update_location(self, newloc):
         self.location = newloc
         self.rect.topleft = newloc
+
+    def set_hovercolor(self, col):
+        self._hovercolor = col
 
 class Button:
     #args are [pygame.Rect] or [location, surface]
