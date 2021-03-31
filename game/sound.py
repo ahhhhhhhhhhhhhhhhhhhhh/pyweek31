@@ -73,12 +73,15 @@ class SoundEffectsManager:
         self.reloadVolume()
 
     def playButtonSound(self):
+        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[0])
 
     def playBuildingSound(self):
+        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[1])
     
     def playBulletSound(self):
+        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[2])
 
     def changeVolume(self, changingValue):
