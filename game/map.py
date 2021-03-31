@@ -174,8 +174,8 @@ class FastTower(Tower):
     bullet_color = (255, 0, 0)
 
 def ready_tiles():
-    House.image = load.image("smallhouse50.png").convert_alpha()
-    HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
+    House.image = load.image("smallhouse.png").convert_alpha()
+    HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
     BrickHouse.image = load.image("brickhouse.png").convert_alpha()
     BigHouse.image = load.image("garagehouse.png").convert_alpha()
     Tower.base_image = load.image("box.png").convert_alpha()
