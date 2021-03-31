@@ -8,6 +8,7 @@ import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager
+from game.ui import TowerInfoPanel
 import game.entity as entity
 
 class Loop:
@@ -102,6 +103,7 @@ class Game(Scene):
         self.projectiles = []
 
         self.selected_tower = None
+        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
 
         self.build_mode = False
         self.selected_towertype = Tower
@@ -135,7 +137,12 @@ class Game(Scene):
             self.build_mode = True
             self.selected_tower = None
 
-        draw_tower_info_panel(self.screen, self.selected_tower, (1050, 100))
+        # updating tower info panel
+        if self.selected_tower != self.tower_info_panel.tower:
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
+        self.tower_info_panel.update()
+        self.tower_info_panel.draw()
+
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
@@ -226,28 +233,6 @@ class Game(Scene):
         if self.lives < 1:
             loop.get_scene("endscreen").set_won(False)
             loop.switch_scene("endscreen")
-            
-def draw_tower_info_panel(screen, tower, pos):
-    panel = pygame.Surface((200, 400))
-    panel.fill((54, 54, 54))
-    screen.blit(panel, pos)
-
-    if tower == None:
-        return
-
-    title = Text(tower.name, [pos[0] + 100, pos[1] + 20], 30, centered=True)
-    title.draw(screen) 
-
-    spacing = 30
-    damage_text = Text("Damage: " + str(tower.damage), [pos[0] + 20, pos[1] + 70], 20)
-    damage_text.draw(screen)
-    range_text = Text("Range: " + str(tower.max_range), [pos[0] + 20, pos[1] + 70 + spacing], 20)
-    range_text.draw(screen)
-    speed_text = Text("Fire Speed: " + str(tower.fire_speed), [pos[0] + 20, pos[1] + 70 + spacing * 2], 20)
-    speed_text.draw(screen)
-
-    # drawing range circle
-    pygame.draw.circle(screen, (255,255,255), tower.center_pos(), tower.max_range, width=1)
     
 
 class EndScreen(Scene):

@@ -138,11 +138,12 @@ Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
     name = "Officer"
-    damage = 50
-    max_range = 175
-    fire_speed = 2  # how many seconds between shots
+    damage = [50, 75, 100]
+    max_range = [175, 200, 200]
+    fire_speed = [2, 2, 1.5]  # how many seconds between shots
     bullet_color = (255,255,255)
 
+    lvl = 0
     timer = 0
 
     base_image = None
@@ -151,6 +152,7 @@ class Tower(Tile):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.damage # single access to set max level
 
     def update(self, deltatime):
         self.timer -= deltatime
@@ -172,11 +174,25 @@ class Tower(Tile):
     def center_pos(self):
         return [self.x + SCALE / 2, self.y + SCALE / 2]
 
+    def upgrade(self):
+        if not self.is_max_level():
+            self.lvl += 1
+
+    def is_max_level(self):
+        return self.lvl >= self.max_level - 1
+
+    def __getattribute__(self, name):
+        if name in ["damage", "max_range", "fire_speed"]:
+            self.max_level = len(object.__getattribute__(self, name))
+            return object.__getattribute__(self, name)[self.lvl]
+        else:
+            return object.__getattribute__(self, name)
+
 class FastTower(Tower):
     name = "Fast Officer"
-    damage = 35
-    fire_speed = 0.5
-    max_range = 120
+    damage = [35, 50]
+    fire_speed = [0.5, 0.4]
+    max_range = [120, 130]
     bullet_color = (255, 0, 0)
 
 def ready_tiles():
