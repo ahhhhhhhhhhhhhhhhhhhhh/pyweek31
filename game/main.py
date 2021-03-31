@@ -89,7 +89,7 @@ class Game(Scene):
         self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt")
 
-        self.tmap_offset = [60,60]
+        self.tmap_offset = [25,25]
         self.zombies = []
         #self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
 
@@ -197,8 +197,26 @@ class Game(Scene):
                 to_del.append(p)
         for p in to_del:
             self.projectiles.remove(p)
+
+        if len(self.towers) > 0:
+            draw_tower_info_panel(self.screen, self.towers[0], (1050, 100))
             
-        
+def draw_tower_info_panel(screen, tower, pos):
+    panel = pygame.Surface((200, 400))
+    panel.fill((54, 54, 54))
+    screen.blit(panel, pos)
+
+    title = Text(tower.name, [pos[0] + 100, pos[1] + 20], 30, centered=True)
+    title.draw(screen) 
+
+    spacing = 30
+    damage_text = Text("Damage: " + str(tower.damage), [pos[0] + 20, pos[1] + 70], 20)
+    damage_text.draw(screen)
+    range_text = Text("Range: " + str(tower.max_range), [pos[0] + 20, pos[1] + 70 + spacing], 20)
+    range_text.draw(screen)
+    speed_text = Text("Fire Speed: " + str(tower.fire_speed), [pos[0] + 20, pos[1] + 70 + spacing * 2], 20)
+    speed_text.draw(screen)
+    
             
 class MainMenu(Scene):
     def __init__(self, screen):
