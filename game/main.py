@@ -87,11 +87,10 @@ class Game(Scene):
         self.screen = screen
         
         self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
-        self.waves = entity.Waves("maps/map1_waves.txt")
+        self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
 
         self.tmap_offset = [25,25]
         self.zombies = []
-        #self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
 
         self.lives = 50
         self.display_lives = Text("", [1100, 20], size=32)
@@ -106,15 +105,12 @@ class Game(Scene):
     def update(self, loop):
         deltatime = loop.get_ticktime()
         
-        # spawning zombies
-        # if random.randint(0,100) in range(1,5):
-        #    self.zombies.append(entity.Zombie(random.choice(self.tmap.starts)))
-
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.waves.spawn_next(self.zombies, self.tmap)
-                
-            
+                self.waves.call_next(self.tmap)
+
+        self.waves.update(self.zombies)
+          
         self.tmap.render(self.screen, self.tmap_offset)
 
         # updating lives text
@@ -301,5 +297,6 @@ def main():
     # populate "need to know" classes with loop reference
     TextButton.loop = loop
     TileMap.loop = loop
+    entity.Waves.loop = loop
     
     loop.start()

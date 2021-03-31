@@ -24,6 +24,30 @@ class Tile(ABC):
     def link(self, tilemap, x, y):
         pass
 
+class MultiTile(Tile):
+    xdim = 1
+    ydim = 1
+    
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.corner = False
+    
+    def link(self, tilemap, x, y):
+        distx = 0
+        while type(tilemap[x+distx, y]) == type(self):
+            distx += 1
+        
+        disty = 0
+        while type(tilemap[x, y+disty]) == type(self):
+            disty += 1
+        
+        if distx%self.xdim == 0 and disty%self.ydim == 0:
+            self.corner = True
+    
+    def render(self, screen, x, y):
+        if self.corner:
+            super().render(screen, x, y)
+
 class NoTile(Tile):
     image = None
 
@@ -94,6 +118,10 @@ class Start(Road):
 class House(Tile):
     pass
 
+class BigHouse(MultiTile):
+    xdim = 2
+    ydim = 2
+
 class HouseVariant1(House):
     pass
 
@@ -153,16 +181,33 @@ class FastTower(Tower):
 
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
+    BigHouse.image = load.image("garagehouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
     Tower.base_image = load.image("box.png").convert_alpha()
     Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
+
+
+class TileArray():
+    def __init__(self, tmap):
+        self.map = tmap
+        self.xdim = len(tmap)
+        self.ydim = len(tmap[0])
+    def __getitem__(self, tup):
+        x,y = tup
+        if x >= 0 and x < self.xdim and y >= 0 and y < self.ydim:
+            return self.map[x][y]
+        else:
+            return None
+    
+
 
 class TileMap():
     colormap = {(255,0,0): [Start],
                 (0,38,255): [End],
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
-                (0, 127, 70): [House, HouseVariant1]}
+                (0, 127, 70): [House, HouseVariant1],
+                (0, 127, 127): [BigHouse]}
 
     def _tile_from_color(self, color):
         if color in self.colormap:
@@ -182,7 +227,8 @@ class TileMap():
         
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].link(self, x, y)
+                self.map[x][y].link(TileArray(self.map), x, y)
+                self.blocking[x][y].link(TileArray(self.blocking), x, y)
 
         self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
         self.selector_open.fill((0,0,255))
@@ -210,12 +256,12 @@ class TileMap():
                 self.map[x][y].render(screen, coords[0], coords[1])
                 self.blocking[x][y].render(screen, coords[0], coords[1])
     
-    def __getitem__(self, tup):
-        x,y = tup
-        if x >= 0 and x < self.xdim and y >= 0 and y < self.ydim:
-            return self.map[x][y]
-        else:
-            return None
+    # def __getitem__(self, tup):
+    #     x,y = tup
+    #     if x >= 0 and x < self.xdim and y >= 0 and y < self.ydim:
+    #         return self.map[x][y]
+    #     else:
+    #         return None
 
     # returns what tile a given screen position is in
     def screen_to_tile_coords(self, pos):

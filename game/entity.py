@@ -86,7 +86,7 @@ class Waves:
     zombiemap = {"zombie": Zombie,
                  "fastzombie": FastZombie}
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, tmap):
         filepath = load.handle_path(filepath)
 
         with open(filepath, "r") as file:
@@ -103,7 +103,9 @@ class Waves:
                     waves[i][j][Waves.zombiemap[key]] = lines[i][j][key]
 
         self.waves = waves
-        print(self.waves)
+        self.zombies_to_spawn = [[] for _ in range(len(tmap.starts))]
+        self.timer = 0
+        self.time_threshold = 1
 
     def get_next(self):
         if self.waves:
@@ -116,14 +118,22 @@ class Waves:
     def _spawn_dict_at(self, zombielist, tmap, zdict, spawn):
         for key in zdict:
             for _ in range(zdict[key]):
-                zombielist.append(key(tmap.starts[spawn]))
+                zombielist[spawn].append(key(tmap.starts[spawn]))
 
-    def spawn_next(self, zombielist, tmap):
+    def call_next(self, tmap):
         wave = self.get_next()
         if wave:
             for i, spawner_wave in enumerate(wave):
-                self._spawn_dict_at(zombielist, tmap, spawner_wave, i)
-        
+                self._spawn_dict_at(self.zombies_to_spawn, tmap, spawner_wave, i)
+
+    def update(self, zombielist):
+        self.timer += Waves.loop.get_ticktime()
+        if self.timer > self.time_threshold:
+            self.timer = 0
+            for i in range(len(self.zombies_to_spawn)):
+                if self.zombies_to_spawn[i]:
+                    zombielist.append(self.zombies_to_spawn[i].pop(0))
+            
 
 class ProjectileBase:
     image = None
