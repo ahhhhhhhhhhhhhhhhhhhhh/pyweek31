@@ -183,7 +183,7 @@ class Game(Scene):
             target = min(in_range, key=lambda z: z.dist())
 
             self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
-            tower.fire()
+            tower.fire(target)
             target.hit(tower.damage)
             if target.is_dead():
                 self.zombies.remove(target)
