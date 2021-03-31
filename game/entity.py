@@ -25,8 +25,14 @@ class ZombieBase:
 
         self.max_health_bar_width = 30
         self.update_health_bar()
+
+        self.stun_timer = 0
     
     def timestep(self, deltatime):
+        if self.stun_timer > 0:
+            self.stun_timer -= deltatime
+            return
+
         if (type(self.tile) in (Road, Start)):
             thresh = 0.01
             if (abs(self.x - self.dest.x) < thresh and abs(self.y - self.dest.y) < thresh):
@@ -72,6 +78,9 @@ class ZombieBase:
     def update_health_bar(self):
         self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 3))
         self.health_bar.fill((0, 255, 0))
+
+    def stun(self, duration):
+        self.stun_timer = duration
 
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")

@@ -152,7 +152,12 @@ class Tower(Tile):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.damage # single access to set max level
+        
+        self.max_level = 99999 # placeholder value
+        # accesses each attribute once to set max level to attribute with least number of upgrades to prevent errors
+        self.damage
+        self.fire_speed
+        self.max_range
 
         self.info_image = load.image("officer.png")
 
@@ -185,17 +190,30 @@ class Tower(Tile):
 
     def __getattribute__(self, name):
         if name in ["damage", "max_range", "fire_speed"]:
-            self.max_level = len(object.__getattribute__(self, name))
+            self.max_level = min(len(object.__getattribute__(self, name)), self.max_level)
             return object.__getattribute__(self, name)[self.lvl]
         else:
             return object.__getattribute__(self, name)
 
 class FastTower(Tower):
-    name = "Fast Officer"
+    name = "Hotshot"
     damage = [35, 50]
     fire_speed = [0.5, 0.4]
     max_range = [120, 130]
     bullet_color = (255, 0, 0)
+
+class SniperTower(Tower):
+    name = "Sniper"
+    damage = [200, 300]
+    fire_speed = [3, 3]
+    max_range = [400, 500]
+    bullet_color = (0, 0, 0)
+
+class StunTower(Tower):
+    name = "TASER"
+    damage = [10, 15]
+    stun_duration = 1
+    bullet_color = (0, 0, 255)
 
 def ready_tiles():
     House.image = load.image("smallhouse.png").convert_alpha()

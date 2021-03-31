@@ -5,7 +5,7 @@ import random
 import pygame
 
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
+from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel
@@ -108,8 +108,12 @@ class Game(Scene):
 
         self.build_mode = False
         self.selected_towertype = Tower
-        self.tower_button = TextButton("Station Additional Officer", [40, 620], 25)
-        self.fast_tower_button = TextButton("Station Additional Fast Officer", [40, 660], 25)
+        button_spacing = 30
+        button_start_y = 600
+        self.tower_button = TextButton("Deploy Officer", [40, button_start_y], 25)
+        self.fast_tower_button = TextButton("Deploy Hotshot", [40, button_start_y + button_spacing], 25)
+        self.sniper_tower_button = TextButton("Deploy Sniper", [40, button_start_y + button_spacing * 2], 25)
+        self.stun_tower_button = TextButton("Deploy TASER", [40, button_start_y + button_spacing * 3], 25)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -129,12 +133,22 @@ class Game(Scene):
         # updating tower buying buttons
         self.tower_button.draw(self.screen)
         self.fast_tower_button.draw(self.screen)
+        self.sniper_tower_button.draw(self.screen)
+        self.stun_tower_button.draw(self.screen)
         if self.tower_button.clicked:
             self.selected_towertype = Tower
             self.build_mode = True
             self.selected_tower = None
         elif self.fast_tower_button.clicked:
             self.selected_towertype = FastTower
+            self.build_mode = True
+            self.selected_tower = None
+        elif self.sniper_tower_button.clicked:
+            self.selected_towertype = SniperTower
+            self.build_mode = True
+            self.selected_tower = None
+        elif self.stun_tower_button.clicked:
+            self.selected_towertype = StunTower
             self.build_mode = True
             self.selected_tower = None
 
@@ -218,8 +232,13 @@ class Game(Scene):
             self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
             tower.fire(target)
             target.hit(tower.damage)
+
+            if isinstance(tower, StunTower):
+                target.stun(tower.stun_duration)
+
             if target.is_dead():
                 self.zombies.remove(target)
+
 
         # updating projectiles
         to_del = []
