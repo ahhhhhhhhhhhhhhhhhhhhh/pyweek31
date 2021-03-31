@@ -293,9 +293,17 @@ class MainMenu(Scene):
 
 class Settings(Scene):
     def __init__(self, screen):
+        self.soundManager = SoundEffectsManager()
         self.id = "settings"
         self.screen = screen
         self.t = Text("Settings", [840, 40], 64, centered=True)
+        self.musicText = Text("Music Volume:", [700, 130], 32, centered=True)
+        self.soundText = Text("Sound Effects Volume:", [640, 190], 32, centered=True)
+        self.musicLowerButton = TextButton("-", [900, 145], 32, centered=True)
+        self.musicHigherButton = TextButton("+", [1000, 140], 32, centered=True)
+        self.soundLowerButton = TextButton("-", [900, 205], 32, centered=True)
+        self.soundHigherButton = TextButton("+", [1000, 200], 32, centered=True)
+        self.leaveButton = TextButton("Return to Main Menu", [840, 250], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -310,6 +318,25 @@ class Settings(Scene):
         self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
 
         self.t.draw(self.screen)
+        self.musicText.draw(self.screen)
+        self.soundText.draw(self.screen)
+        self.musicLowerButton.draw(self.screen)
+        self.musicHigherButton.draw(self.screen)
+        self.soundLowerButton.draw(self.screen)
+        self.soundHigherButton.draw(self.screen)
+        self.leaveButton.draw(self.screen)
+
+        if self.musicLowerButton.clicked:
+           loop.musicManager.changeVolume(-.1)
+        elif self.musicHigherButton.clicked:
+            loop.musicManager.changeVolume(.1)
+        elif self.soundLowerButton.clicked:
+            self.soundManager.changeVolume(-.1)
+        elif self.soundHigherButton.clicked:
+            self.soundManager.changeVolume(.1)
+        elif self.leaveButton.clicked:
+            loop.switch_scene("menu")
+
 
         
 def main():
