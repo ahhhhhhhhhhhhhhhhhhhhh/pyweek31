@@ -4,9 +4,10 @@ import json
 import pygame
 
 import game.load as load
-import game.utils as utils
+from game.sound import SoundEffectsManager
 from game.map import Road, Start, SCALE
 
+soundManager = SoundEffectsManager()
 
 class ZombieBase:
     image = None
@@ -152,6 +153,7 @@ class BulletTrail(ProjectileBase):
     lifetime = 0.1
 
     def __init__(self, start, end, color):
+        soundManager.playBulletSound()
         self.start = start
         self.end = end
         self.color = color

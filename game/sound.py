@@ -7,14 +7,9 @@ class MusicManager:
     def __init__(self, scene):
         pygame.mixer.init(buffer=512)
         self.scene = scene
-        self.sounds = [
-            load.sound("sound_files/buttonSound.wav"),
-        ]
         data = self.loadVolume()
         self.volume = data["Volume"]["musicVolume"]
         pygame.mixer.music.set_volume(self.volume)
-        for i in self.sounds:
-            pygame.mixer.Sound.set_volume(i, self.volume)
         if self.scene == "game":
             self.playGameMusic()
         elif self.scene == "menu":
@@ -63,6 +58,8 @@ class SoundEffectsManager:
         pygame.mixer.init(buffer=512)
         self.sounds = [
             load.sound("sound_files/buttonSound.wav"),
+            load.sound("sound_files/buildingSound.wav"),
+            load.sound("sound_files/bulletSound.wav")
         ]
         data = self.loadVolume()
         self.volume = data["Volume"]["soundVolume"]
@@ -71,6 +68,12 @@ class SoundEffectsManager:
 
     def playButtonSound(self):
         pygame.mixer.Sound.play(self.sounds[0])
+
+    def playBuildingSound(self):
+        pygame.mixer.Sound.play(self.sounds[1])
+    
+    def playBulletSound(self):
+        pygame.mixer.Sound.play(self.sounds[2])
 
     def updateVolume(self, soundVolume):
         self.volume = soundVolume

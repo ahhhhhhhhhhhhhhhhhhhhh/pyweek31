@@ -7,7 +7,7 @@ import pygame
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
 from game.utils import Text, TextButton
-from game.sound import MusicManager
+from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel
 import game.entity as entity
 
@@ -89,6 +89,7 @@ class Game(Scene):
     def __init__(self, screen):
         self.id = "game"
         self.screen = screen
+        self.soundManager = SoundEffectsManager()
         
         self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
@@ -160,6 +161,7 @@ class Game(Scene):
 
                     if self.build_mode and self.tmap.can_build(tile):
                         print("building tower", tile)
+                        self.soundManager.playBuildingSound()
                         coords = self.tmap.tile_to_screen_coords(tile)
                         new_tower = self.selected_towertype(coords[0], coords[1])
                         self.tmap.blocking[tile[0]][tile[1]] = new_tower
