@@ -108,6 +108,10 @@ class Tower(Tile):
 
     timer = 0
 
+    base_image = None
+    turret_image = None
+    turret_image_index = 0
+
     def __init__(self, x, y):
         super().__init__(x, y)
         self.button = utils.ToggleButton([0,0,SCALE,SCALE])
@@ -122,13 +126,19 @@ class Tower(Tile):
             tower_pos = self.center_pos()
             pygame.draw.circle(screen, (255,255,255), tower_pos, self.max_range, width=1)
     
-        if self.image != None:
-            screen.blit(self.image, (x, y))
+        if self.base_image != None:
+            screen.blit(self.base_image, (x, y))
+            screen.blit(self.turret_image[self.turret_image_index], (x, y - 10))
         self.button.update_location((x, y))
         self.button.draw(screen)
 
-    def fire(self):
+    def fire(self, target):
         self.timer = self.fire_speed
+
+        if target.center_pos()[0] < self.x:
+            self.turret_image_index = 0
+        else:
+            self.turret_image_index = 1
 
     def center_pos(self):
         return [self.x + SCALE / 2, self.y + SCALE / 2]
@@ -142,7 +152,8 @@ class FastTower(Tower):
 def ready_tiles():
     House.image = load.image("smallhouse50.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse50variant.png").convert_alpha()
-    Tower.image = load.image("woodentower.png").convert_alpha()
+    Tower.base_image = load.image("box.png").convert_alpha()
+    Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
 
 class TileMap():
     colormap = {(255,0,0): [Start],
