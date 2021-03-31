@@ -129,9 +129,11 @@ class Game(Scene):
         if self.tower_button.clicked:
             self.selected_towertype = Tower
             self.build_mode = True
+            self.selected_tower = None
         elif self.fast_tower_button.clicked:
             self.selected_towertype = FastTower
             self.build_mode = True
+            self.selected_tower = None
 
         draw_tower_info_panel(self.screen, self.selected_tower, (1050, 100))
 
@@ -165,10 +167,13 @@ class Game(Scene):
             coords = self.tmap.tile_to_screen_coords(tile)
             canbuild = self.tmap.can_build(tile)
 
+            temp = self.selected_towertype(coords[0], coords[1])
             if canbuild:
                 self.screen.blit(self.tmap.selector_open, coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
             else:
                 self.screen.blit(self.tmap.selector_closed, coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
 
         # updating zombies and deleting zombies that reach end
         to_del = []
