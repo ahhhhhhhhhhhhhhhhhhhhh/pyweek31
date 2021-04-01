@@ -68,7 +68,9 @@ class SoundEffectsManager:
         self.sounds = [
             load.sound("sound_files/buttonSound.wav"),
             load.sound("sound_files/buildingSound.wav"),
-            load.sound("sound_files/bulletSound.wav")
+            load.sound("sound_files/bulletSound.wav"),
+            load.sound("sound_files/zombieDeathSound.wav"),
+            load.sound("sound_files/zombieEndSound.wav")
         ]
         data = self.loadVolume()
         self.volume = data["Volume"]["soundVolume"]
@@ -83,6 +85,12 @@ class SoundEffectsManager:
     
     def playBulletSound(self):
         pygame.mixer.Sound.play(self.sounds[2])
+
+    def playZombieDeathSound(self):
+        pygame.mixer.Sound.play(self.sounds[3])
+
+    def playZombieEndSound(self):
+        pygame.mixer.Sound.play(self.sounds[4])
 
     def changeVolume(self, changingValue):
         self.volume = self.volume + changingValue

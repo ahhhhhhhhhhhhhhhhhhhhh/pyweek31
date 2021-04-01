@@ -212,6 +212,7 @@ class Game(Scene):
             if zombie.tile == None:
                 to_del.append(zombie)
                 self.lives -= 1
+                loop.soundManager.playZombieEndSound()
         for zombie in to_del:
             self.zombies.remove(zombie)
 
@@ -243,6 +244,7 @@ class Game(Scene):
                 target.stun(tower.stun_duration)
 
             if target.is_dead():
+                loop.soundManager.playZombieDeathSound()
                 self.zombies.remove(target)
 
         # updating projectiles
