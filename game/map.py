@@ -265,15 +265,16 @@ def ready_tiles():
     officer = load.image("smofficer.png").convert_alpha()
     Tower.turret_image = [pygame.transform.flip(officer, True, False), officer]
 
-    blue_officer = _replace_color(officer, (239,1,159), (0,48,200))
-    blue_officer = _replace_color(blue_officer, (176,6,145), (0,74,127))
+    blue_officer = _replace_color(officer, (239,1,159), (61,61,207))
+    blue_officer = _replace_color(blue_officer, (176,6,145), (19,19,133))
     StunTower.turret_image = [pygame.transform.flip(blue_officer, True, False), blue_officer]
 
     red_officer = _replace_color(officer, (239,1,159), (176,16,29))
     red_officer = _replace_color(red_officer, (176,6,145), (127,9,17))
     FastTower.turret_image = [pygame.transform.flip(red_officer, True, False), red_officer]
 
-    grey_officer = _replace_color(officer, (239,1,159), (105,105,112))
+    grey_officer = load.image("smofficer_sniper.png")
+    grey_officer = _replace_color(grey_officer, (239,1,159), (105,105,112))
     grey_officer = _replace_color(grey_officer, (176,6,145), (72,72,75))
     SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
 
