@@ -99,7 +99,10 @@ class Game(Scene):
         self.zombies = []
 
         self.lives = 50
-        self.display_lives = Text("", [1100, 20], size=32)
+        self.display_lives = Text("", [1050, 20], size=32)
+
+        self.currency = 300
+        self.display_currency = Text("", [1050, 50], size=32)
 
         self.towers = []
         self.projectiles = []
@@ -127,9 +130,11 @@ class Game(Scene):
           
         self.tmap.render(self.screen, self.tmap_offset)
 
-        # updating lives text
+        # updating lives/currency text
         self.display_lives.update_text("Lives: " + str(self.lives))
         self.display_lives.draw(self.screen)
+        self.display_currency.update_text("Goodwill: " + str(self.currency))
+        self.display_currency.draw(self.screen)
 
         # updating tower buying buttons
         self.tower_button.draw(self.screen)
@@ -167,13 +172,14 @@ class Game(Scene):
                     else:
                         self.selected_tower = None
 
-                    if self.build_mode and self.tmap.can_build(tile):
+                    coords = self.tmap.tile_to_screen_coords(tile)
+                    new_tower = self.selected_towertype(coords[0], coords[1])
+                    if self.build_mode and self.tmap.can_build(tile) and self.currency >= new_tower.cost[0]:
                         print("building tower", tile)
                         loop.soundManager.playBuildingSound()
-                        coords = self.tmap.tile_to_screen_coords(tile)
-                        new_tower = self.selected_towertype(coords[0], coords[1])
                         self.tmap.blocking[tile[0]][tile[1]] = new_tower
                         self.towers.append(new_tower)
+                        self.currency -= new_tower.cost[0]
 
                 # right click to exit build mode
                 elif event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 3:
@@ -195,7 +201,7 @@ class Game(Scene):
         # updating tower info panel
         if self.selected_tower != self.tower_info_panel.tower:
             self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
-        self.tower_info_panel.update()
+        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
         self.tower_info_panel.draw()
 
         # updating zombies and deleting zombies that reach end

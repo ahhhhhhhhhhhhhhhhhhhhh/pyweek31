@@ -157,8 +157,7 @@ class Tower(Tile):
     bullet_color = (255,255,255)
     bullet_duration = 0.1
 
-    lvl = 0
-    timer = 0
+    cost = [100, 50, 75] # initial tower cost, then cost of upgrades
 
     base_image = None
     turret_image = None
@@ -166,6 +165,8 @@ class Tower(Tile):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+        self.timer = 0
+        self.lvl = 0
         
         self.max_level = 99999 # placeholder value
         # accesses each attribute once to set max level to attribute with least number of upgrades to prevent errors
@@ -201,6 +202,10 @@ class Tower(Tile):
 
     def is_max_level(self):
         return self.lvl >= self.max_level - 1
+
+    def upgrade_cost(self):
+        if not self.is_max_level():
+            return self.cost[self.lvl + 1]
 
     def __getattribute__(self, name):
         if name in ["damage", "max_range", "fire_speed", "stun_duration"]:

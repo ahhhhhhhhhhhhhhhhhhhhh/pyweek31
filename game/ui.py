@@ -35,17 +35,23 @@ class TowerInfoPanel:
 	def make_upgrade_button(self):
 		if not self.tower.is_max_level():
 			self.upgrade_button = TextButton("Promote", [self.pos[0] + 100, self.pos[1] + 400], 30, centered=True, color=(0, 255, 0))
+			self.upgrade_cost_text = Text("Costs " + str(self.tower.upgrade_cost()) + " goodwill", [self.pos[0] + 100, self.pos[1] + 430], 12, centered=True)
 		else:
 			self.upgrade_button = Text("Max Level", [self.pos[0] + 100, self.pos[1] + 400], 30, centered=True, color=(255, 204, 0))
+			self.upgrade_cost_text = Text("", self.pos)
 
-	def update(self):
+	def update(self, currency):
 		if self.tower == None:
-			return
+			return currency
 
-		if not self.tower.is_max_level() and self.upgrade_button.clicked:
+		cost = self.tower.upgrade_cost()
+		if not self.tower.is_max_level() and self.upgrade_button.clicked and currency >= cost:
 			self.tower.upgrade()
 			self.make_info_text()
 			self.make_upgrade_button()
+			return currency - cost
+
+		return currency
 
 	def draw(self):
 		self.screen.blit(self.panel, self.pos)
@@ -68,5 +74,6 @@ class TowerInfoPanel:
 		self.speed_text.draw(self.screen)
 
 		self.upgrade_button.draw(self.screen)
+		self.upgrade_cost_text.draw(self.screen)
 
 		
