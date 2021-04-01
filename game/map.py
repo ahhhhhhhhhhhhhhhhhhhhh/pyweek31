@@ -221,6 +221,14 @@ class StunTower(Tower):
     bullet_color = (0, 0, 255)
     bullet_duration = 0.5
 
+def _replace_color(surf, old, new):
+    surf = surf.copy()
+    for x in range(surf.get_width()):
+        for y in range(surf.get_height()):
+            if surf.get_at((x,y)) == old:
+                surf.set_at((x,y), new)
+    return surf
+
 def ready_tiles():
     House.image = load.image("smallhouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
@@ -232,6 +240,11 @@ def ready_tiles():
     Tower.base_image = load.image("box.png").convert_alpha()
     officer = load.image("smofficer.png").convert_alpha()
     Tower.turret_image = [pygame.transform.flip(officer, True, False), officer]
+
+
+    officer = _replace_color(officer, (239,1,159), (0,48,200))
+    officer = _replace_color(officer, (176,6,145), (0,74,127))
+    StunTower.turret_image = [pygame.transform.flip(officer, True, False), officer]
 
 
 class TileArray():
