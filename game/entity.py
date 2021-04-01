@@ -123,7 +123,7 @@ class Waves:
         return False
 
     def get_finished(self):
-        return not self.waves
+        return not self.waves and not any([bool(x) for x in self.zombies_to_spawn])
 
     def _spawn_dict_at(self, zombielist, tmap, zdict, spawn):
         for key in zdict:
