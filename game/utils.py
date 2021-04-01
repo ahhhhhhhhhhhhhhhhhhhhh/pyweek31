@@ -154,7 +154,6 @@ class LinedText:
             screen.blit(image, (x, y))
             y += image.get_height() * self.spacing
             
-
     def update_location(self, newloc):
         self.location = newloc
         self.rect.topleft = newloc

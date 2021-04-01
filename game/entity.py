@@ -159,13 +159,12 @@ class ProjectileBase:
         return self.lifetime <= 0
 
 class BulletTrail(ProjectileBase):
-    lifetime = 0.1
-
-    def __init__(self, start, end, color):
+    def __init__(self, start, end, color, lifetime=0.1):
         soundManager.playBulletSound()
         self.start = start
         self.end = end
         self.color = color
+        self.lifetime = lifetime
 
     def render(self, screen):
         pygame.draw.line(screen, self.color, self.start, self.end, width=1)

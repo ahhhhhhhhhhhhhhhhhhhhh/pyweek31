@@ -138,10 +138,12 @@ Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
     name = "Officer"
+    text = "Just a standard cop trying to fend off the zombies"
     damage = [50, 75, 100]
     max_range = [175, 200, 200]
     fire_speed = [2, 2, 1.5]  # how many seconds between shots
     bullet_color = (255,255,255)
+    bullet_duration = 0.1
 
     lvl = 0
     timer = 0
@@ -189,7 +191,7 @@ class Tower(Tile):
         return self.lvl >= self.max_level - 1
 
     def __getattribute__(self, name):
-        if name in ["damage", "max_range", "fire_speed"]:
+        if name in ["damage", "max_range", "fire_speed", "stun_duration"]:
             self.max_level = min(len(object.__getattribute__(self, name)), self.max_level)
             return object.__getattribute__(self, name)[self.lvl]
         else:
@@ -197,6 +199,7 @@ class Tower(Tile):
 
 class FastTower(Tower):
     name = "Hotshot"
+    text = "Takes down zombies quickly, but can only focus on what is right in front of them"
     damage = [35, 50]
     fire_speed = [0.5, 0.4]
     max_range = [120, 130]
@@ -204,6 +207,7 @@ class FastTower(Tower):
 
 class SniperTower(Tower):
     name = "Sniper"
+    text = "Loves shooting things from very far away, but takes time to aim"
     damage = [200, 300]
     fire_speed = [3, 3]
     max_range = [400, 500]
@@ -211,9 +215,11 @@ class SniperTower(Tower):
 
 class StunTower(Tower):
     name = "TASER"
+    text = "Apparently tasers work on zombies. Who knew?"
     damage = [10, 15]
-    stun_duration = 1
+    stun_duration = [1, 1.25]
     bullet_color = (0, 0, 255)
+    bullet_duration = 0.5
 
 def ready_tiles():
     House.image = load.image("smallhouse.png").convert_alpha()

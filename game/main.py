@@ -229,7 +229,7 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
+            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color, tower.bullet_duration))
             tower.fire(target)
             target.hit(tower.damage)
 
