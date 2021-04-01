@@ -72,6 +72,18 @@ class Touching(Tile):
                 self.image = pygame.transform.rotate(img, 90*rot)
                 return
 
+#
+# class Bordered(Tile):
+#     borderes = {}
+#     base = None
+#     images = []
+#
+#     def init_images():
+#         self.images = []
+#         for sides in range(int("1111", 2)):
+#
+
+
 class Road(Touching):
     # image = pygame.Surface((SCALE,SCALE))
     # image.fill((64,64,64))
@@ -285,10 +297,20 @@ class TileMap():
         self.build_map(self.map, map_surf)
         self.build_map(self.blocking, blocking_surf)
         
+        tmap = TileArray(self.map)
+        tmapblock = TileArray(self.blocking)
+        
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].link(TileArray(self.map), x, y)
-                self.blocking[x][y].link(TileArray(self.blocking), x, y)
+                if type(self.blocking[x][y]) in (Road, Start, End):
+                    print (x,y, self.blocking[x][y])
+                    self.map[x][y] = self.blocking[x][y]
+                    self.blocking[x][y] = NoTile(x, y)
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
+                self.map[x][y].link(tmap, x, y)
+                self.blocking[x][y].link(tmapblock, x, y)
 
         self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
         self.selector_open.fill((0,0,255))

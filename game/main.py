@@ -91,7 +91,7 @@ class Game(Scene):
         self.screen = screen
         self.soundManager = SoundEffectsManager()
         
-        self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
+        self.tmap = TileMap(load.image("maps/blank_bg.png"), load.image("maps/testmap_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
 
         self.tmap_offset = [25,25]
@@ -282,7 +282,7 @@ class EndScreen(Scene):
         if won:
             self.outcome_display.update_text("You won!")
         else:
-            self.outcome_display.update_text("You lost!")        
+            self.outcome_display.update_text("You lost!")
             
 class MainMenu(Scene):
     def __init__(self, screen):
