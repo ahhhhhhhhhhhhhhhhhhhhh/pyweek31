@@ -271,7 +271,7 @@ class TileArray():
         else:
             return None
 
-
+# tilemap
 class TileMap():
     colormap = {(255,0,0): [Start],
                 (0,38,255): [End],
