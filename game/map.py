@@ -72,6 +72,18 @@ class Touching(Tile):
                 self.image = pygame.transform.rotate(img, 90*rot)
                 return
 
+#
+# class Bordered(Tile):
+#     borderes = {}
+#     base = None
+#     images = []
+#
+#     def init_images():
+#         self.images = []
+#         for sides in range(int("1111", 2)):
+#
+
+
 class Road(Touching):
     # image = pygame.Surface((SCALE,SCALE))
     # image.fill((64,64,64))
@@ -138,10 +150,12 @@ Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
     name = "Officer"
+    text = "Just a standard cop trying to fend off the zombies"
     damage = [50, 75, 100]
     max_range = [175, 200, 200]
     fire_speed = [2, 2, 1.5]  # how many seconds between shots
     bullet_color = (255,255,255)
+    bullet_duration = 0.1
 
     lvl = 0
     timer = 0
@@ -152,7 +166,14 @@ class Tower(Tile):
 
     def __init__(self, x, y):
         super().__init__(x, y)
-        self.damage # single access to set max level
+        
+        self.max_level = 99999 # placeholder value
+        # accesses each attribute once to set max level to attribute with least number of upgrades to prevent errors
+        self.damage
+        self.fire_speed
+        self.max_range
+
+        self.info_image = load.image("officer.png")
 
     def update(self, deltatime):
         self.timer -= deltatime
@@ -161,7 +182,7 @@ class Tower(Tile):
     def render(self, screen, x, y):
         if self.base_image != None:
             screen.blit(self.base_image, (x, y))
-            screen.blit(self.turret_image[self.turret_image_index], (x, y - 10))
+            screen.blit(self.turret_image[self.turret_image_index], (x+10, y+10))
 
     def fire(self, target):
         self.timer = self.fire_speed
@@ -182,18 +203,43 @@ class Tower(Tile):
         return self.lvl >= self.max_level - 1
 
     def __getattribute__(self, name):
-        if name in ["damage", "max_range", "fire_speed"]:
-            self.max_level = len(object.__getattribute__(self, name))
+        if name in ["damage", "max_range", "fire_speed", "stun_duration"]:
+            self.max_level = min(len(object.__getattribute__(self, name)), self.max_level)
             return object.__getattribute__(self, name)[self.lvl]
         else:
             return object.__getattribute__(self, name)
 
 class FastTower(Tower):
-    name = "Fast Officer"
+    name = "Hotshot"
+    text = "Takes down zombies quickly, but can only focus on what is right in front of them"
     damage = [35, 50]
     fire_speed = [0.5, 0.4]
     max_range = [120, 130]
     bullet_color = (255, 0, 0)
+
+class SniperTower(Tower):
+    name = "Sniper"
+    text = "Loves shooting things from very far away, but takes time to aim"
+    damage = [200, 300]
+    fire_speed = [3, 3]
+    max_range = [400, 500]
+    bullet_color = (0, 0, 0)
+
+class StunTower(Tower):
+    name = "TASER"
+    text = "Apparently tasers work on zombies. Who knew?"
+    damage = [10, 15]
+    stun_duration = [1, 1.25]
+    bullet_color = (0, 0, 255)
+    bullet_duration = 0.5
+
+def _replace_color(surf, old, new):
+    surf = surf.copy()
+    for x in range(surf.get_width()):
+        for y in range(surf.get_height()):
+            if surf.get_at((x,y)) == old:
+                surf.set_at((x,y), new)
+    return surf
 
 def ready_tiles():
     House.image = load.image("smallhouse.png").convert_alpha()
@@ -202,8 +248,15 @@ def ready_tiles():
     BigHouse.image = load.image("garagehouse.png").convert_alpha()
     Bush1.image = load.image("bush.png").convert_alpha()
     Bush2.image = load.image("bush2.png").convert_alpha()
+
     Tower.base_image = load.image("box.png").convert_alpha()
-    Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
+    officer = load.image("smofficer.png").convert_alpha()
+    Tower.turret_image = [pygame.transform.flip(officer, True, False), officer]
+
+
+    officer = _replace_color(officer, (239,1,159), (0,48,200))
+    officer = _replace_color(officer, (176,6,145), (0,74,127))
+    StunTower.turret_image = [pygame.transform.flip(officer, True, False), officer]
 
 
 class TileArray():
@@ -244,10 +297,19 @@ class TileMap():
         self.build_map(self.map, map_surf)
         self.build_map(self.blocking, blocking_surf)
         
+        tmap = TileArray(self.map)
+        tmapblock = TileArray(self.blocking)
+        
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].link(TileArray(self.map), x, y)
-                self.blocking[x][y].link(TileArray(self.blocking), x, y)
+                if type(self.blocking[x][y]) in (Road, Start, End):
+                    self.map[x][y] = self.blocking[x][y]
+                    self.blocking[x][y] = NoTile(x, y)
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
+                self.map[x][y].link(tmap, x, y)
+                self.blocking[x][y].link(tmapblock, x, y)
 
         self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
         self.selector_open.fill((0,0,255))

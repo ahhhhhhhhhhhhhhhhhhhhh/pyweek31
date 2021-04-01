@@ -23,8 +23,14 @@ class ZombieBase:
 
         self.max_health_bar_width = 30
         self.update_health_bar()
+
+        self.stun_timer = 0
     
     def timestep(self, deltatime):
+        if self.stun_timer > 0:
+            self.stun_timer -= deltatime
+            return
+
         if (type(self.tile) in (Road, Start)):
             thresh = 0.01
             if (abs(self.x - self.dest.x) < thresh and abs(self.y - self.dest.y) < thresh):
@@ -71,6 +77,9 @@ class ZombieBase:
         self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 3))
         self.health_bar.fill((0, 255, 0))
 
+    def stun(self, duration):
+        self.stun_timer = duration
+
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")
     speed = 1
@@ -94,16 +103,18 @@ class Waves:
         lines = [json.loads(line) for line in lines]
         waves = []
     
-        for i, line in enumerate(lines):
+        for wave in lines:
             waves.append([])
-            for j in range(len(line)):
-                waves[i].append({})
-                for key in lines[i][j]:
-                    waves[i][j][Waves.zombiemap[key]] = lines[i][j][key]
-
+            for spawnwave in wave:
+                waves[-1].append([])
+                for i in range(0, len(spawnwave), 2):
+                    for _ in range(spawnwave[i+1]):
+                        waves[-1][-1].append(Waves.zombiemap[spawnwave[i]])
+                    
         self.waves = waves
         self.zombies_to_spawn = [[] for _ in range(len(tmap.starts))]
-        self.timer = 0
+        self.spawn_timers = [0 for _ in range(len(self.zombies_to_spawn))]
+        self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
         self.time_threshold = 1
 
     def get_next(self):
@@ -112,27 +123,30 @@ class Waves:
         return False
 
     def get_finished(self):
-        return not self.waves
-
-    def _spawn_dict_at(self, zombielist, tmap, zdict, spawn):
-        for key in zdict:
-            for _ in range(zdict[key]):
-                zombielist[spawn].append(key(tmap.starts[spawn]))
+        return not self.waves and not any([bool(x) for x in self.zombies_to_spawn])
 
     def call_next(self, tmap):
         wave = self.get_next()
-        if wave:
-            for i, spawner_wave in enumerate(wave):
-                self._spawn_dict_at(self.zombies_to_spawn, tmap, spawner_wave, i)
+        self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
+
+        for i in range(len(wave)):
+            spawnwave = wave[i]
+            for ztype in spawnwave:
+                self.zombies_to_spawn[i].append(ztype(tmap.starts[i]))
 
     def update(self, zombielist):
-        self.timer += Waves.loop.get_ticktime()
-        if self.timer > self.time_threshold:
-            self.timer = 0
-            for i in range(len(self.zombies_to_spawn)):
-                if self.zombies_to_spawn[i]:
+        for i in range(len(self.spawn_timers)):
+            self.spawn_timers[i] += Waves.loop.get_ticktime()
+
+            if self.zombies_to_spawn[i]:
+                normal = self.spawn_timers[i] > self.time_threshold
+                micro_wave = self.spawn_timers[i] > self.time_threshold / 2
+                micro_wave = micro_wave and isinstance(self.zombies_to_spawn[i][0], self.spawn_last[i])
+
+                if normal or micro_wave:
+                    self.spawn_timers[i] = 0
                     zombielist.append(self.zombies_to_spawn[i].pop(0))
-            
+                    self.spawn_last[i] = type(zombielist[i])
 
 class ProjectileBase:
     image = None
@@ -148,13 +162,12 @@ class ProjectileBase:
         return self.lifetime <= 0
 
 class BulletTrail(ProjectileBase):
-    lifetime = 0.1
-
-    def __init__(self, start, end, color):
+    def __init__(self, start, end, color, lifetime=0.1):
         BulletTrail.loop.soundManager.playBulletSound()
         self.start = start
         self.end = end
         self.color = color
+        self.lifetime = lifetime
 
     def render(self, screen):
         pygame.draw.line(screen, self.color, self.start, self.end, width=1)

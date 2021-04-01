@@ -5,7 +5,7 @@ import random
 import pygame
 
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower
+from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel
@@ -30,7 +30,8 @@ class Loop:
             self.requested_cursor = None
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT
-                or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):
+                or (event.type == pygame.KEYDOWN and event.key == pygame.K_q
+                and pygame.key.get_mods() & pygame.KMOD_CTRL)):
                     self.end_game()
                 self.events.append(event)
 
@@ -91,7 +92,7 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
         
-        self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
+        self.tmap = TileMap(load.image("maps/blank_bg.png"), load.image("maps/testmap_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
 
         self.tmap_offset = [25,25]
@@ -104,12 +105,16 @@ class Game(Scene):
         self.projectiles = []
 
         self.selected_tower = None
-        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
+        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
 
         self.build_mode = False
         self.selected_towertype = Tower
-        self.tower_button = TextButton("Station Additional Officer", [40, 620], 25)
-        self.fast_tower_button = TextButton("Station Additional Fast Officer", [40, 660], 25)
+        button_spacing = 30
+        button_start_y = 600
+        self.tower_button = TextButton("Deploy Officer", [40, button_start_y], 25)
+        self.fast_tower_button = TextButton("Deploy Hotshot", [40, button_start_y + button_spacing], 25)
+        self.sniper_tower_button = TextButton("Deploy Sniper", [40, button_start_y + button_spacing * 2], 25)
+        self.stun_tower_button = TextButton("Deploy TASER", [40, button_start_y + button_spacing * 3], 25)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -129,6 +134,8 @@ class Game(Scene):
         # updating tower buying buttons
         self.tower_button.draw(self.screen)
         self.fast_tower_button.draw(self.screen)
+        self.sniper_tower_button.draw(self.screen)
+        self.stun_tower_button.draw(self.screen)
         if self.tower_button.clicked:
             self.selected_towertype = Tower
             self.build_mode = True
@@ -137,10 +144,18 @@ class Game(Scene):
             self.selected_towertype = FastTower
             self.build_mode = True
             self.selected_tower = None
+        elif self.sniper_tower_button.clicked:
+            self.selected_towertype = SniperTower
+            self.build_mode = True
+            self.selected_tower = None
+        elif self.stun_tower_button.clicked:
+            self.selected_towertype = StunTower
+            self.build_mode = True
+            self.selected_tower = None
 
         # updating tower info panel
         if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 100))
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
         self.tower_info_panel.update()
         self.tower_info_panel.draw()
 
@@ -215,11 +230,16 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color))
+            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color, tower.bullet_duration))
             tower.fire(target)
             target.hit(tower.damage)
+
+            if isinstance(tower, StunTower):
+                target.stun(tower.stun_duration)
+
             if target.is_dead():
                 self.zombies.remove(target)
+
 
         # updating projectiles
         to_del = []
@@ -234,6 +254,10 @@ class Game(Scene):
         # game end conditions
         if self.lives < 1:
             loop.get_scene("endscreen").set_won(False)
+            loop.switch_scene("endscreen")
+
+        if self.waves.get_finished() and not len(self.zombies):
+            loop.get_scene("endscreen").set_won(True)
             loop.switch_scene("endscreen")
     
 
@@ -259,7 +283,7 @@ class EndScreen(Scene):
         if won:
             self.outcome_display.update_text("You won!")
         else:
-            self.outcome_display.update_text("You lost!")        
+            self.outcome_display.update_text("You lost!")
             
 class MainMenu(Scene):
     def __init__(self, screen):
