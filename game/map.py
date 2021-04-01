@@ -303,7 +303,6 @@ class TileMap():
         for x in range(self.xdim):
             for y in range(self.ydim):
                 if type(self.blocking[x][y]) in (Road, Start, End):
-                    print (x,y, self.blocking[x][y])
                     self.map[x][y] = self.blocking[x][y]
                     self.blocking[x][y] = NoTile(x, y)
         
