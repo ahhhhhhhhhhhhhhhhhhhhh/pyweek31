@@ -92,7 +92,7 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
         
-        self.tmap = TileMap(load.image("maps/blank_bg.png"), load.image("maps/testmap_blocking.png"))
+        self.tmap = TileMap(load.image("maps/startmap_bg.png"), load.image("maps/startmap_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
 
         self.tmap_offset = [25,25]
