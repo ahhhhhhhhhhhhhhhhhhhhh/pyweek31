@@ -7,8 +7,6 @@ import game.load as load
 from game.sound import SoundEffectsManager
 from game.map import Road, Start, SCALE
 
-soundManager = SoundEffectsManager()
-
 class ZombieBase:
     image = None
     speed = 1
@@ -165,7 +163,7 @@ class ProjectileBase:
 
 class BulletTrail(ProjectileBase):
     def __init__(self, start, end, color, lifetime=0.1):
-        soundManager.playBulletSound()
+        BulletTrail.loop.soundManager.playBulletSound()
         self.start = start
         self.end = end
         self.color = color
