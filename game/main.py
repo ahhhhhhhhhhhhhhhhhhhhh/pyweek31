@@ -254,6 +254,10 @@ class Game(Scene):
         if self.lives < 1:
             loop.get_scene("endscreen").set_won(False)
             loop.switch_scene("endscreen")
+
+        if self.waves.get_finished() and not len(self.zombies):
+            loop.get_scene("endscreen").set_won(True)
+            loop.switch_scene("endscreen")
     
 
 class EndScreen(Scene):
