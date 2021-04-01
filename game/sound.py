@@ -70,18 +70,18 @@ class SoundEffectsManager:
             load.sound("sound_files/buildingSound.wav"),
             load.sound("sound_files/bulletSound.wav")
         ]
-        self.reloadVolume()
+        data = self.loadVolume()
+        self.volume = data["Volume"]["soundVolume"]
+        for i in self.sounds:
+            pygame.mixer.Sound.set_volume(i, self.volume)
 
     def playButtonSound(self):
-        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[0])
 
     def playBuildingSound(self):
-        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[1])
     
     def playBulletSound(self):
-        self.reloadVolume()
         pygame.mixer.Sound.play(self.sounds[2])
 
     def changeVolume(self, changingValue):
@@ -116,9 +116,3 @@ class SoundEffectsManager:
                 write_file.write(json.dumps(data))   
             with open(load.handle_path("persistence.json"), "r") as read_file:
                 return json.load(read_file)
-
-    def reloadVolume(self):
-        data = self.loadVolume()
-        self.volume = data["Volume"]["soundVolume"]
-        for i in self.sounds:
-            pygame.mixer.Sound.set_volume(i, self.volume)

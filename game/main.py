@@ -14,6 +14,7 @@ import game.entity as entity
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
         self.musicManager = musicManager
+        self.soundManager = SoundEffectsManager()
         self.scene = scene
         self.screen = screen
         self.clock = pygame.time.Clock()
@@ -89,7 +90,6 @@ class Game(Scene):
     def __init__(self, screen):
         self.id = "game"
         self.screen = screen
-        self.soundManager = SoundEffectsManager()
         
         self.tmap = TileMap(load.image("maps/map1_bg.png"), load.image("maps/map1_blocking.png"))
         self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
@@ -161,7 +161,7 @@ class Game(Scene):
 
                     if self.build_mode and self.tmap.can_build(tile):
                         print("building tower", tile)
-                        self.soundManager.playBuildingSound()
+                        loop.soundManager.playBuildingSound()
                         coords = self.tmap.tile_to_screen_coords(tile)
                         new_tower = self.selected_towertype(coords[0], coords[1])
                         self.tmap.blocking[tile[0]][tile[1]] = new_tower
@@ -293,7 +293,6 @@ class MainMenu(Scene):
 
 class Settings(Scene):
     def __init__(self, screen):
-        self.soundManager = SoundEffectsManager()
         self.id = "settings"
         self.screen = screen
         self.t = Text("Settings", [840, 40], 64, centered=True)
@@ -331,9 +330,9 @@ class Settings(Scene):
         elif self.musicHigherButton.clicked:
             loop.musicManager.changeVolume(.1)
         elif self.soundLowerButton.clicked:
-            self.soundManager.changeVolume(-.1)
+            loop.soundManager.changeVolume(-.1)
         elif self.soundHigherButton.clicked:
-            self.soundManager.changeVolume(.1)
+            loop.soundManager.changeVolume(.1)
         elif self.leaveButton.clicked:
             loop.switch_scene("menu")
 
@@ -358,5 +357,6 @@ def main():
     TextButton.loop = loop
     TileMap.loop = loop
     entity.Waves.loop = loop
+    entity.BulletTrail.loop = loop
     
     loop.start()
