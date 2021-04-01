@@ -2,9 +2,22 @@ Track: Your Gentle Touch — Artificial.Music & Syiphorous [Audio Library Releas
 Music provided by Audio Library Plus
 Watch: https://youtu.be/5ThbUjaIiDg​
 Free Download / Stream: https://alplus.io/your-gentle-touch
+(Audio has been amplified in certain areas)
+--menuMusic
 
 Eternal Flame by Lahar https://soundcloud.com/musicbylahar​
 Creative Commons — Attribution 3.0 Unported — CC BY 3.0
 Free Download / Stream: https://bit.ly/al-eternal-flame​
 Music promoted by Audio Library https://youtu.be/Q8773hTncoM
+(Audio has been amplified in certain areas)
+--gameMusic
+
+Creator: ccssmith
+--buildingSound
+--bulletSound
+--buttonSound
+--zombieDeathSound
+--zombieEndSound
+--taserSound
+--sniperSound
 

@@ -242,6 +242,16 @@ class Game(Scene):
 
             if isinstance(tower, StunTower):
                 target.stun(tower.stun_duration)
+                loop.soundManager.playTaserSound()
+
+            if isinstance(tower, Tower):
+                loop.soundManager.playBulletSound()
+
+            if isinstance(tower, FastTower):
+                loop.soundManager.playBulletSound()
+
+            if isinstance(tower, SniperTower):
+                loop.soundManager.playSniperSound()
 
             if target.is_dead():
                 loop.soundManager.playZombieDeathSound()
@@ -420,6 +430,5 @@ def main():
     TextButton.loop = loop
     TileMap.loop = loop
     entity.Waves.loop = loop
-    entity.BulletTrail.loop = loop
     
     loop.start()

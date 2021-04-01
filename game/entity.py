@@ -163,7 +163,6 @@ class ProjectileBase:
 
 class BulletTrail(ProjectileBase):
     def __init__(self, start, end, color, lifetime=0.1):
-        BulletTrail.loop.soundManager.playBulletSound()
         self.start = start
         self.end = end
         self.color = color
