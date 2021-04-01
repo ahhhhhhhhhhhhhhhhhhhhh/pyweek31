@@ -233,6 +233,10 @@ class StunTower(Tower):
     bullet_color = (0, 0, 255)
     bullet_duration = 0.5
 
+    def __init__(self, x, y):
+        super().__init__(x,y)
+        self.info_image = load.image("bluecop.png")
+
 def _replace_color(surf, old, new):
     surf = surf.copy()
     for x in range(surf.get_width()):
