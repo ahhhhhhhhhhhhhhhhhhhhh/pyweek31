@@ -26,6 +26,7 @@ class ZombieBase:
         self.update_health_bar()
 
         self.stun_timer = 0
+        self.disp_offset = [random.random()/2-0.25, random.random()/2-0.25]
     
     def timestep(self, deltatime):
         if self.stun_timer > 0:
@@ -48,9 +49,13 @@ class ZombieBase:
     def render(self, screen, off = [0,0]):
         off = [
             off[0] + (SCALE - self.image.get_width())//2,
-            off[1] + (SCALE - self.image.get_height())//2
+            off[1] + (SCALE - self.image.get_height()) - SCALE//3
         ]
-        self.last_render_pos = (self.x*SCALE + off[0], self.y*SCALE + off[1])
+        tpos = [
+            self.x + self.disp_offset[0],
+            self.y + self.disp_offset[1]
+        ]
+        self.last_render_pos = (tpos[0]*SCALE + off[0], tpos[1]*SCALE + off[1])
         screen.blit(self.image, self.last_render_pos)
 
         self.update_health_bar()
@@ -91,9 +96,56 @@ class FastZombie(ZombieBase):
     reward = 15
 
 
+class GiantZombie(ZombieBase):
+    image = pygame.transform.scale(load.image("smallzombie.png"), (30, 60))
+    speed = 0.5
+    max_health = 1000
+
+class BabyZombie(ZombieBase):
+    image = pygame.transform.scale(load.image("smallzombie.png"), (30, 15))
+    speed = 2.5
+    max_health = 50
+
+class ShieldZombie(ZombieBase):
+    image = load.image("smallzombie.png")
+    shieldimage = load.image("shield.png")
+    speed = 1
+    max_health = 75
+    shield_health = 1
+    
+    def __init__(self, tile):
+        super().__init__(tile)
+        self.shield = self.shield_health
+        
+    
+    def hit(self, damage):
+        if self.shield > 0:
+            self.shield -= damage
+        else:
+            self.health -= damage
+    
+    def render(self, screen, off = [0,0]):
+        super().render(screen, off)
+        if self.shield > 0:
+            screen.blit(self.shieldimage, [
+                self.last_render_pos[0] + self.image.get_width()//3,
+                self.last_render_pos[1] + self.image.get_height()//3
+            ])
+
+
+class SummonerZombie(ZombieBase):
+    image = load.image("smallzombie.png")
+    max_health = 100
+
+
+
 class Waves:
     zombiemap = {"zombie": Zombie,
-                 "fastzombie": FastZombie}
+                 "fast": FastZombie,
+                 "giant": GiantZombie,
+                 "baby": BabyZombie,
+                 "shield": ShieldZombie,
+                 "summoner": SummonerZombie}
 
     def __init__(self, filepath, tmap):
         filepath = load.handle_path(filepath)
@@ -151,7 +203,7 @@ class Waves:
 
 class ProjectileBase:
     image = None
-    lifetime = 1 
+    lifetime = 1
 
     def timestep(self, deltatime):
         self.lifetime -= deltatime
