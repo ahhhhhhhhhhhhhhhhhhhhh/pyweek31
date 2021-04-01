@@ -153,13 +153,6 @@ class Game(Scene):
             self.build_mode = True
             self.selected_tower = None
 
-        # updating tower info panel
-        if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
-        self.tower_info_panel.update()
-        self.tower_info_panel.draw()
-
-
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
         if tile:
@@ -198,6 +191,12 @@ class Game(Scene):
             else:
                 self.screen.blit(self.tmap.selector_closed, coords)
                 pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
+
+        # updating tower info panel
+        if self.selected_tower != self.tower_info_panel.tower:
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
+        self.tower_info_panel.update()
+        self.tower_info_panel.draw()
 
         # updating zombies and deleting zombies that reach end
         to_del = []

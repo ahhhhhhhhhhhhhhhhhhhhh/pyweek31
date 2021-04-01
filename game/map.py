@@ -217,6 +217,10 @@ class FastTower(Tower):
     max_range = [120, 130]
     bullet_color = (255, 0, 0)
 
+    def __init__(self, x, y):
+        super().__init__(x,y)
+        self.info_image = load.image("redcop.png")
+
 class SniperTower(Tower):
     name = "Sniper"
     text = "Loves shooting things from very far away, but takes time to aim"
@@ -224,6 +228,10 @@ class SniperTower(Tower):
     fire_speed = [3, 3]
     max_range = [400, 500]
     bullet_color = (0, 0, 0)
+
+    def __init__(self, x, y):
+        super().__init__(x,y)
+        self.info_image = load.image("greycop.png")
 
 class StunTower(Tower):
     name = "TASER"

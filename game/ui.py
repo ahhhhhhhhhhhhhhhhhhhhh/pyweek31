@@ -53,6 +53,10 @@ class TowerInfoPanel:
 		if self.tower == None:
 			return
 
+		# drawing range circle
+		pygame.draw.circle(self.screen, (255,255,255), self.tower.center_pos(), self.tower.max_range, width=1)
+		self.screen.blit(self.panel, self.pos) # has to redraw so panel is on top of range circle
+
 		self.title.draw(self.screen)
 		self.lvl_text.draw(self.screen)
 
@@ -65,5 +69,4 @@ class TowerInfoPanel:
 
 		self.upgrade_button.draw(self.screen)
 
-		# drawing range circle
-		pygame.draw.circle(self.screen, (255,255,255), self.tower.center_pos(), self.tower.max_range, width=1)
+		
