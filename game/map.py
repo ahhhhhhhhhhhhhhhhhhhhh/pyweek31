@@ -170,7 +170,7 @@ class Tower(Tile):
     def render(self, screen, x, y):
         if self.base_image != None:
             screen.blit(self.base_image, (x, y))
-            screen.blit(self.turret_image[self.turret_image_index], (x, y - 10))
+            screen.blit(self.turret_image[self.turret_image_index], (x+10, y+10))
 
     def fire(self, target):
         self.timer = self.fire_speed
@@ -228,8 +228,10 @@ def ready_tiles():
     BigHouse.image = load.image("garagehouse.png").convert_alpha()
     Bush1.image = load.image("bush.png").convert_alpha()
     Bush2.image = load.image("bush2.png").convert_alpha()
+
     Tower.base_image = load.image("box.png").convert_alpha()
-    Tower.turret_image = [load.image("smallofficerL.png").convert_alpha(), load.image("smallofficerR.png").convert_alpha()]
+    officer = load.image("smofficer.png").convert_alpha()
+    Tower.turret_image = [pygame.transform.flip(officer, True, False), officer]
 
 
 class TileArray():
