@@ -88,12 +88,12 @@ class Scene(ABC):
 
 
 class Game(Scene):
-    def __init__(self, screen):
+    def __init__(self, screen, bg_image_path, blocking_image_path, wave_txt_path):
         self.id = "game"
         self.screen = screen
         
-        self.tmap = TileMap(load.image("maps/startmap_bg.png"), load.image("maps/startmap_blocking.png"))
-        self.waves = entity.Waves("maps/map1_waves.txt", self.tmap)
+        self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
+        self.waves = entity.Waves(wave_txt_path, self.tmap)
 
         self.tmap_offset = [25,25]
         self.zombies = []
@@ -239,7 +239,6 @@ class Game(Scene):
             if target.is_dead():
                 self.zombies.remove(target)
 
-
         # updating projectiles
         to_del = []
         for p in self.projectiles:
@@ -258,6 +257,32 @@ class Game(Scene):
         if self.waves.get_finished() and not len(self.zombies):
             loop.get_scene("endscreen").set_won(True)
             loop.switch_scene("endscreen")
+
+
+class LevelSelect(Scene):
+    def __init__(self, screen):
+        self.screen = screen
+        self.id = "level_select"
+
+        self.title_text = Text("Level Select", [640, 40], 64, centered=True)
+
+        self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/map1_waves.txt")
+        self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
+
+        self.maps = [self.start_map, self.map1]
+        self.buttons = []
+        for i in range(len(self.maps)):
+            b = TextButton("Map " + str(i + 1), [200, 200 + i * 50], 40)
+            self.buttons.append(b)
+
+    def update(self, loop):
+        self.title_text.draw(self.screen)
+
+        for i in range(len(self.buttons)):
+            b = self.buttons[i]
+            b.draw(self.screen)
+            if b.clicked:
+                loop.switch_scene(self.maps[i])
     
 
 class EndScreen(Scene):
@@ -309,7 +334,7 @@ class MainMenu(Scene):
         self.sb.draw(self.screen)
 
         if self.b.clicked:
-            loop.switch_scene("game")
+            loop.switch_scene("level_select")
  
         if self.sb.clicked:
             loop.switch_scene("settings")
@@ -367,11 +392,11 @@ def main():
     pygame.display.set_caption("John Brawn")
     ready_tiles()
 
-    game = Game(screen)
     menu = MainMenu(screen)
+    level_select = LevelSelect(screen)
     settings = Settings(screen)
     endscreen = EndScreen(screen)
-    scenedict = {"game": game, "menu": menu, "settings": settings, "endscreen": endscreen}
+    scenedict = {"menu": menu, "level_select": level_select, "settings": settings, "endscreen": endscreen}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)
