@@ -1,6 +1,7 @@
 import pygame
 
-from game.utils import Text, TextButton, LinedText
+from game.utils import Text, TextButton, LinedText, Button
+import game.load as load
 
 class TowerInfoPanel:
 	def __init__(self, screen, tower, pos):
@@ -77,3 +78,45 @@ class TowerInfoPanel:
 		self.upgrade_cost_text.draw(self.screen)
 
 		
+class BuyPanel:
+	def __init__(self, screen, pos, towers):
+		self.screen = screen
+		self.pos = pos
+		self.towers = towers
+
+		self.panel = pygame.Surface((600, 175))
+		self.panel.fill((54, 54, 54))
+
+		self.buttons = []
+		for i in range(len(self.towers)):
+			b = BuyButton(self.screen, [self.pos[0] + 10 + 150 * i, self.pos[1] + 10], self.towers[i])
+			self.buttons.append(b)
+
+	def update(self):
+		for b in self.buttons:
+			b.update()
+
+	def draw(self):
+		self.screen.blit(self.panel, self.pos)
+
+		for b in self.buttons:
+			b.draw()
+
+class BuyButton:
+	def __init__(self, screen, pos, tower):
+		self.screen = screen
+		self.pos = pos
+		self.tower = tower
+
+		self.icon = pygame.transform.scale(tower.buy_icon, (136,100))
+		self.text = Text("Deploy " + tower.name, [self.pos[0], self.pos[1] + 100], 20)
+		self.cost_text = Text("Costs " + str(tower.cost[0]) + " goodwill", [self.pos[0] + 10, self.pos[1] + 125], 12)
+		self.button = Button(pygame.Rect(self.pos, (136,150)))
+
+	def update(self):
+		self.button.draw(self.screen)
+
+	def draw(self):
+		self.screen.blit(self.icon, self.pos)
+		self.text.draw(self.screen)
+		self.cost_text.draw(self.screen)

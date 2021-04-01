@@ -11,6 +11,7 @@ class ZombieBase:
     image = None
     speed = 1
     max_health = 100
+    reward = 10
     
     def __init__(self, tile):
         self.x, self.y = tile.x, tile.y
@@ -84,10 +85,10 @@ class Zombie(ZombieBase):
     image = load.image("smallzombie.png")
     speed = 1
 
-
 class FastZombie(ZombieBase):
     image = load.image("smallzombie.png")
     speed = 2
+    reward = 15
 
 
 class Waves:

@@ -174,7 +174,8 @@ class Tower(Tile):
         self.fire_speed
         self.max_range
 
-        self.info_image = load.image("officer.png")
+        self.info_image = load.image("officer_original.png")
+        self.buy_icon = load.image("officer_head.png")
 
     def update(self, deltatime):
         self.timer -= deltatime
@@ -221,10 +222,12 @@ class FastTower(Tower):
     fire_speed = [0.5, 0.4]
     max_range = [120, 130]
     bullet_color = (255, 0, 0)
+    cost = [150, 100]
 
     def __init__(self, x, y):
         super().__init__(x,y)
         self.info_image = load.image("redcop.png")
+        self.buy_icon = load.image("redcop_head.png")
 
 class SniperTower(Tower):
     name = "Sniper"
@@ -237,6 +240,7 @@ class SniperTower(Tower):
     def __init__(self, x, y):
         super().__init__(x,y)
         self.info_image = load.image("greycop.png")
+        self.buy_icon = load.image("greycop_head.png")
 
 class StunTower(Tower):
     name = "TASER"
@@ -249,6 +253,7 @@ class StunTower(Tower):
     def __init__(self, x, y):
         super().__init__(x,y)
         self.info_image = load.image("bluecop.png")
+        self.buy_icon = load.image("bluecop_head.png")
 
 def _replace_color(surf, old, new):
     surf = surf.copy()

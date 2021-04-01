@@ -8,7 +8,7 @@ import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
-from game.ui import TowerInfoPanel
+from game.ui import TowerInfoPanel, BuyPanel
 import game.entity as entity
 
 class Loop:
@@ -99,10 +99,10 @@ class Game(Scene):
         self.zombies = []
 
         self.lives = 50
-        self.display_lives = Text("", [1050, 20], size=32)
+        self.display_lives = Text("", [1050, 10], size=32)
 
         self.currency = 300
-        self.display_currency = Text("", [1050, 50], size=32)
+        self.display_currency = Text("", [1050, 40], size=32)
 
         self.towers = []
         self.projectiles = []
@@ -110,14 +110,10 @@ class Game(Scene):
         self.selected_tower = None
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
 
+        self.buy_panel = BuyPanel(self.screen, (0, 545), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
+        self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
-        button_spacing = 30
-        button_start_y = 600
-        self.tower_button = TextButton("Deploy Officer", [40, button_start_y], 25)
-        self.fast_tower_button = TextButton("Deploy Hotshot", [40, button_start_y + button_spacing], 25)
-        self.sniper_tower_button = TextButton("Deploy Sniper", [40, button_start_y + button_spacing * 2], 25)
-        self.stun_tower_button = TextButton("Deploy TASER", [40, button_start_y + button_spacing * 3], 25)
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -135,28 +131,6 @@ class Game(Scene):
         self.display_lives.draw(self.screen)
         self.display_currency.update_text("Goodwill: " + str(self.currency))
         self.display_currency.draw(self.screen)
-
-        # updating tower buying buttons
-        self.tower_button.draw(self.screen)
-        self.fast_tower_button.draw(self.screen)
-        self.sniper_tower_button.draw(self.screen)
-        self.stun_tower_button.draw(self.screen)
-        if self.tower_button.clicked:
-            self.selected_towertype = Tower
-            self.build_mode = True
-            self.selected_tower = None
-        elif self.fast_tower_button.clicked:
-            self.selected_towertype = FastTower
-            self.build_mode = True
-            self.selected_tower = None
-        elif self.sniper_tower_button.clicked:
-            self.selected_towertype = SniperTower
-            self.build_mode = True
-            self.selected_tower = None
-        elif self.stun_tower_button.clicked:
-            self.selected_towertype = StunTower
-            self.build_mode = True
-            self.selected_tower = None
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
@@ -198,11 +172,20 @@ class Game(Scene):
                 self.screen.blit(self.tmap.selector_closed, coords)
                 pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
 
-        # updating tower info panel
+        # updating tower info and buy panel
         if self.selected_tower != self.tower_info_panel.tower:
             self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
         self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
         self.tower_info_panel.draw()
+
+        self.buy_panel.update()
+        self.buy_panel.draw()
+        for i, b in enumerate(self.buy_panel.buttons):
+            b = b.button
+            if b.clicked:
+                self.selected_towertype = self.towertypes[i]
+                self.build_mode = True
+                self.selected_tower = None
 
         # updating zombies and deleting zombies that reach end
         to_del = []
@@ -255,6 +238,7 @@ class Game(Scene):
 
             if target.is_dead():
                 loop.soundManager.playZombieDeathSound()
+                self.currency += target.reward
                 self.zombies.remove(target)
 
         # updating projectiles

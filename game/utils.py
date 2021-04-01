@@ -112,7 +112,7 @@ class Button:
                 if self.rect.collidepoint(event.pos):
                     self.clicked = True
                     event.used = True
-                    soundManager.playButtonSound()
+                    #soundManager.playButtonSound()
 
         self.hovered = False
         if self.rect.collidepoint(pygame.mouse.get_pos()):
