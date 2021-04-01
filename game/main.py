@@ -29,7 +29,8 @@ class Loop:
             self.requested_cursor = None
             for event in pygame.event.get():
                 if (event.type == pygame.QUIT
-                or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):
+                or (event.type == pygame.KEYDOWN and event.key == pygame.K_q
+                and pygame.key.get_mods() & pygame.KMOD_CTRL)):
                     self.end_game()
                 self.events.append(event)
 
