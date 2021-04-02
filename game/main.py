@@ -128,13 +128,13 @@ class Game(Scene):
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_LEFT]:
-            self.tmap_offset[0] += loop.get_ticktime() * 150
+            self.tmap_offset[0] += loop.get_ticktime() * 300
         if pressed[pygame.K_RIGHT]:
-            self.tmap_offset[0] -= loop.get_ticktime() * 150
+            self.tmap_offset[0] -= loop.get_ticktime() * 300
         if pressed[pygame.K_UP]:
-            self.tmap_offset[1] += loop.get_ticktime() * 150
+            self.tmap_offset[1] += loop.get_ticktime() * 300
         if pressed[pygame.K_DOWN]:
-            self.tmap_offset[1] -= loop.get_ticktime() * 150
+            self.tmap_offset[1] -= loop.get_ticktime() * 300
 
         self.waves.update(self.zombies)
           
@@ -301,6 +301,8 @@ class LevelSelect(Scene):
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
         self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
+        self.rivermap = Game(screen, "maps/river_bg.png", "maps/river_blocking.png", "maps/1wavetest.txt")
+
 
 
         self.start_map_button = LevelSelectButton(self.screen, self.start_map, pygame.Rect(420, 200, 150, 200), "Start map")
@@ -309,7 +311,8 @@ class LevelSelect(Scene):
         self.map1_button = LevelSelectButton(self.screen, self.map1, pygame.Rect(780, 175, 100, 100), "Map 1")
         self.map1_button.unlocked = True
 
-        self.river_map_button = LevelSelectButton(self.screen, None, pygame.Rect(600, 350, 200, 125), "River")
+        self.river_map_button = LevelSelectButton(self.screen, self.rivermap, pygame.Rect(600, 350, 200, 125), "River")
+        self.river_map_button.unlocked = True
 
         self.onewavetest_b = LevelSelectButton(self.screen, self.onewavetest, pygame.Rect(500, 500, 50, 50), "1 wave")
         self.onewavetest_b.unlocked = True

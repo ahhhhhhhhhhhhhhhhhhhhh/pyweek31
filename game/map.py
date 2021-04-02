@@ -130,21 +130,42 @@ class Start(Road):
 class House(Tile):
     pass
 
-class BigHouse(MultiTile):
-    xdim = 2
-    ydim = 2
-
 class HouseVariant1(House):
     pass
 
 class BrickHouse(House):
     pass
 
+class BigHouse(MultiTile):
+    xdim = 2
+    ydim = 2
+
+class BigHouse2(BigHouse):
+    pass
+
+class BigHouse3(BigHouse):
+    pass
+
+class BigHouse4(BigHouse):
+    pass
+
+
 class Bush1(Tile):
     pass
 
 class Bush2(Tile):
     pass
+
+class Water(Tile):
+    pass
+
+class Apartment(MultiTile):
+    xdim = 1
+    ydim = 2
+
+class BigApartment(MultiTile):
+    xdim = 2
+    ydim = 2
 
 Road.touchgroup = [Road, Start, End]
 
@@ -267,7 +288,12 @@ def ready_tiles():
     House.image = load.image("smallhouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
     BrickHouse.image = load.image("brickhouse.png").convert_alpha()
+    
     BigHouse.image = load.image("garagehouse.png").convert_alpha()
+    BigHouse2.image = load.image("garagehouse2.png").convert_alpha()
+    BigHouse3.image = load.image("garagehouse3.png").convert_alpha()
+    BigHouse4.image = load.image("garagehouse4.png").convert_alpha()
+    
     Bush1.image = load.image("bush.png").convert_alpha()
     Bush2.image = load.image("bush2.png").convert_alpha()
 
@@ -288,6 +314,10 @@ def ready_tiles():
     grey_officer = _replace_color(grey_officer, (176,6,145), (72,72,75))
     SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
 
+    Water.image = load.image("watertile.png").convert_alpha()
+
+    Apartment.image = load.image("apartments.png").convert_alpha()
+    BigApartment.image = load.image("bigapartments.png").convert_alpha()
 
 class TileArray():
     def __init__(self, tmap):
@@ -303,18 +333,23 @@ class TileArray():
 
 # tilemap
 class TileMap():
+    #[BigHouse, BigHouse2, BigHouse3, BigHouse4]
     colormap = {(255,0,0): [Start],
                 (0,38,255): [End],
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
                 (0, 127, 70): [House, HouseVariant1, BrickHouse],
                 (0, 127, 127): [BigHouse],
-                (255, 0, 220): [Bush1, Bush2]}
+                (255, 0, 220): [Bush1, Bush2],
+                (0, 255, 255): [Water],
+                (255, 216, 0): [Apartment],
+                (87, 0, 127): [BigApartment]}
 
     def _tile_from_color(self, color):
         if color in self.colormap:
             ret = TileMap.colormap[color]
             return random.choice(ret)
+        print("WARNING: no tile found for color", color)
         return NoTile
     
     def __init__(self, map_surf, blocking_surf):
