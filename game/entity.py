@@ -105,7 +105,7 @@ class GiantZombie(ZombieBase):
     healthbar_off_y = 40
 
 class BabyZombie(ZombieBase):
-    image = pygame.transform.scale(load.image("smallzombie.png"), (30, 15))
+    image = load.image("babyzombie.png")
     speed = 2.5
     max_health = 50
 
