@@ -9,7 +9,7 @@ from game.sound import SoundEffectsManager as SoundManager
 pygame.freetype.init()
 font = pygame.freetype.Font(load.handle_path("lora/Lora-Bold.ttf"))
 
-DEFAULT_HOVERCOLOR = (187,10,30)
+DEFAULT_HOVERCOLOR = (128,255,0)
 DEFAULT_TEXTSIZE = 16
 DEFAULT_TEXTCOLOR = (255,255,255)
 
