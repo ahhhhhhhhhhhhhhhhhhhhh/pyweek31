@@ -119,8 +119,13 @@ class Game(Scene):
         deltatime = loop.get_ticktime()
         
         for event in loop.get_events():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                self.waves.call_next(self.tmap)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    self.waves.call_next(self.tmap)
+
+                # cheats
+                if event.key == pygame.K_g:
+                    self.currency += 100
 
         self.waves.update(self.zombies)
           
