@@ -1,4 +1,3 @@
-[["summoner", 1]]
 [["shield", 1, "zombie", 5, "zombie", 10]]
 [["zombie", 5, "fast", 15], ["fast", 3, "zombie", 15]]
 [["zombie", 5, "fast", 15, "zombie", 10], ["fast", 6, "zombie", 15]]
