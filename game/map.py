@@ -16,9 +16,9 @@ class Tile(ABC):
         self.x, self.y = x, y
     
     #renders at screen pos (Not tile grid pos)
-    def render(self, screen, x, y):
+    def render(self, screen, x, y, offset):
         if self.image != None:
-            screen.blit(self.image, (x, y))
+            screen.blit(self.image, (x + offset[0], y + offset[1]))
     
     #stuff that needs to happen after map creation
     def link(self, tilemap, x, y):
@@ -44,9 +44,9 @@ class MultiTile(Tile):
         if distx%self.xdim == 0 and disty%self.ydim == 0:
             self.corner = True
     
-    def render(self, screen, x, y):
+    def render(self, screen, x, y, offset):
         if self.corner:
-            super().render(screen, x, y)
+            super().render(screen, x, y, offset)
 
 class NoTile(Tile):
     image = None
@@ -202,10 +202,10 @@ class Tower(Tile):
         self.timer -= deltatime
         return self.timer < 0
 
-    def render(self, screen, x, y):
+    def render(self, screen, x, y, offset):
         if self.base_image != None:
-            screen.blit(self.base_image, (x, y))
-            screen.blit(self.turret_image[self.turret_image_index], (x+10, y+10))
+            screen.blit(self.base_image, (x + offset[0], y + offset[1]))
+            screen.blit(self.turret_image[self.turret_image_index], (x + 10 + offset[0], y + 10 + offset[1]))
 
     def fire(self, target):
         self.timer = self.fire_speed
@@ -215,8 +215,8 @@ class Tower(Tile):
         else:
             self.turret_image_index = 1
 
-    def center_pos(self):
-        return [self.x + SCALE / 2, self.y + SCALE / 2]
+    def center_pos(self, offset):
+        return [self.x + offset[0] + SCALE / 2, self.y + offset[1] + SCALE / 2]
 
     def upgrade(self):
         if not self.is_max_level():
@@ -398,9 +398,8 @@ class TileMap():
 
         for x in range(self.xdim):
             for y in range(self.ydim):
-                coords = self.tile_to_screen_coords([x,y])
-                self.map[x][y].render(screen, coords[0], coords[1])
-                self.blocking[x][y].render(screen, coords[0], coords[1])
+                self.map[x][y].render(screen, x * SCALE, y * SCALE, offset)
+                self.blocking[x][y].render(screen, x * SCALE, y * SCALE, offset)
     
     # def __getitem__(self, tup):
     #     x,y = tup
@@ -418,9 +417,9 @@ class TileMap():
         else:
             return False
 
-    # returns top corner pos of tile on the screen for rendering
+    # returns top corner pos of tile on the screen for rendering WITHOUT OFFSET
     def tile_to_screen_coords(self, tile):
-        return [self.current_offset[0] + tile[0] * SCALE, self.current_offset[1] + tile[1] * SCALE]
+        return [tile[0] * SCALE, tile[1] * SCALE]
 
     def can_build(self, tile):
         return isinstance(self.blocking[tile[0]][tile[1]], NoTile) and not isinstance(self.map[tile[0]][tile[1]], Road)

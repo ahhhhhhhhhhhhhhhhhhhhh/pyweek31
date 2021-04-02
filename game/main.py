@@ -183,21 +183,23 @@ class Game(Scene):
         # highlights tiles if in build mode
         if self.build_mode and tile:
             coords = self.tmap.tile_to_screen_coords(tile)
+            temp = self.selected_towertype(coords[0], coords[1])
+            draw_coords = [coords[0] + self.tmap_offset[0], coords[1] + self.tmap_offset[1]]
             canbuild = self.tmap.can_build(tile)
 
-            temp = self.selected_towertype(coords[0], coords[1])
+            
             if canbuild:
-                self.screen.blit(self.tmap.selector_open, coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
+                self.screen.blit(self.tmap.selector_open, draw_coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
             else:
-                self.screen.blit(self.tmap.selector_closed, coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
+                self.screen.blit(self.tmap.selector_closed, draw_coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
 
         # updating tower info and buy panel
         if self.selected_tower != self.tower_info_panel.tower:
             self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
         self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
-        self.tower_info_panel.draw()
+        self.tower_info_panel.draw(self.tmap_offset)
 
         self.buy_panel.update()
         self.buy_panel.draw()
@@ -222,7 +224,7 @@ class Game(Scene):
 
         # updating towers
         for tower in self.towers:
-            tower_pos = tower.center_pos()
+            tower_pos = tower.center_pos(self.tmap_offset)
             
             if not tower.update(deltatime):
                 continue
