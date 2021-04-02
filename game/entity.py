@@ -139,6 +139,7 @@ class SummonerZombie(ZombieBase):
     max_health = 100
     spawn_rate = 5
     spawn_group = 5
+    spawntype = Zombie
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
@@ -151,7 +152,10 @@ class SummonerZombie(ZombieBase):
             if self.last_spawn > 0.5 and self.spawn_rate - self.last_spawn > 0.5:
                 super().timestep(deltatime)
         else:
-            self.game.zombies.append(Zombie(self.game, self.tile))
+            zomb = self.spawntype(self.game, self.tile)
+            zomb.x = self.x
+            zomb.y = self.y
+            self.game.zombies.append(zomb)
             self.spawns -= 1
             if self.spawns > 0:
                 self.last_spawn = 0.1
