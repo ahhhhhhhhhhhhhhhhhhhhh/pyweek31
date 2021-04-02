@@ -400,6 +400,8 @@ class TileMap():
             for y in range(self.ydim):
                 self.map[x][y].render(screen, x * SCALE, y * SCALE, offset)
                 self.blocking[x][y].render(screen, x * SCALE, y * SCALE, offset)
+
+        pygame.draw.rect(screen, (0,0,0), (offset, (self.xdim * SCALE, self.ydim * SCALE)), width=2)
     
     # def __getitem__(self, tup):
     #     x,y = tup
