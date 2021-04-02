@@ -136,9 +136,9 @@ class ShieldZombie(ZombieBase):
 
 class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
-    max_health = 100
-    spawn_rate = 5
-    spawn_group = 5
+    max_health = 250
+    spawn_rate = 5 # time between spawns
+    spawn_group = 3
     spawntype = Zombie
     
     def __init__(self, game, tile):
