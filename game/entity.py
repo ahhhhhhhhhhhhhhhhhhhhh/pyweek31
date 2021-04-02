@@ -95,11 +95,11 @@ class FastZombie(ZombieBase):
     speed = 2
     reward = 15
 
-
 class GiantZombie(ZombieBase):
     image = pygame.transform.scale(load.image("smallzombie.png"), (30, 60))
     speed = 0.5
     max_health = 1000
+    reward = 50
 
 class BabyZombie(ZombieBase):
     image = pygame.transform.scale(load.image("smallzombie.png"), (30, 15))
@@ -136,7 +136,6 @@ class ShieldZombie(ZombieBase):
 class SummonerZombie(ZombieBase):
     image = load.image("smallzombie.png")
     max_health = 100
-
 
 
 class Waves:
