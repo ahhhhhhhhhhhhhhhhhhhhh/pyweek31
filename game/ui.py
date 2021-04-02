@@ -120,3 +120,46 @@ class BuyButton:
 		self.screen.blit(self.icon, self.pos)
 		self.text.draw(self.screen)
 		self.cost_text.draw(self.screen)
+
+class LevelSelectButton:
+	def __init__(self, screen, level, rect, label_text):
+		self.screen = screen
+		self.level = level
+		self.rect = rect
+		self.label_text = label_text
+
+		self.completed = False
+		self.unlocked = False
+
+		self.locked_color = (255, 0, 0)
+		self.unlocked_color = (255, 242, 0)
+		self.completed_color = (60, 255, 0)
+
+		self.current_color = self.locked_color
+
+		self.b = Button(self.rect)
+		self.surf = pygame.Surface(self.rect.size)
+		self.surf.set_alpha(100)
+
+	def update(self, loop):
+		self.b.draw(self.screen)
+
+		if not self.unlocked:
+			self.current_color = self.locked_color
+		elif not self.completed:
+			self.current_color = self.unlocked_color
+		else:
+			self.current_color = self.completed_color
+
+		if self.surf.get_at((0,0)) != self.current_color:
+			self.surf.fill(self.current_color)
+			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=self.current_color, centered=True)
+
+		if self.b.clicked and self.unlocked:
+			loop.switch_scene(self.level)
+
+	def draw(self):
+		self.screen.blit(self.surf, (self.rect.x, self.rect.y))
+		pygame.draw.rect(self.screen, self.current_color, self.rect, width=2)
+
+		self.label.draw(self.screen)

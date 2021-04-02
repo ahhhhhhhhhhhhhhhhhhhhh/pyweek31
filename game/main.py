@@ -8,7 +8,7 @@ import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
-from game.ui import TowerInfoPanel, BuyPanel
+from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton
 import game.entity as entity
 
 class Loop:
@@ -273,23 +273,28 @@ class LevelSelect(Scene):
 
         self.title_text = Text("Level Select", [640, 40], 64, centered=True)
 
+        self.city_image = load.image("very_very_bad_city_map.png")
+
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
 
         self.maps = [self.start_map, self.map1]
-        self.buttons = []
-        for i in range(len(self.maps)):
-            b = TextButton("Map " + str(i + 1), [200, 200 + i * 50], 40)
-            self.buttons.append(b)
+
+        self.start_map_button = LevelSelectButton(self.screen, self.start_map, pygame.Rect(420, 200, 150, 200), "Start map")
+        self.start_map_button.unlocked = True
+        self.map1_button = LevelSelectButton(self.screen, self.map1, pygame.Rect(780, 175, 100, 100), "Map 1")
+        self.map1_button.unlocked = True
+        self.river_map_button = LevelSelectButton(self.screen, None, pygame.Rect(600, 350, 200, 125), "River")  # todo
+        self.river_map_button.locked = True
+        self.buttons = [self.start_map_button, self.map1_button, self.river_map_button]
 
     def update(self, loop):
         self.title_text.draw(self.screen)
+        self.screen.blit(self.city_image, (400, 150))
 
-        for i in range(len(self.buttons)):
-            b = self.buttons[i]
-            b.draw(self.screen)
-            if b.clicked:
-                loop.switch_scene(self.maps[i])
+        for b in self.buttons:
+            b.update(loop)
+            b.draw()
     
 
 class EndScreen(Scene):
