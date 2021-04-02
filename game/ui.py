@@ -142,21 +142,17 @@ class LevelSelectButton:
 		self.surf.set_alpha(100)
 
 	def update(self, loop):
-		self.b.draw(self.screen)
-
 		if not self.unlocked:
 			self.current_color = self.locked_color
 		elif not self.completed:
 			self.current_color = self.unlocked_color
+			self.b.draw(self.screen)
 		else:
 			self.current_color = self.completed_color
 
 		if self.surf.get_at((0,0)) != self.current_color:
 			self.surf.fill(self.current_color)
-			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=self.current_color, centered=True)
-
-		if self.b.clicked and self.unlocked:
-			loop.switch_scene(self.level)
+			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=(0,0,0), centered=True)
 
 	def draw(self):
 		self.screen.blit(self.surf, (self.rect.x, self.rect.y))
