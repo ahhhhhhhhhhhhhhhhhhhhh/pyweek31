@@ -1,2 +1,3 @@
+[["carry", 1]]
 [["giant", 1, "shield", 3]]
 [["zombie", 10]]

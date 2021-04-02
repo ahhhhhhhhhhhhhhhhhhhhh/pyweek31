@@ -93,7 +93,7 @@ class Game(Scene):
         self.screen = screen
         
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(wave_txt_path, self.tmap)
+        self.waves = entity.Waves(self, wave_txt_path, self.tmap)
 
         self.tmap_offset = [25,25]
         self.zombies = []
