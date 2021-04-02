@@ -165,13 +165,20 @@ class Waves:
                         waves[-1][-1].append(Waves.zombiemap[spawnwave[i]])
                     
         self.waves = waves
+        for i, spawnwave in enumerate(waves):
+            if len(spawnwave) > len(tmap.starts):
+                print("WARNING: This wave file has too many spawnpoints on wave " + str(i+1))
+        
         self.zombies_to_spawn = [[] for _ in range(len(tmap.starts))]
         self.spawn_timers = [0 for _ in range(len(self.zombies_to_spawn))]
         self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
         self.time_threshold = 1
+        self.total_waves = len(waves)
+        self.current_wave = 1
 
     def get_next(self):
         if self.waves:
+            self.current_wave += 1
             return self.waves.pop(0)
         return False
 
@@ -200,6 +207,9 @@ class Waves:
                     self.spawn_timers[i] = 0
                     zombielist.append(self.zombies_to_spawn[i].pop(0))
                     self.spawn_last[i] = type(zombielist[i])
+
+    def get_progress(self): # returns (current_wave, total_waves)
+        return self.current_wave, self.total_waves
 
 class ProjectileBase:
     image = None
