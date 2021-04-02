@@ -12,6 +12,7 @@ class ZombieBase:
     speed = 1
     max_health = 100
     reward = 10
+    healthbar_off_y = 20
     
     def __init__(self, game, tile):
         self.game = game
@@ -63,7 +64,7 @@ class ZombieBase:
         center = self.center_pos()
 
         if self.health < self.max_health:
-            screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - 20])
+            screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - self.healthbar_off_y])
     
     def render_pos(self):
         return self.last_render_pos
@@ -92,15 +93,16 @@ class Zombie(ZombieBase):
     speed = 1
 
 class FastZombie(ZombieBase):
-    image = load.image("smallzombie.png")
+    image = load.image("fastzombie.png")
     speed = 2
     reward = 15
 
 class GiantZombie(ZombieBase):
-    image = pygame.transform.scale(load.image("smallzombie.png"), (30, 60))
+    image = load.image("buffzombie.png")
     speed = 0.5
     max_health = 1000
     reward = 50
+    healthbar_off_y = 40
 
 class BabyZombie(ZombieBase):
     image = pygame.transform.scale(load.image("smallzombie.png"), (30, 15))
