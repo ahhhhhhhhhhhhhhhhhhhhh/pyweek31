@@ -235,10 +235,11 @@ class Waves:
         wave = self.get_next()
         self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
 
-        for i in range(len(wave)):
-            spawnwave = wave[i]
-            for ztype in spawnwave:
-                self.zombies_to_spawn[i].append(ztype(self.game, tmap.starts[i]))
+        if wave:
+            for i in range(len(wave)):
+                spawnwave = wave[i]
+                for ztype in spawnwave:
+                    self.zombies_to_spawn[i].append(ztype(self.game, tmap.starts[i]))
 
     def update(self, zombielist):
         for i in range(len(self.spawn_timers)):
