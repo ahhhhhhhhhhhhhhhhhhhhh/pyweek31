@@ -135,7 +135,7 @@ class ShieldZombie(ZombieBase):
 
 
 class SummonerZombie(ZombieBase):
-    image = load.image("smallzombie.png")
+    image = load.image("smartzombie.png")
     max_health = 100
     spawn_rate = 5
     spawn_group = 5
