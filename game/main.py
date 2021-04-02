@@ -391,7 +391,7 @@ class MainMenu(Scene):
     def __init__(self, screen):
         self.id = "menu"
         self.screen = screen
-        self.t = Text("John Brawn", [840, 40], 64, centered=True)
+        self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
         self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
 
@@ -474,7 +474,7 @@ class Settings(Scene):
 def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
-    pygame.display.set_caption("John Brawn")
+    pygame.display.set_caption("The Last Commissioner")
     ready_tiles()
 
     menu = MainMenu(screen)
