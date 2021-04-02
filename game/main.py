@@ -126,6 +126,16 @@ class Game(Scene):
                 if event.key == pygame.K_g:
                     self.currency += 100
 
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_LEFT]:
+            self.tmap_offset[0] -= loop.get_ticktime() * 150
+        if pressed[pygame.K_RIGHT]:
+            self.tmap_offset[0] += loop.get_ticktime() * 150
+        if pressed[pygame.K_UP]:
+            self.tmap_offset[1] -= loop.get_ticktime() * 150
+        if pressed[pygame.K_DOWN]:
+            self.tmap_offset[1] += loop.get_ticktime() * 150
+
         self.waves.update(self.zombies)
           
         self.tmap.render(self.screen, self.tmap_offset)
