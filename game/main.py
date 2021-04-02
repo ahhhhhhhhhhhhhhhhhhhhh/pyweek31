@@ -8,7 +8,7 @@ import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
-from game.ui import TowerInfoPanel, BuyPanel
+from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton
 import game.entity as entity
 
 class Loop:
@@ -125,6 +125,16 @@ class Game(Scene):
                 # cheats
                 if event.key == pygame.K_g:
                     self.currency += 100
+
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_LEFT]:
+            self.tmap_offset[0] += loop.get_ticktime() * 150
+        if pressed[pygame.K_RIGHT]:
+            self.tmap_offset[0] -= loop.get_ticktime() * 150
+        if pressed[pygame.K_UP]:
+            self.tmap_offset[1] += loop.get_ticktime() * 150
+        if pressed[pygame.K_DOWN]:
+            self.tmap_offset[1] -= loop.get_ticktime() * 150
 
         self.waves.update(self.zombies)
           
@@ -264,11 +274,11 @@ class Game(Scene):
 
         # game end conditions
         if self.lives < 1:
-            loop.get_scene("endscreen").set_won(False)
+            loop.get_scene("endscreen").set_won(False, loop)
             loop.switch_scene("endscreen")
 
         if self.waves.get_finished() and not len(self.zombies):
-            loop.get_scene("endscreen").set_won(True)
+            loop.get_scene("endscreen").set_won(True, loop)
             loop.switch_scene("endscreen")
 
         # pausing
@@ -286,23 +296,38 @@ class LevelSelect(Scene):
 
         self.title_text = Text("Level Select", [640, 40], 64, centered=True)
 
+        self.city_image = load.image("very_very_bad_city_map.png")
+
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
+        self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
 
-        self.maps = [self.start_map, self.map1]
-        self.buttons = []
-        for i in range(len(self.maps)):
-            b = TextButton("Map " + str(i + 1), [200, 200 + i * 50], 40)
-            self.buttons.append(b)
+
+        self.start_map_button = LevelSelectButton(self.screen, self.start_map, pygame.Rect(420, 200, 150, 200), "Start map")
+        self.start_map_button.unlocked = True
+
+        self.map1_button = LevelSelectButton(self.screen, self.map1, pygame.Rect(780, 175, 100, 100), "Map 1")
+        self.map1_button.unlocked = True
+
+        self.river_map_button = LevelSelectButton(self.screen, None, pygame.Rect(600, 350, 200, 125), "River")
+
+        self.onewavetest_b = LevelSelectButton(self.screen, self.onewavetest, pygame.Rect(500, 500, 50, 50), "1 wave")
+        self.onewavetest_b.unlocked = True
+
+        self.buttons = [self.start_map_button, self.map1_button, self.river_map_button, self.onewavetest_b]
+
+        self.most_recent_played = None
 
     def update(self, loop):
         self.title_text.draw(self.screen)
+        self.screen.blit(self.city_image, (400, 150))
 
-        for i in range(len(self.buttons)):
-            b = self.buttons[i]
-            b.draw(self.screen)
-            if b.clicked:
-                loop.switch_scene(self.maps[i])
+        for b in self.buttons:
+            b.update(loop)
+            if b.unlocked and not b.completed and b.b.clicked:
+                self.most_recent_played = b
+                loop.switch_scene(b.level)
+            b.draw()
     
 
 class Pause(Scene):
@@ -342,7 +367,7 @@ class EndScreen(Scene):
         self.screen = screen
         self.id = "endscreen"
         self.outcome_display = Text("", [640, 90], 90, centered=True)
-        self.exit_button = TextButton("[Exit to Menu]", [640, 400], 40, centered=True)
+        self.exit_button = TextButton("[Back to Map]", [640, 400], 40, centered=True)
         self.quit_button = TextButton("[Quit Game]", [640, 470], 40, centered=True)
 
     def update(self, loop):
@@ -351,13 +376,14 @@ class EndScreen(Scene):
         self.quit_button.draw(self.screen)
 
         if self.exit_button.clicked:
-            loop.switch_scene("menu")
+            loop.switch_scene("level_select")
         if self.quit_button.clicked:
             loop.end_game()
 
-    def set_won(self, won):
+    def set_won(self, won, loop):
         if won:
             self.outcome_display.update_text("You won!")
+            loop.scenedict["level_select"].most_recent_played.completed = True
         else:
             self.outcome_display.update_text("You lost!")
             
