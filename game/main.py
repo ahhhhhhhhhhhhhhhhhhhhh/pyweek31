@@ -93,7 +93,9 @@ class Game(Scene):
         self.screen = screen
         
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(wave_txt_path, self.tmap)
+        self.waves = entity.Waves(self, wave_txt_path, self.tmap)
+        self.waves_display = Text("", [640,20], size=32, centered=True)
+        self.waves_button = TextButton("[Call Next]", [640, 60], size=24, centered=True)
 
         self.tmap_offset = [25,25]
         self.zombies = []
@@ -120,9 +122,6 @@ class Game(Scene):
         
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    self.waves.call_next(self.tmap)
-
                 # cheats
                 if event.key == pygame.K_g:
                     self.currency += 100
@@ -130,6 +129,13 @@ class Game(Scene):
         self.waves.update(self.zombies)
           
         self.tmap.render(self.screen, self.tmap_offset)
+
+        wl, wp = self.waves.get_progress()
+        self.waves_display.update_text(f"Wave {wl}/{wp}")
+        self.waves_display.draw(self.screen)
+        self.waves_button.draw(self.screen)
+        if self.waves_button.clicked:
+            self.waves.call_next(self.tmap)
 
         # updating lives/currency text
         self.display_lives.update_text("Lives: " + str(self.lives))
@@ -140,7 +146,7 @@ class Game(Scene):
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
         if tile:
-            for event in TileMap.loop.get_events():
+            for event in loop.get_events():
                 if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
                     event.used = True
 
@@ -265,6 +271,13 @@ class Game(Scene):
             loop.get_scene("endscreen").set_won(True)
             loop.switch_scene("endscreen")
 
+        # pausing
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.get_scene("pause").set_return(self)
+                loop.switch_scene("pause")
+                event.used = True
+
 
 class LevelSelect(Scene):
     def __init__(self, screen):
@@ -296,6 +309,38 @@ class LevelSelect(Scene):
             b.update(loop)
             b.draw()
     
+
+class Pause(Scene):
+    def __init__(self, screen):
+        self.screen = screen
+        self.id = "pause"
+        self.title = Text("Paused", [640, 90], 90, centered=True)
+        self.ret_button = TextButton("[Return to Game]", [640, 400], 40, centered=True)
+        self.exit_button = TextButton("[Exit to Menu]", [640, 470], 40, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [640, 540], 40, centered=True)
+        self.ret_scene = "game" #should be overwritten, this is merely a default
+
+    def update(self, loop):
+        self.title.draw(self.screen)
+        self.ret_button.draw(self.screen)
+        self.exit_button.draw(self.screen)
+        self.quit_button.draw(self.screen)
+
+        if self.exit_button.clicked:
+            loop.switch_scene("menu")
+        if self.quit_button.clicked:
+            loop.end_game()
+        if self.ret_button.clicked:
+            loop.switch_scene(self.ret_scene)
+
+        # unpausing via keyboard
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene(self.ret_scene)
+                event.used = True
+
+    def set_return(self, ret):
+        self.ret_scene = ret
 
 class EndScreen(Scene):
     def __init__(self, screen):
@@ -415,7 +460,10 @@ def main():
     level_select = LevelSelect(screen)
     settings = Settings(screen)
     endscreen = EndScreen(screen)
-    scenedict = {"menu": menu, "level_select": level_select, "settings": settings, "endscreen": endscreen}
+    pause = Pause(screen)
+    scenedict = {"menu": menu, "level_select": level_select,
+                 "settings": settings, "endscreen": endscreen,
+                 "pause": pause}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)

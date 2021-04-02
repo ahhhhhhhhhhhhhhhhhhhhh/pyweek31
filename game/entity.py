@@ -13,7 +13,8 @@ class ZombieBase:
     max_health = 100
     reward = 10
     
-    def __init__(self, tile):
+    def __init__(self, game, tile):
+        self.game = game
         self.x, self.y = tile.x, tile.y
         self.tile = tile
         self.goal = random.choice(list(self.tile.next.keys()))
@@ -34,7 +35,7 @@ class ZombieBase:
             return
 
         if (type(self.tile) in (Road, Start)):
-            thresh = 0.01
+            thresh = deltatime * self.speed
             if (abs(self.x - self.dest.x) < thresh and abs(self.y - self.dest.y) < thresh):
                 self.tile = self.dest
                 if type(self.tile) not in (Road, Start):
@@ -113,8 +114,8 @@ class ShieldZombie(ZombieBase):
     max_health = 75
     shield_health = 1
     
-    def __init__(self, tile):
-        super().__init__(tile)
+    def __init__(self, game, tile):
+        super().__init__(game, tile)
         self.shield = self.shield_health
         
     
@@ -136,6 +137,44 @@ class ShieldZombie(ZombieBase):
 class SummonerZombie(ZombieBase):
     image = load.image("smallzombie.png")
     max_health = 100
+    spawn_rate = 5
+    spawn_group = 5
+    
+    def __init__(self, game, tile):
+        super().__init__(game, tile)
+        self.last_spawn = self.spawn_rate
+        self.spawns = self.spawn_group
+    
+    def timestep(self, deltatime):
+        if self.last_spawn > 0:
+            self.last_spawn -= deltatime
+            if self.last_spawn > 0.5 and self.spawn_rate - self.last_spawn > 0.5:
+                super().timestep(deltatime)
+        else:
+            self.game.zombies.append(Zombie(self.game, self.tile))
+            self.spawns -= 1
+            if self.spawns > 0:
+                self.last_spawn = 0.1
+            else:
+                self.spawns = self.spawn_group
+                self.last_spawn = self.spawn_rate
+
+
+class CarryZombie(ZombieBase):
+    image = load.image("cart.png")
+    max_health = 500
+    speed = 0.3
+    spawntype = BabyZombie
+    spawn_group = 5
+    
+    def hit(self, damage):
+        if self.health > 0 and self.health < damage:
+            for i in range(self.spawn_group):
+                zomb = self.spawntype(self.game, self.tile)
+                zomb.x = self.x
+                zomb.y = self.y
+                self.game.zombies.append(zomb)
+        super().hit(damage)
 
 
 class Waves:
@@ -144,9 +183,11 @@ class Waves:
                  "giant": GiantZombie,
                  "baby": BabyZombie,
                  "shield": ShieldZombie,
-                 "summoner": SummonerZombie}
+                 "summoner": SummonerZombie,
+                 "carry": CarryZombie}
 
-    def __init__(self, filepath, tmap):
+    def __init__(self, game, filepath, tmap):
+        self.game = game
         filepath = load.handle_path(filepath)
 
         with open(filepath, "r") as file:
@@ -164,13 +205,20 @@ class Waves:
                         waves[-1][-1].append(Waves.zombiemap[spawnwave[i]])
                     
         self.waves = waves
+        for i, spawnwave in enumerate(waves):
+            if len(spawnwave) > len(tmap.starts):
+                print("WARNING: This wave file has too many spawnpoints on wave " + str(i+1))
+        
         self.zombies_to_spawn = [[] for _ in range(len(tmap.starts))]
         self.spawn_timers = [0 for _ in range(len(self.zombies_to_spawn))]
         self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
         self.time_threshold = 1
+        self.total_waves = len(waves)
+        self.current_wave = 0
 
     def get_next(self):
         if self.waves:
+            self.current_wave += 1
             return self.waves.pop(0)
         return False
 
@@ -184,7 +232,7 @@ class Waves:
         for i in range(len(wave)):
             spawnwave = wave[i]
             for ztype in spawnwave:
-                self.zombies_to_spawn[i].append(ztype(tmap.starts[i]))
+                self.zombies_to_spawn[i].append(ztype(self.game, tmap.starts[i]))
 
     def update(self, zombielist):
         for i in range(len(self.spawn_timers)):
@@ -199,6 +247,9 @@ class Waves:
                     self.spawn_timers[i] = 0
                     zombielist.append(self.zombies_to_spawn[i].pop(0))
                     self.spawn_last[i] = type(zombielist[i])
+
+    def get_progress(self): # returns (current_wave, total_waves)
+        return self.current_wave, self.total_waves
 
 class ProjectileBase:
     image = None
