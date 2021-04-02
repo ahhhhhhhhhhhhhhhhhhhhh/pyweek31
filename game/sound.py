@@ -56,10 +56,13 @@ class MusicManager:
 
     def update(self, loop):
         if loop.scene.id != self.scene:
-            if loop.scene.id== "game":
+            if loop.scene.id == "game":
                 self.playGameMusic()
-            elif (loop.scene.id == "menu" or loop.scene.id == "settings") and self.scene == "game":
+            elif ((loop.scene.id == "menu" or loop.scene.id == "settings" or loop.scene.id == "level_select") 
+                    and self.scene == "pause" or self.scene == "endscreen"):
                 self.playMenuMusic()
+            elif loop.scene.id == "endscreen":
+                pygame.mixer.music.fadeout(100)
             self.scene = loop.scene.id
 
 class SoundEffectsManager:
@@ -73,6 +76,8 @@ class SoundEffectsManager:
             load.sound("sound_files/zombieEndSound.wav"),
             load.sound("sound_files/taserSound.wav"),
             load.sound("sound_files/sniperSound.wav"),
+            load.sound("sound_files/levelWinSound.wav"),
+            load.sound("sound_files/levelLoseSound.wav"),
         ]
         data = self.loadVolume()
         self.volume = data["Volume"]["soundVolume"]
@@ -99,6 +104,12 @@ class SoundEffectsManager:
 
     def playSniperSound(self):
         pygame.mixer.Sound.play(self.sounds[6])
+
+    def playLevelWinSound(self):
+        pygame.mixer.Sound.play(self.sounds[7])
+
+    def playLevelLoseSound(self):
+        pygame.mixer.Sound.play(self.sounds[8])
 
     def changeVolume(self, changingValue):
         self.volume = self.volume + changingValue

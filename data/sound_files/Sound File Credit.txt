@@ -12,6 +12,14 @@ Music promoted by Audio Library https://youtu.be/Q8773hTncoM
 (Audio has been amplified in certain areas)
 --gameMusic
 
+https://freesound.org/people/FunWithSound/sounds/456968/
+FunWithSound
+https://freesound.org/people/FunWithSound/
+--levelWinMusic
+
+http://thinksoundeffects.com
+--levelLoseSound
+
 Creator: ccssmith
 --buildingSound
 --bulletSound
