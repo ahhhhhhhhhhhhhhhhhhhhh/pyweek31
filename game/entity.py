@@ -95,11 +95,11 @@ class FastZombie(ZombieBase):
     speed = 2
     reward = 15
 
+
 class GiantZombie(ZombieBase):
     image = pygame.transform.scale(load.image("smallzombie.png"), (30, 60))
     speed = 0.5
     max_health = 1000
-    reward = 50
 
 class BabyZombie(ZombieBase):
     image = pygame.transform.scale(load.image("smallzombie.png"), (30, 15))
@@ -138,6 +138,7 @@ class SummonerZombie(ZombieBase):
     max_health = 100
 
 
+
 class Waves:
     zombiemap = {"zombie": Zombie,
                  "fast": FastZombie,
@@ -173,7 +174,7 @@ class Waves:
         self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
         self.time_threshold = 1
         self.total_waves = len(waves)
-        self.current_wave = 1
+        self.current_wave = 0
 
     def get_next(self):
         if self.waves:
