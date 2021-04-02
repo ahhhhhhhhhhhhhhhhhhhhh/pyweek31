@@ -54,14 +54,14 @@ class TowerInfoPanel:
 
 		return currency
 
-	def draw(self):
+	def draw(self, tmap_offset):
 		self.screen.blit(self.panel, self.pos)
 
 		if self.tower == None:
 			return
 
 		# drawing range circle
-		pygame.draw.circle(self.screen, (255,255,255), self.tower.center_pos(), self.tower.max_range, width=1)
+		pygame.draw.circle(self.screen, (255,255,255), self.tower.center_pos(tmap_offset), self.tower.max_range, width=1)
 		self.screen.blit(self.panel, self.pos) # has to redraw so panel is on top of range circle
 
 		self.title.draw(self.screen)

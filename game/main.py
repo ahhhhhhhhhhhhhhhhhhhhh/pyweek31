@@ -128,13 +128,13 @@ class Game(Scene):
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_LEFT]:
-            self.tmap_offset[0] += loop.get_ticktime() * 150
+            self.tmap_offset[0] += loop.get_ticktime() * 300
         if pressed[pygame.K_RIGHT]:
-            self.tmap_offset[0] -= loop.get_ticktime() * 150
+            self.tmap_offset[0] -= loop.get_ticktime() * 300
         if pressed[pygame.K_UP]:
-            self.tmap_offset[1] += loop.get_ticktime() * 150
+            self.tmap_offset[1] += loop.get_ticktime() * 300
         if pressed[pygame.K_DOWN]:
-            self.tmap_offset[1] -= loop.get_ticktime() * 150
+            self.tmap_offset[1] -= loop.get_ticktime() * 300
 
         self.waves.update(self.zombies)
           
@@ -183,21 +183,23 @@ class Game(Scene):
         # highlights tiles if in build mode
         if self.build_mode and tile:
             coords = self.tmap.tile_to_screen_coords(tile)
+            temp = self.selected_towertype(coords[0], coords[1])
+            draw_coords = [coords[0] + self.tmap_offset[0], coords[1] + self.tmap_offset[1]]
             canbuild = self.tmap.can_build(tile)
 
-            temp = self.selected_towertype(coords[0], coords[1])
+            
             if canbuild:
-                self.screen.blit(self.tmap.selector_open, coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
+                self.screen.blit(self.tmap.selector_open, draw_coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
             else:
-                self.screen.blit(self.tmap.selector_closed, coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(), temp.max_range, width=1)
+                self.screen.blit(self.tmap.selector_closed, draw_coords)
+                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
 
         # updating tower info and buy panel
         if self.selected_tower != self.tower_info_panel.tower:
             self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
         self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
-        self.tower_info_panel.draw()
+        self.tower_info_panel.draw(self.tmap_offset)
 
         self.buy_panel.update()
         self.buy_panel.draw()
@@ -222,7 +224,7 @@ class Game(Scene):
 
         # updating towers
         for tower in self.towers:
-            tower_pos = tower.center_pos()
+            tower_pos = tower.center_pos(self.tmap_offset)
             
             if not tower.update(deltatime):
                 continue
@@ -303,6 +305,8 @@ class LevelSelect(Scene):
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
         self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
+        self.rivermap = Game(screen, "maps/river_bg.png", "maps/river_blocking.png", "maps/1wavetest.txt")
+
 
 
         self.start_map_button = LevelSelectButton(self.screen, self.start_map, pygame.Rect(420, 200, 150, 200), "Start map")
@@ -311,7 +315,8 @@ class LevelSelect(Scene):
         self.map1_button = LevelSelectButton(self.screen, self.map1, pygame.Rect(780, 175, 100, 100), "Map 1")
         self.map1_button.unlocked = True
 
-        self.river_map_button = LevelSelectButton(self.screen, None, pygame.Rect(600, 350, 200, 125), "River")
+        self.river_map_button = LevelSelectButton(self.screen, self.rivermap, pygame.Rect(600, 350, 200, 125), "River")
+        self.river_map_button.unlocked = True
 
         self.onewavetest_b = LevelSelectButton(self.screen, self.onewavetest, pygame.Rect(500, 500, 50, 50), "1 wave")
         self.onewavetest_b.unlocked = True
@@ -393,7 +398,7 @@ class MainMenu(Scene):
     def __init__(self, screen):
         self.id = "menu"
         self.screen = screen
-        self.t = Text("John Brawn", [840, 40], 64, centered=True)
+        self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
         self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
 
@@ -476,7 +481,7 @@ class Settings(Scene):
 def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720])
-    pygame.display.set_caption("John Brawn")
+    pygame.display.set_caption("The Last Commissioner")
     ready_tiles()
 
     menu = MainMenu(screen)
