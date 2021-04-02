@@ -19,7 +19,7 @@ class ZombieBase:
         self.tile = tile
         self.goal = random.choice(list(self.tile.next.keys()))
         self.dest = self.tile.next[self.goal][0]
-        self.last_render_pos = []
+        self.last_render_pos = [0,0]
 
         self.health = self.max_health
 
