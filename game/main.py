@@ -120,6 +120,12 @@ class Game(Scene):
     def update(self, loop):
         deltatime = loop.get_ticktime()
         
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN:
+                # cheats
+                if event.key == pygame.K_g:
+                    self.currency += 100
+
         self.waves.update(self.zombies)
           
         self.tmap.render(self.screen, self.tmap_offset)
@@ -280,7 +286,7 @@ class LevelSelect(Scene):
 
         self.title_text = Text("Level Select", [640, 40], 64, centered=True)
 
-        self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/map1_waves.txt")
+        self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
 
         self.maps = [self.start_map, self.map1]
