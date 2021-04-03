@@ -92,13 +92,15 @@ class Game(Scene):
     def __init__(self, screen, image_name, wave_txt_path):
         self.id = "game"
         self.screen = screen
+        self.image_name = image_name
+        self.wave_txt_path = wave_txt_path
 
         self.description = ""
 
-        bg_image_path = "maps/" + image_name + "_bg.png"
-        blocking_image_path = "maps/" + image_name + "_blocking.png"
+        bg_image_path = "maps/" + self.image_name + "_bg.png"
+        blocking_image_path = "maps/" + self.image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(self, wave_txt_path, self.tmap)
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
         self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
         CENTER_AT = [515, 260]
@@ -128,6 +130,31 @@ class Game(Scene):
         self.endWinTime = None
         self.endLoseTime = None
         self.time = 0
+
+    # resetting the level after a loss so it can be played again
+    def reset(self):
+        bg_image_path = "maps/" + self.image_name + "_bg.png"
+        blocking_image_path = "maps/" + self.image_name + "_blocking.png"
+        self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
+
+        self.zombies = []
+
+        self.towers = []
+        self.projectiles = []
+
+        self.lives = 20
+        self.currency = 500
+
+        self.selected_tower = None
+        self.build_mode = False
+        self.is_tower_unlocked = [True, True, False, False]
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
+
+        self.endWinTime = None
+        self.endLoseTime = None
+        self.time = 0
+
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -477,6 +504,7 @@ class EndScreen(Scene):
             loop.get_scene("level_select").current_level += 1
         else:
             self.outcome_display.update_text("You lost!")
+            loop.get_scene("level_select").most_recent_played.level.reset()
             
 class MainMenu(Scene):
     def __init__(self, screen):

@@ -95,7 +95,7 @@ class Zombie(ZombieBase):
 
 class FastZombie(ZombieBase):
     image = load.image("fastzombie.png")
-    speed = 2
+    speed = 1.75
     reward = 25
 
 class GiantZombie(ZombieBase):
