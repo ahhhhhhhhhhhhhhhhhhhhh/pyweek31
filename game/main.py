@@ -116,9 +116,14 @@ class Game(Scene):
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
+
+        self.endWinTime = None
+        self.endLoseTime = None
+        self.time = 0
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
+        self.time += deltatime
         
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN:
@@ -274,13 +279,22 @@ class Game(Scene):
                 self.selected_tower = None
 
         # game end conditions
-        if self.lives < 1:
+        if self.lives < 1 and self.endLoseTime == None:
+            self.endLoseTime = self.time
+            loop.musicManager.fadeout(3000)
+
+        if self.endLoseTime != None and (self.time - self.endLoseTime) >= 3:
             loop.get_scene("endscreen").set_won(False, loop)
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
             loop.soundManager.playLevelLoseSound()
 
-        if self.waves.get_finished() and not len(self.zombies):
+        if self.waves.get_finished() and not len(self.zombies) and self.endWinTime == None:
+            self.endWinTime = self.time
+            loop.musicManager.fadeout(3000)
+        
+        if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
+            print(self.time - self.endWinTime)
             loop.get_scene("endscreen").set_won(True, loop)
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
