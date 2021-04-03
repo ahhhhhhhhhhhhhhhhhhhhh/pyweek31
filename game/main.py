@@ -398,13 +398,19 @@ class LevelSelect(Scene):
         self.current_level = 0
         with open(load.handle_path("gamestate.json")) as file:
             self.current_level = json.load(file)["current_level"]
-
         
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
 
         self.most_recent_played = None
+
+    def reset(self):
+        for b in self.buttons:
+            b.unlocked = False
+            b.completed = False
+
+        self.buttons[0].unlocked = True
 
     def update(self, loop):
         self.screen.blit(self.city_image, (0, 0))
@@ -527,7 +533,7 @@ class FinalScreen(Scene):
         self.text = LinedText(conclusion, [150, 175], 80, size=26, color=(0,0,0))
         self.image = load.image("end.png").convert()
 
-        self.back_button = TextButton("[Back to Main Menu]", [800, 600], 40)
+        self.back_button = TextButton("[Back to Main Menu]", [950, 680], 30)
 
     def update(self, loop):
         self.screen.blit(self.image, (0,0))
@@ -618,7 +624,7 @@ class Settings(Scene):
         self.musicHigherButton = TextButton("[+]", [1100, 130], 32, centered=True)
         self.soundLowerButton = TextButton("[-]", [900, 190], 32, centered=True)
         self.soundHigherButton = TextButton("[+]", [1100, 190], 32, centered=True)
-        self.resetbutton = TextButton("[Reset Progress]", [840, 250], 32, centered = True)
+        self.resetbutton = TextButton("[Reset Progress]", [840, 250], 32, centered = True, color=(255,0,0))
         self.leaveButton = TextButton("[Return to Main Menu]", [840, 300], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
@@ -658,8 +664,10 @@ class Settings(Scene):
             loop.soundManager.changeVolume(.05)
         elif self.resetbutton.clicked:
             loop.get_scene("level_select").current_level = 0
+            loop.get_scene("level_select").reset()
             with open(load.handle_path("gamestate.json"), "w") as file:
                 json.dump({"current_level": 0}, file)
+
         elif self.leaveButton.clicked:
             loop.scenedict["menu"].i = self.i
             loop.switch_scene("menu")
