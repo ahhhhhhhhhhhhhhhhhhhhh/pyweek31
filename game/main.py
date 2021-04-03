@@ -447,6 +447,7 @@ class MainMenu(Scene):
             loop.switch_scene("level_select")
  
         if self.sb.clicked:
+            loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
 
 class Settings(Scene):
@@ -499,10 +500,12 @@ class Settings(Scene):
         elif self.soundHigherButton.clicked:
             loop.soundManager.changeVolume(.05)
         elif self.leaveButton.clicked:
+            loop.scenedict["menu"].i = self.i
             loop.switch_scene("menu")
 
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.scenedict["menu"].i = self.i
                 loop.switch_scene("menu")
                 event.used = True
 
