@@ -615,6 +615,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode([1280, 720], pygame.SCALED, vsync=True)
     pygame.display.set_caption("The Last Commissioner")
+    pygame.display.set_icon(load.image("copicon.png"))
     ready_tiles()
 
     menu = MainMenu(screen)
