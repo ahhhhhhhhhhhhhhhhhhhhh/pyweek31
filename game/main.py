@@ -1,6 +1,7 @@
 from abc import ABC
 import math
 import random
+import json
 
 import pygame
 
@@ -399,6 +400,10 @@ class LevelSelect(Scene):
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
         self.current_level = 0
+        with open(load.handle_path("gamestate.json")) as file:
+            self.current_level = json.load(file)["current_level"]
+
+        
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
@@ -509,6 +514,8 @@ class EndScreen(Scene):
             self.outcome_display.update_text("You won!")
             loop.get_scene("level_select").most_recent_played.completed = True
             loop.get_scene("level_select").current_level += 1
+            with open(load.handle_path("gamestate.json"), "w") as file:
+                json.dump({"current_level": loop.get_scene("level_select").current_level}, file)
         else:
             self.outcome_display.update_text("You lost!")
             loop.get_scene("level_select").most_recent_played.level.reset()
@@ -518,7 +525,7 @@ class MainMenu(Scene):
         self.id = "menu"
         self.screen = screen
         self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
-        self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
+        self.b = TextButton("[Play, If You Dare...]", [840, 130], 32, centered=True)
         self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
         self.quit_button = TextButton("[Quit Game]", [840, 250], 32, centered=True)
 
