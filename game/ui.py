@@ -25,7 +25,7 @@ class TowerInfoPanel:
 		self.make_upgrade_button()
 
 		self.info_image = pygame.transform.scale(self.tower.info_image, (275,275))
-		self.flavor_text = LinedText(self.tower.text, (self.pos[0] + 15, self.pos[1] + 330), 30, spacing=1, size=14)
+		self.flavor_text = LinedText(self.tower.text, (self.pos[0] + 15, self.pos[1] + 330), 30, size=14)
 
 	# updates tower info text, needs to be called when tower is upgraded so info panel is accurate
 	def make_info_text(self):
@@ -231,13 +231,13 @@ class LevelSelectButton:
 
 		self.locked_color = (255, 0, 0)
 		self.unlocked_color = (255, 242, 0)
-		self.completed_color = (60, 255, 0)
+		self.completed_color = (30, 255, 0)
 
 		self.current_color = self.locked_color
 
 		self.b = Button(self.rect)
 		self.surf = pygame.Surface(self.rect.size)
-		self.surf.set_alpha(100)
+		self.surf.set_alpha(160)
 
 		self.desc = Description(self.screen,self.label_text, self.level.description, (366, 384))
 
@@ -282,7 +282,7 @@ class Description:
 
 		self.title = Text(self.title, (self.pos[0] + self.size[0]/2, self.pos[1] + 20), 40, centered=True)
 		self.completed_text = Text("(Completed!)", (self.pos[0] + 410, self.pos[1] + 26), 28, color=(0,255,0))
-		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, spacing=1, size=24)
+		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, size=24)
 
 	def draw(self, completed):
 		self.screen.blit(self.panel, self.pos)
