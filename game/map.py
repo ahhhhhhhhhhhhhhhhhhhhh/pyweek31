@@ -508,4 +508,13 @@ class TileMap():
     def can_build(self, tile):
         return (isinstance(self.blocking[tile[0]][tile[1]], NoTile)
         and not type(self.map[tile[0]][tile[1]]) in (Road, Water, WaterRight, WaterLeft))
+
+    # in tiles
+    def get_size(self):
+        return self.xdim, self.ydim
+
+    def get_px_size(self):
+        return self.xdim * SCALE, self.ydim * SCALE
+        
+        
    

@@ -86,7 +86,6 @@ class Scene(ABC):
     def update(self, loop):
         pass
 
-
 class Game(Scene):
     def __init__(self, screen, image_name, wave_txt_path):
         self.id = "game"
@@ -100,7 +99,10 @@ class Game(Scene):
         self.waves = entity.Waves(self, wave_txt_path, self.tmap)
         self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
-        self.tmap_offset = [5,5]
+        CENTER_AT = [515, 260]
+        width, height = self.tmap.get_px_size()
+        self.tmap_offset = [CENTER_AT[0]-width/2, CENTER_AT[1]-height/2]
+        
         self.zombies = []
 
         self.towers = []
