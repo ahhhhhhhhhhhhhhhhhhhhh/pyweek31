@@ -276,13 +276,13 @@ class Description:
 		self.title = title
 		self.pos = pos
 
-		self.size = (664, 283)
+		self.size = (664, 270)
 		self.panel = pygame.Surface(self.size)
 		self.panel.fill(PANEL_COLOR)
 
 		self.title = Text(self.title, (self.pos[0] + self.size[0]/2, self.pos[1] + 20), 40, centered=True)
 		self.completed_text = Text("(Completed!)", (self.pos[0] + 410, self.pos[1] + 26), 28, color=(0,255,0))
-		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, size=24)
+		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 54, size=22)
 
 	def draw(self, completed):
 		self.screen.blit(self.panel, self.pos)
