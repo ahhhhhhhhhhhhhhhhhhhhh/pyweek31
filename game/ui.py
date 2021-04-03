@@ -1,7 +1,6 @@
 import pygame
 
 from game.utils import Text, TextButton, LinedText, Button
-import game.load as load
 
 PANEL_COLOR = (75, 75, 75)
 PANEL_BORDER_COLOR = (0, 0, 0)
@@ -91,10 +90,11 @@ class TowerInfoPanel:
 
 		
 class BuyPanel:
-	def __init__(self, screen, pos, towers):
+	def __init__(self, screen, pos, towers, is_tower_unlocked):
 		self.screen = screen
 		self.pos = pos
 		self.towers = towers
+		self.is_tower_unlocked = is_tower_unlocked
 
 		self.size = (1030, 200)
 		self.panel = pygame.Surface(self.size)
@@ -105,16 +105,26 @@ class BuyPanel:
 			b = BuyButton(self.screen, [self.pos[0] + 20 + 200 * i, self.pos[1] + 10], self.towers[i])
 			self.buttons.append(b)
 
+		self.unlock_advanced_image = None
+		self.unlock_advanced_text1 = Text("Unlock", [self.pos[0] + 800, self.pos[1] + 109], 24)
+		self.unlock_advanced_text2 = Text("Advanced Weapons", [self.pos[0] + 800, self.pos[1] + 135], 24)
+		self.unlock_advanced_cost_text = self.cost_text = Text("Costs 300 goodwill", [self.pos[0] + 820, self.pos[1] + 165], 14)
+		self.unlock_advanced_button = None
+
 	def update(self):
-		for b in self.buttons:
-			b.update()
+		for i,b in enumerate(self.buttons):
+			b.update(self.is_tower_unlocked[i])
 
 	def draw(self):
 		self.screen.blit(self.panel, self.pos)
 		pygame.draw.rect(self.screen, PANEL_BORDER_COLOR, (self.pos, self.size), width=4)
 
-		for b in self.buttons:
-			b.draw()
+		for i,b in enumerate(self.buttons):
+			b.draw(self.is_tower_unlocked[i])
+
+		self.unlock_advanced_text1.draw(self.screen)
+		self.unlock_advanced_text2.draw(self.screen)
+		self.unlock_advanced_cost_text.draw(self.screen)
 
 
 class BuyButton:
@@ -126,15 +136,26 @@ class BuyButton:
 		self.icon = pygame.transform.scale(tower.buy_icon, (163,120))
 		self.text = Text("Deploy " + tower.name, [self.pos[0], self.pos[1] + 125], 24)
 		self.cost_text = Text("Costs " + str(tower.cost[0]) + " goodwill", [self.pos[0] + 10, self.pos[1] + 155], 14)
+
+		self.locked_icon = pygame.transform.scale(tower.locked_icon, (163,120))
+		self.locked_text = Text("Deploy " + ("?" * len(tower.name)), [self.pos[0], self.pos[1] + 125], 24)
+		self.locked_cost_text = Text("Costs ??? goodwill", [self.pos[0] + 10, self.pos[1] + 155], 14)
+
 		self.button = Button(pygame.Rect(self.pos, (163,175)))
 
-	def update(self):
-		self.button.draw(self.screen)
+	def update(self, is_unlocked):
+		if is_unlocked:
+			self.button.draw(self.screen)
 
-	def draw(self):
-		self.screen.blit(self.icon, self.pos)
-		self.text.draw(self.screen)
-		self.cost_text.draw(self.screen)
+	def draw(self, is_unlocked):
+		if is_unlocked:
+			self.screen.blit(self.icon, self.pos)
+			self.text.draw(self.screen)
+			self.cost_text.draw(self.screen)
+		else:
+			self.screen.blit(self.locked_icon, self.pos)
+			self.locked_text.draw(self.screen)
+			self.locked_cost_text.draw(self.screen)
 
 
 class InfoDisplay:

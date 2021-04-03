@@ -221,6 +221,7 @@ class Tower(Tile):
 
         self.info_image = load.image("officer_original.png")
         self.buy_icon = load.image("officer_head.png")
+        self.locked_icon = load.image("locked_head.png")
 
     def update(self, deltatime):
         self.timer -= deltatime
