@@ -108,7 +108,7 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
-        self.lives = 30
+        self.lives = 20
         self.currency = 500
 
         self.info_display = InfoDisplay(self.screen, (1030, 0))
@@ -345,14 +345,17 @@ class LevelSelect(Scene):
                                    "to rid the city of zombies in 6 months. "
                                    "Our first target: the suburb on the way into town.")
         
-        self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
+        self.level3 = Game(screen, "level3", "maps/level3_waves.txt") # river
+        self.level3.currency = 700
         self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
                                    "in their lab downtown. "
                                    "They’ve been studying the virus that causes zombieism, "
                                    "maybe helping them will help us. "
                                    "To get downtown, we first need to cross the bridge that we’ve come to.")
         self.level4 = Game(screen, "level3", "maps/1wave.txt") # downtown
-        self.level4.description = ("TODO")
+        self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
+                                    "it will be our most dangerous challenge yet. What a way to get to know a new job. "
+                                    "At least the scientists say they’re close to a breakthrough.")
 
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
@@ -361,7 +364,7 @@ class LevelSelect(Scene):
 
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
-        self.current_level = 1
+        self.current_level = 2
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
