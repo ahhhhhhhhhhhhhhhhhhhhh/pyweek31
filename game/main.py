@@ -126,15 +126,17 @@ class Game(Scene):
                 if event.key == pygame.K_g:
                     self.currency += 100
 
+        camera_freedom = (150, 150) # how far the camera can go outside the tilemap
+        scrolling_speed = 500 # how fast camera moves
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_LEFT]:
-            self.tmap_offset[0] += loop.get_ticktime() * 300
-        if pressed[pygame.K_RIGHT]:
-            self.tmap_offset[0] -= loop.get_ticktime() * 300
-        if pressed[pygame.K_UP]:
-            self.tmap_offset[1] += loop.get_ticktime() * 300
-        if pressed[pygame.K_DOWN]:
-            self.tmap_offset[1] -= loop.get_ticktime() * 300
+        if pressed[pygame.K_LEFT] and self.tmap_offset[0] < camera_freedom[0]:
+            self.tmap_offset[0] += loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_RIGHT] and self.tmap_offset[0] > -(self.tmap.xdim * self.tmap.SCALE - 1030) - camera_freedom[0]:
+            self.tmap_offset[0] -= loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_UP] and self.tmap_offset[1] < camera_freedom[1]:
+            self.tmap_offset[1] += loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_DOWN] and self.tmap_offset[1] > -(self.tmap.ydim * self.tmap.SCALE - 520) - camera_freedom[1]:
+            self.tmap_offset[1] -= loop.get_ticktime() * scrolling_speed
 
         self.waves.update(self.zombies)
           

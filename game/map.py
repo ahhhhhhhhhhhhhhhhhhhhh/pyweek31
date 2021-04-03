@@ -340,6 +340,7 @@ class TileArray():
 
 # tilemap
 class TileMap():
+    SCALE = SCALE
     #[BigHouse, BigHouse2, BigHouse3, BigHouse4]
     colormap = {(255,0,0): [Start],
                 (0,38,255): [End],
