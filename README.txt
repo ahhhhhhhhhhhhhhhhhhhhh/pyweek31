@@ -1,5 +1,5 @@
-John Brawn
-===============
+The Last Commissioner
+=====================
 
 Entry in PyWeek #31 <http://www.pyweek.org/29/>
 Team: #TODO
@@ -18,5 +18,9 @@ You click on towers to buy them, you click on a valid map space to place.
 You click on a placed tower to see its information.
 
 To scroll around the larger maps, you can use the arrow keys.
+
+CREDITS:
+All art was created from scratch by our team, along with many of the sound effects.
+Obviously the game was created from scratch in stock pygame.
 
 LICENSE:

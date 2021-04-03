@@ -112,7 +112,7 @@ class Game(Scene):
         self.selected_tower = None
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
 
-        self.buy_panel = BuyPanel(self.screen, (0, 580), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
@@ -294,7 +294,6 @@ class Game(Scene):
             loop.musicManager.fadeout(3000)
         
         if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
-            print(self.time - self.endWinTime)
             loop.get_scene("endscreen").set_won(True, loop)
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
@@ -447,6 +446,7 @@ class MainMenu(Scene):
             loop.switch_scene("level_select")
  
         if self.sb.clicked:
+            loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
 
 class Settings(Scene):
@@ -499,10 +499,12 @@ class Settings(Scene):
         elif self.soundHigherButton.clicked:
             loop.soundManager.changeVolume(.05)
         elif self.leaveButton.clicked:
+            loop.scenedict["menu"].i = self.i
             loop.switch_scene("menu")
 
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.scenedict["menu"].i = self.i
                 loop.switch_scene("menu")
                 event.used = True
 
