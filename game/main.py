@@ -168,6 +168,8 @@ class Game(Scene):
                         self.tmap.blocking[tile[0]][tile[1]] = new_tower
                         self.towers.append(new_tower)
                         self.currency -= new_tower.cost[0]
+                    elif self.build_mode and self.currency <= new_tower.cost[0]:
+                        loop.soundManager.playFailSound()
 
                 # right click to exit build mode
                 elif event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 3:
@@ -259,7 +261,7 @@ class Game(Scene):
         # updating ui (buy panel, tower info, lives/currency display, waves display)
         if self.selected_tower != self.tower_info_panel.tower:
             self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
-        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
+        self.currency = self.tower_info_panel.update(self.currency, loop) # passes back any changes to currency becuase of upgrades
         self.tower_info_panel.draw(self.tmap_offset)
         
         self.waves_display.update(self.waves)
