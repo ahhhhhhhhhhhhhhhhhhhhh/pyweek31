@@ -92,6 +92,8 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
 
+        self.description = ""
+
         bg_image_path = "maps/" + image_name + "_bg.png"
         blocking_image_path = "maps/" + image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
@@ -116,7 +118,8 @@ class Game(Scene):
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.is_tower_unlocked = [True, True, False, False]
         self.selected_towertype = Tower
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked)
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"))
+        self.advanced_weapons_cost = 300
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -280,6 +283,11 @@ class Game(Scene):
                 self.selected_towertype = self.towertypes[i]
                 self.build_mode = True
                 self.selected_tower = None
+        if self.buy_panel.unlock_advanced_button.clicked and not self.is_tower_unlocked[2] and self.currency >= self.advanced_weapons_cost:
+            self.currency -= self.advanced_weapons_cost
+            self.is_tower_unlocked[2] = True # Sniper
+            self.is_tower_unlocked[3] = True # TASER
+            self.buy_panel.unlock_advanced()
 
         # game end conditions
         if self.lives < 1 and self.endLoseTime == None:
@@ -321,6 +329,7 @@ class LevelSelect(Scene):
 
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
+        self.level1.description = "classic rural tutorial level, you gotta get in there and kill some zombies am i right? just gotta fill up this space so i know if the description popup works correctly. Yada yada kill zombies. you can do it inspirational yay"
         self.level2 = Game(screen, "level2", "maps/1wave.txt") # suburbs/planned community
         self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
 
