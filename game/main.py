@@ -110,7 +110,7 @@ class Game(Scene):
         self.selected_tower = None
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
 
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
+        self.buy_panel = BuyPanel(self.screen, (0, 580), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
@@ -147,7 +147,7 @@ class Game(Scene):
                     if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower):
                         self.build_mode = False
                         self.selected_tower = self.tmap.blocking[tile[0]][tile[1]]
-                    else:
+                    elif not self.tower_info_panel.get_rect().collidepoint(event.pos):
                         self.selected_tower = None
 
                     coords = self.tmap.tile_to_screen_coords(tile)
@@ -243,6 +243,11 @@ class Game(Scene):
             self.projectiles.remove(p)
 
         # updating ui (buy panel, tower info, lives/currency display, waves display)
+        if self.selected_tower != self.tower_info_panel.tower:
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
+        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
+        self.tower_info_panel.draw(self.tmap_offset)
+        
         self.waves_display.update(self.waves)
         self.waves_display.draw()
         if self.waves_display.next_wave.clicked:
@@ -250,11 +255,6 @@ class Game(Scene):
 
         self.info_display.update(self.lives, self.currency)
         self.info_display.draw()
-
-        if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
-        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
-        self.tower_info_panel.draw(self.tmap_offset)
 
         self.buy_panel.update()
         self.buy_panel.draw()
