@@ -58,6 +58,17 @@ class MultiTile(Tile):
 class NoTile(Tile):
     image = None
 
+
+class Grass(Tile):
+    pass
+
+class Sand(Tile):
+    pass
+
+class Sidewalk(Tile):
+    pass
+
+
 # This class connects same tiles together
 # the images class constant should set a list of all possible connections
 # in the order:   -, '-, ---, -'-, -|-
@@ -173,6 +184,12 @@ class Apartment(MultiTile):
 class BigApartment(MultiTile):
     xdim = 2
     ydim = 2
+
+class Farm(Tile):
+    pass
+
+class ShortGrass(Tile):
+    pass
 
 Road.touchgroup = [Road, Start, End]
 
@@ -296,6 +313,12 @@ def _replace_color(surf, old, new):
     return surf
 
 def ready_tiles():
+    Grass.image = load.image("grass3.png").convert_alpha()
+    ShortGrass.image = load.image("grass6.png").convert_alpha()
+    Sand.image = load.image("sand.png").convert_alpha()
+    Sidewalk.image = load.image("concrete.png").convert_alpha()
+    Farm.image = load.image("farm.png").convert_alpha()
+    
     House.image = load.image("smallhouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
     BrickHouse.image = load.image("brickhouse.png").convert_alpha()
@@ -355,7 +378,12 @@ class TileMap():
                 (255, 0, 220): [Bush1, Bush2],
                 (0, 255, 255): [Water],
                 (255, 216, 0): [Apartment],
-                (87, 0, 127): [BigApartment]}
+                (87, 0, 127): [BigApartment],
+                (0, 255, 0): [Grass],
+                (127,127,0): [Sand],
+                (127, 127, 127): [Sidewalk],
+                (127, 127, 0): [Farm],
+                (0, 127, 0): [ShortGrass]}
 
     def _tile_from_color(self, color, x, y):
         if color in self.colormap:
@@ -381,11 +409,11 @@ class TileMap():
         tmap = TileArray(self.map)
         tmapblock = TileArray(self.blocking)
         
-        for x in range(self.xdim):
-            for y in range(self.ydim):
-                if type(self.blocking[x][y]) in (Road, Start, End):
-                    self.map[x][y] = self.blocking[x][y]
-                    self.blocking[x][y] = NoTile(x, y)
+        # for x in range(self.xdim):
+        #     for y in range(self.ydim):
+        #         if type(self.blocking[x][y]) in (Road, Start, End):
+        #             self.map[x][y] = self.blocking[x][y]
+        #             self.blocking[x][y] = NoTile(x, y)
         
         for x in range(self.xdim):
             for y in range(self.ydim):
@@ -415,6 +443,9 @@ class TileMap():
         for x in range(self.xdim):
             for y in range(self.ydim):
                 self.map[x][y].render(screen, x * SCALE, y * SCALE, offset)
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
                 self.blocking[x][y].render(screen, x * SCALE, y * SCALE, offset)
 
         pygame.draw.rect(screen, (0,0,0), (offset, (self.xdim * SCALE, self.ydim * SCALE)), width=2)
