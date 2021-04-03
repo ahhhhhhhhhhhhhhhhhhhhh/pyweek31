@@ -91,7 +91,7 @@ class TowerInfoPanel:
 
 		
 class BuyPanel:
-	def __init__(self, screen, pos, towers, is_tower_unlocked, unlock_advanced_icon):
+	def __init__(self, screen, pos, towers, is_tower_unlocked, unlock_advanced_icon, unlock_advanced_cost):
 		self.screen = screen
 		self.pos = pos
 		self.towers = towers
@@ -109,7 +109,7 @@ class BuyPanel:
 		self.unlock_advanced_icon = unlock_advanced_icon
 		self.unlock_advanced_text1 = Text("Unlock", [self.pos[0] + 800, self.pos[1] + 109], 24)
 		self.unlock_advanced_text2 = Text("Advanced Weapons", [self.pos[0] + 800, self.pos[1] + 135], 24)
-		self.unlock_advanced_cost_text = self.cost_text = Text("Costs 300 goodwill", [self.pos[0] + 820, self.pos[1] + 165], 14)
+		self.unlock_advanced_cost_text = self.cost_text = Text("Costs " + str(unlock_advanced_cost) + " goodwill", [self.pos[0] + 820, self.pos[1] + 165], 14)
 		self.unlock_advanced_button = Button(pygame.Rect([self.pos[0] + 800, self.pos[1]], [200, 175]))
 
 	def update(self):

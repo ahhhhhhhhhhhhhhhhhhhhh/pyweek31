@@ -10,8 +10,8 @@ from game.map import Road, Start, SCALE
 class ZombieBase:
     image = None
     speed = 1
-    max_health = 100
-    reward = 10
+    max_health = 200
+    reward = 20
     healthbar_off_y = 20
     lives_impact = 1
     
@@ -96,28 +96,29 @@ class Zombie(ZombieBase):
 class FastZombie(ZombieBase):
     image = load.image("fastzombie.png")
     speed = 2
-    reward = 15
+    reward = 30
 
 class GiantZombie(ZombieBase):
     image = load.image("buffzombie.png")
     speed = 0.5
-    max_health = 1000
-    reward = 50
+    max_health = 2000
+    reward = 100
     healthbar_off_y = 40
     lives_impact = 10
 
 class BabyZombie(ZombieBase):
     image = load.image("babyzombie.png")
     speed = 2.5
-    max_health = 50
+    max_health = 100
+    reward = 40
 
 class ShieldZombie(ZombieBase):
     image = load.image("smallzombie.png")
     shieldimage = load.image("shield.png")
     speed = 1
-    max_health = 75
-    reward = 15
-    shield_health = 1
+    max_health = 300
+    reward = 30
+    shield_health = 50
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
@@ -141,10 +142,10 @@ class ShieldZombie(ZombieBase):
 
 class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
-    max_health = 250
+    max_health = 500
     spawn_rate = 10 # time between spawns
     spawn_group = 3
-    reward = 75
+    reward = 150
     spawntype = Zombie
     lives_impact = 5
     
@@ -173,9 +174,9 @@ class SummonerZombie(ZombieBase):
 
 class CarryZombie(ZombieBase):
     image = load.image("cart.png")
-    max_health = 500
+    max_health = 1000
     speed = 0.65
-    reward = 20
+    reward = 50
     spawntype = BabyZombie
     spawn_group = 5
     lives_impact = 5

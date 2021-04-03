@@ -304,7 +304,7 @@ class SniperTower(Tower):
     fire_speed = [3, 3]
     max_range = [400, 500]
     bullet_color = (0, 0, 0)
-    cost = [200, 100]
+    cost = [200, 150]
 
     def __init__(self, x, y):
         super().__init__(x,y)
@@ -313,14 +313,14 @@ class SniperTower(Tower):
 
 class StunTower(Tower):
     name = "TASER"
-    text = "Apparently tasers work on zombies. Who knew?"
+    text = "Apparently tasers work on zombies. Who knew? (Upgrades increase stun duration)"
     damage = [10, 15, 20]
     fire_speed = [2, 2, 2]
     max_range = [125, 140, 160]
     stun_duration = [1, 1.25, 1.5]
     bullet_color = (0, 0, 255)
     bullet_duration = 0.5
-    cost = [100, 75, 125]
+    cost = [125, 100, 150]
 
     def __init__(self, x, y):
         super().__init__(x,y)

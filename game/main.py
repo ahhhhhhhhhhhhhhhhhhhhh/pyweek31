@@ -109,7 +109,7 @@ class Game(Scene):
         self.projectiles = []
 
         self.lives = 30
-        self.currency = 300
+        self.currency = 500
 
         self.info_display = InfoDisplay(self.screen, (1030, 0))
 
@@ -120,8 +120,8 @@ class Game(Scene):
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.is_tower_unlocked = [True, True, False, False]
         self.selected_towertype = Tower
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"))
-        self.advanced_weapons_cost = 300
+        self.advanced_weapons_cost = 400
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -361,7 +361,10 @@ class LevelSelect(Scene):
 
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
-        self.current_level = 0
+        self.current_level = 1
+        for i in range(self.current_level):
+            self.buttons[i].unlocked = True
+            self.buttons[i].completed = True
 
         self.most_recent_played = None
 
