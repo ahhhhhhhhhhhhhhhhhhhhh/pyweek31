@@ -398,7 +398,6 @@ class LevelSelect(Scene):
         self.current_level = 0
         with open(load.handle_path("gamestate.json")) as file:
             self.current_level = json.load(file)["current_level"]
-
         
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
@@ -527,7 +526,7 @@ class FinalScreen(Scene):
         self.text = LinedText(conclusion, [150, 175], 80, size=26, color=(0,0,0))
         self.image = load.image("end.png").convert()
 
-        self.back_button = TextButton("[Back to Main Menu]", [800, 600], 40)
+        self.back_button = TextButton("[Back to Main Menu]", [950, 680], 30)
 
     def update(self, loop):
         self.screen.blit(self.image, (0,0))
