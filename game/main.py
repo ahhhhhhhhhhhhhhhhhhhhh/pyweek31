@@ -8,7 +8,7 @@ import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
 from game.utils import Text, TextButton
 from game.sound import MusicManager, SoundEffectsManager
-from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton
+from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
 import game.entity as entity
 
 class Loop:
@@ -94,25 +94,23 @@ class Game(Scene):
         
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
         self.waves = entity.Waves(self, wave_txt_path, self.tmap)
-        self.waves_display = Text("", [640,20], size=32, centered=True)
-        self.waves_button = TextButton("[Call Next]", [640, 60], size=24, centered=True)
+        self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
         self.tmap_offset = [25,25]
         self.zombies = []
 
-        self.lives = 50
-        self.display_lives = Text("", [1050, 10], size=32)
-
-        self.currency = 300
-        self.display_currency = Text("", [1050, 40], size=32)
-
         self.towers = []
         self.projectiles = []
 
-        self.selected_tower = None
-        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
+        self.lives = 50
+        self.currency = 300
 
-        self.buy_panel = BuyPanel(self.screen, (0, 545), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
+        self.info_display = InfoDisplay(self.screen, (1030, 0))
+
+        self.selected_tower = None
+        self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
+
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
@@ -139,19 +137,6 @@ class Game(Scene):
         self.waves.update(self.zombies)
           
         self.tmap.render(self.screen, self.tmap_offset)
-
-        wl, wp = self.waves.get_progress()
-        self.waves_display.update_text(f"Wave {wl}/{wp}")
-        self.waves_display.draw(self.screen)
-        self.waves_button.draw(self.screen)
-        if self.waves_button.clicked:
-            self.waves.call_next(self.tmap)
-
-        # updating lives/currency text
-        self.display_lives.update_text("Lives: " + str(self.lives))
-        self.display_lives.draw(self.screen)
-        self.display_currency.update_text("Goodwill: " + str(self.currency))
-        self.display_currency.draw(self.screen)
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
 
@@ -195,9 +180,17 @@ class Game(Scene):
                 self.screen.blit(self.tmap.selector_closed, draw_coords)
                 pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
 
-        # updating tower info and buy panel
+        # updating ui (buy panel, tower info, lives/currency display, waves display)
+        self.waves_display.update(self.waves)
+        self.waves_display.draw()
+        if self.waves_display.next_wave.clicked:
+            self.waves.call_next(self.tmap)
+
+        self.info_display.update(self.lives, self.currency)
+        self.info_display.draw()
+
         if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
         self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
         self.tower_info_panel.draw(self.tmap_offset)
 
