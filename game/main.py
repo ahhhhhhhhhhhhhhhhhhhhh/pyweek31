@@ -656,7 +656,9 @@ class Settings(Scene):
         elif self.soundHigherButton.clicked:
             loop.soundManager.changeVolume(.05)
         elif self.resetbutton.clicked:
-            pass
+            loop.get_scene("level_select").current_level = 0
+            with open(load.handle_path("gamestate.json"), "w") as file:
+                json.dump({"current_level": 0}, file)
         elif self.leaveButton.clicked:
             loop.scenedict["menu"].i = self.i
             loop.switch_scene("menu")
