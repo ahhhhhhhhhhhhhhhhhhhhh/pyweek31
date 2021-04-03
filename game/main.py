@@ -7,7 +7,7 @@ import pygame
 
 import game.load as load
 from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
-from game.utils import Text, TextButton
+from game.utils import Text, TextButton, LinedText
 from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
 import game.entity as entity
@@ -507,9 +507,37 @@ class EndScreen(Scene):
             loop.get_scene("level_select").current_level += 1
             with open(load.handle_path("gamestate.json"), "w") as file:
                 json.dump({"current_level": loop.get_scene("level_select").current_level}, file)
+
+            if loop.get_scene("level_select").current_level == 4:
+                loop.switch_scene("final")
+
         else:
             self.outcome_display.update_text("You lost!")
             loop.get_scene("level_select").most_recent_played.level.reset()
+
+class FinalScreen(Scene):
+    def __init__(self, screen):
+        self.screen = screen
+        self.id = "final"
+
+        self.title = Text("Congratulations!", [640, 50], 90, centered=True, color=(0,0,0))
+        conclusion = "You finally break through the zombie stronghold and rescue the scientists. They have figured out the zombie's true nature. To your disbelief, the zombies are not dangerous to humans. Like moths to a bright light, they are simply drawn to our road's immaculately maintained yellow divider lines, and will follow these lines wherever they lead. To save Riverton, we merely needed to invest in some paint leading out of town"
+        self.text = LinedText(conclusion, [150, 175], 80, size=26, color=(0,0,0))
+        self.image = load.image("end.png").convert()
+
+        self.back_button = TextButton("[Back to Main Menu]", [800, 600], 40)
+
+    def update(self, loop):
+        self.screen.blit(self.image, (0,0))
+        self.title.draw(self.screen)
+        self.text.draw(self.screen)
+        
+
+        self.back_button.draw(self.screen)
+        if self.back_button.clicked:
+            loop.switch_scene("menu")
+            loop.soundManager.stopSound()
+
             
 class MainMenu(Scene):
     def __init__(self, screen):
@@ -650,9 +678,10 @@ def main():
     endscreen = EndScreen(screen)
     pause = Pause(screen)
     tutorial = Tutorial(screen)
+    final = FinalScreen(screen)
     scenedict = {"menu": menu, "level_select": level_select,
                  "settings": settings, "endscreen": endscreen,
-                 "pause": pause, "tutorial": tutorial}
+                 "pause": pause, "tutorial": tutorial, "final": final}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)
