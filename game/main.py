@@ -294,7 +294,6 @@ class Game(Scene):
             loop.musicManager.fadeout(3000)
         
         if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
-            print(self.time - self.endWinTime)
             loop.get_scene("endscreen").set_won(True, loop)
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
