@@ -116,7 +116,8 @@ class Game(Scene):
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.is_tower_unlocked = [True, True, False, False]
         self.selected_towertype = Tower
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked)
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"))
+        self.advanced_weapons_cost = 300
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -280,6 +281,11 @@ class Game(Scene):
                 self.selected_towertype = self.towertypes[i]
                 self.build_mode = True
                 self.selected_tower = None
+        if self.buy_panel.unlock_advanced_button.clicked and not self.is_tower_unlocked[2] and self.currency >= self.advanced_weapons_cost:
+            self.currency -= self.advanced_weapons_cost
+            self.is_tower_unlocked[2] = True # Sniper
+            self.is_tower_unlocked[3] = True # TASER
+            self.buy_panel.unlock_advanced()
 
         # game end conditions
         if self.lives < 1 and self.endLoseTime == None:

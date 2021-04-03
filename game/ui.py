@@ -90,7 +90,7 @@ class TowerInfoPanel:
 
 		
 class BuyPanel:
-	def __init__(self, screen, pos, towers, is_tower_unlocked):
+	def __init__(self, screen, pos, towers, is_tower_unlocked, unlock_advanced_icon):
 		self.screen = screen
 		self.pos = pos
 		self.towers = towers
@@ -105,15 +105,17 @@ class BuyPanel:
 			b = BuyButton(self.screen, [self.pos[0] + 20 + 200 * i, self.pos[1] + 10], self.towers[i])
 			self.buttons.append(b)
 
-		self.unlock_advanced_image = None
+		self.unlock_advanced_icon = unlock_advanced_icon
 		self.unlock_advanced_text1 = Text("Unlock", [self.pos[0] + 800, self.pos[1] + 109], 24)
 		self.unlock_advanced_text2 = Text("Advanced Weapons", [self.pos[0] + 800, self.pos[1] + 135], 24)
 		self.unlock_advanced_cost_text = self.cost_text = Text("Costs 300 goodwill", [self.pos[0] + 820, self.pos[1] + 165], 14)
-		self.unlock_advanced_button = None
+		self.unlock_advanced_button = Button(pygame.Rect([self.pos[0] + 800, self.pos[1]], [200, 175]))
 
 	def update(self):
 		for i,b in enumerate(self.buttons):
 			b.update(self.is_tower_unlocked[i])
+
+		self.unlock_advanced_button.draw(self.screen)
 
 	def draw(self):
 		self.screen.blit(self.panel, self.pos)
@@ -122,9 +124,16 @@ class BuyPanel:
 		for i,b in enumerate(self.buttons):
 			b.draw(self.is_tower_unlocked[i])
 
+		self.screen.blit(self.unlock_advanced_icon, [self.pos[0] + 820, self.pos[1] + 30])
 		self.unlock_advanced_text1.draw(self.screen)
 		self.unlock_advanced_text2.draw(self.screen)
 		self.unlock_advanced_cost_text.draw(self.screen)
+
+	def unlock_advanced(self):
+		self.unlock_advanced_text1.update_text("")
+		self.unlock_advanced_text2.update_color((255, 204, 0))
+		self.unlock_advanced_text2.update_text("       Unlocked")
+		self.unlock_advanced_cost_text.update_text("")
 
 
 class BuyButton:
