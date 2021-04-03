@@ -527,8 +527,9 @@ class MainMenu(Scene):
         self.screen = screen
         self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play, If You Dare...]", [840, 130], 32, centered=True)
-        self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [840, 250], 32, centered=True)
+        self.tb = TextButton("[How To Play]", [840, 180], 32, centered=True)
+        self.sb = TextButton("[Settings]", [840, 230], 32, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [840, 280], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -544,6 +545,7 @@ class MainMenu(Scene):
 
         self.t.draw(self.screen)
         self.b.draw(self.screen)
+        self.tb.draw(self.screen)
         self.sb.draw(self.screen)
         self.quit_button.draw(self.screen)
 
@@ -554,9 +556,35 @@ class MainMenu(Scene):
             loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
 
+        if self.tb.clicked:
+            loop.switch_scene("tutorial")
+
         if self.quit_button.clicked:
             loop.end_game()
         
+
+class Tutorial(Scene):
+    def __init__(self, screen):
+        self.id = "tutorial"
+        self.screen = screen
+
+        self.bgsurf = load.image("tutorial.png").convert()
+
+        self.back_button = TextButton("[<- Back to Menu]", [10,15], 26)
+
+    def update(self, loop):
+        self.screen.blit(self.bgsurf, (0,0))
+
+        self.back_button.draw(self.screen)
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
+
+        if self.back_button.clicked:
+            loop.switch_scene("menu")
+    
 
 class Settings(Scene):
     def __init__(self, screen):
@@ -631,9 +659,10 @@ def main():
     settings = Settings(screen)
     endscreen = EndScreen(screen)
     pause = Pause(screen)
+    tutorial = Tutorial(screen)
     scenedict = {"menu": menu, "level_select": level_select,
                  "settings": settings, "endscreen": endscreen,
-                 "pause": pause}
+                 "pause": pause, "tutorial": tutorial}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)
