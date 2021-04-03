@@ -13,6 +13,7 @@ from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, Wa
 import game.entity as entity
 
 OVERLAY_COLOR = (130,130,130,155)
+GAMESPACE = pygame.Rect(0, 0, 1030, 520)
 
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
@@ -186,6 +187,7 @@ class Game(Scene):
         self.tmap.render(self.screen, self.tmap_offset)
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
+        tile = tile if GAMESPACE.collidepoint(pygame.mouse.get_pos()) else False
 
         if tile:
             for event in loop.get_events():
@@ -370,28 +372,16 @@ class LevelSelect(Scene):
         self.city_image.set_colorkey((255,255,255))
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt", 25, 500) # rural
-        self.level1.description = ("After a long and arduous search, it’s clear that you’re the "
-                                   "only one to even accept the job of "
-                                   "police commissioner here in Riverton. "
-                                   "No sooner than you pick up the uniform from its former "
-                                   "occupant, the rural area you’ve retreated to is attacked by zombies.")
+        self.level1.description = "After a long and arduous search, it's clear that you're the only one to even apply for the job of police commissioner here in Riverton. The moment you pick up the uniform from its former occupant, the rural area surrounding you is attacked by zombies!"
         
         self.level2 = Game(screen, "level2", "maps/level2_waves.txt", 25, 600) # suburbs/planned community
-        self.level2.description = ("With the help of the PR people, all of whom somehow managed "
-                                   "to survive, the department has embarked on a public campaign "
-                                   "to rid the city of zombies in 6 months. "
-                                   "Our first target: the suburb on the way into town.")
+        self.level2.description = "With the help of the PR people (who all somehow managed to survive the first attack), the police department has embarked on an ambitious public campaign to rid the city of zombies within 6 months. The first area on the list on the to-clear list: the suburb on the way into town!"
         
         self.level3 = Game(screen, "level3", "maps/level3_waves.txt", 25, 800) # river
-        self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
-                                   "in their lab downtown. "
-                                   "They’ve been studying the virus that causes zombieism, "
-                                   "maybe helping them will help us. "
-                                   "To get downtown, we first need to cross the bridge that we’ve come to.")
+        self.level3.description = "We've received word that a bunch of scientist eggheads are trapped in their lab downtown! They've been studying the virus that causes zombieism; maybe they've discovered something that could help fight off the horde! To get to the lab, we'll first need to clear a path across the bridge."
+
         self.level4 = Game(screen, "level4", "maps/level4_waves.txt", 25, 1200) # downtown
-        self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
-                                    "it will be our most dangerous challenge yet. What a way to get to know a new job. "
-                                    "At least the scientists say they’re close to a breakthrough.")
+        self.level4.description = "After a heated campaign, we've finally reached the city center, which has become a zombie stronghold since it started as the early epicenter of the virus. It looks to be the most dangerous challenge yet; what a way to get to know a new job! At least the scientists say they're close to a breakthrough."
 
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
@@ -442,8 +432,9 @@ class Pause(Scene):
         self.id = "pause"
         self.title = Text("Paused", [640, 90], 90, centered=True)
         self.ret_button = TextButton("[Return to Game]", [640, 230], 40, centered=True)
-        self.exit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [640, 370], 40, centered=True)
+        self.restart_button = TextButton("[Restart Level]", [640, 300], 40, centered=True)
+        self.exit_button = TextButton("[Exit to Main Menu]", [640, 370], 40, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [640, 440], 40, centered=True)
         self.ret_scene = "game" #should be overwritten, this is merely a default
         self.bgsurf = None
 
@@ -453,11 +444,15 @@ class Pause(Scene):
         
         self.title.draw(self.screen)
         self.ret_button.draw(self.screen)
+        self.restart_button.draw(self.screen)
         self.exit_button.draw(self.screen)
         self.quit_button.draw(self.screen)
 
         if self.exit_button.clicked:
             loop.switch_scene("menu")
+        if self.restart_button.clicked:
+            loop.get_scene("level_select").most_recent_played.level.reset()
+            loop.switch_scene(self.ret_scene)
         if self.quit_button.clicked:
             loop.end_game()
         if self.ret_button.clicked:
@@ -485,7 +480,6 @@ class EndScreen(Scene):
         self.id = "endscreen"
         self.outcome_display = Text("", [640, 90], 90, centered=True)
         self.exit_button = TextButton("[Back to Map]", [640, 230], 40, centered=True)
-        self.quit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
         self.bgsurf = None
 
     def update(self, loop):
@@ -494,13 +488,9 @@ class EndScreen(Scene):
         
         self.outcome_display.draw(self.screen)
         self.exit_button.draw(self.screen)
-        self.quit_button.draw(self.screen)
 
         if self.exit_button.clicked:
             loop.switch_scene("level_select")
-            loop.soundManager.stopSound()
-        if self.quit_button.clicked:
-            loop.switch_scene("menu")
             loop.soundManager.stopSound()
 
     def ready(self, bgsurf):
@@ -527,8 +517,9 @@ class MainMenu(Scene):
         self.screen = screen
         self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play, If You Dare...]", [840, 130], 32, centered=True)
-        self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [840, 250], 32, centered=True)
+        self.tb = TextButton("[How To Play]", [840, 180], 32, centered=True)
+        self.sb = TextButton("[Settings]", [840, 230], 32, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [840, 280], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -537,13 +528,14 @@ class MainMenu(Scene):
 
     def update(self, loop):
         self.i += 1.5 * loop.get_ticktime()
-        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
-        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
-        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+        self.screen.blit(self.officer, self.officer.get_rect(center=(400,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(1100,500)))
 
         self.t.draw(self.screen)
         self.b.draw(self.screen)
+        self.tb.draw(self.screen)
         self.sb.draw(self.screen)
         self.quit_button.draw(self.screen)
 
@@ -554,9 +546,35 @@ class MainMenu(Scene):
             loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
 
+        if self.tb.clicked:
+            loop.switch_scene("tutorial")
+
         if self.quit_button.clicked:
             loop.end_game()
         
+
+class Tutorial(Scene):
+    def __init__(self, screen):
+        self.id = "tutorial"
+        self.screen = screen
+
+        self.bgsurf = load.image("tutorial.png").convert()
+
+        self.back_button = TextButton("[<- Back to Menu]", [10,15], 26)
+
+    def update(self, loop):
+        self.screen.blit(self.bgsurf, (0,0))
+
+        self.back_button.draw(self.screen)
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
+
+        if self.back_button.clicked:
+            loop.switch_scene("menu")
+    
 
 class Settings(Scene):
     def __init__(self, screen):
@@ -580,10 +598,10 @@ class Settings(Scene):
 
     def update(self, loop):
         self.i += 1.5 * loop.get_ticktime()
-        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
-        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
-        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+        self.screen.blit(self.officer, self.officer.get_rect(center=(400,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(1100,500)))
 
         self.musicVolumeText.update_text(str(round(loop.musicManager.volume*100)))
         self.soundVolumeText.update_text(str(round(loop.soundManager.volume*100)))
@@ -631,9 +649,10 @@ def main():
     settings = Settings(screen)
     endscreen = EndScreen(screen)
     pause = Pause(screen)
+    tutorial = Tutorial(screen)
     scenedict = {"menu": menu, "level_select": level_select,
                  "settings": settings, "endscreen": endscreen,
-                 "pause": pause}
+                 "pause": pause, "tutorial": tutorial}
     startscene = menu # switch around for debugging, default is "menu"
     musicManager = MusicManager(startscene.id)
     loop = Loop(screen, startscene, scenedict, musicManager)
