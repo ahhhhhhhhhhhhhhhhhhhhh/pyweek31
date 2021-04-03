@@ -213,6 +213,40 @@ class ShortGrass(Tile):
 class Sand(Tile):
     pass
 
+class SkyScraper(Tile):
+    pass
+
+class BSkyScraper(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
+class BSkyScraperT(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
+class BSkyScraperB(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
+
+class CSkyScraper(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
+class CSkyScraperT(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
+class CSkyScraperB(MultiTile):
+    xdim = 2
+    ydim = 1
+    pass
+
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
@@ -342,6 +376,14 @@ def ready_tiles():
     Sidewalk.image = load.image("concrete.png").convert_alpha()
     Farm.image = load.image("farm.png").convert_alpha()
     
+    SkyScraper.image = load.image("skyscraper.png").convert_alpha()
+    BSkyScraper.image = load.image("brickskyscraper.png").convert_alpha()
+    BSkyScraperT.image = load.image("brickskyscraper-top.png").convert_alpha()
+    BSkyScraperB.image = load.image("brickskyscraper-bottom.png").convert_alpha()
+    
+    CSkyScraper.image = load.image("concreteskyscraper.png").convert_alpha()
+    CSkyScraperT.image = load.image("concreteskyscraper-top.png").convert_alpha()
+    CSkyScraperB.image = load.image("concreteskyscraper-bottom.png").convert_alpha()
     
     BridgeRoad.image = load.image("bridgeroad.png").convert_alpha()
     BridgeGrate.image = load.image("bridgegrate.png").convert_alpha()
@@ -418,7 +460,14 @@ class TileMap():
                 (0, 127, 0): [ShortGrass],
                 (20,20,20): [BridgeRoad],
                 (200, 200, 200): [BridgeGrate],
-                (100,100,100): [BridgePillars]}
+                (100,100,100): [BridgePillars],
+                (39, 116, 186): [SkyScraper],
+                (193, 78, 40): [BSkyScraper],
+                (211, 85, 43): [BSkyScraperT],
+                (163, 66, 34): [BSkyScraperB],
+                (210, 202, 180): [CSkyScraper],
+                (222, 214, 194): [CSkyScraperT],
+                (191, 184, 165): [CSkyScraperB]}
 
     def _tile_from_color(self, color, x, y):
         if color in self.colormap:
