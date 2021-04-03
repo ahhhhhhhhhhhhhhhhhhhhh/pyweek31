@@ -250,6 +250,14 @@ class CSkyScraperB(MultiTile):
 class ParkingLot(Tile):
     pass
 
+class BlueApartment(MultiTile):
+    xdim = 2
+    ydim = 4
+
+class GiantApartment(MultiTile):
+    xdim = 4
+    ydim = 4
+
 Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
@@ -390,6 +398,10 @@ def ready_tiles():
     CSkyScraperT.image = load.image("concreteskyscraper-top.png").convert_alpha()
     CSkyScraperB.image = load.image("concreteskyscraper-bottom.png").convert_alpha()
     
+    BlueApartment.image = load.image("bigblueapartments.png").convert_alpha()
+    GiantApartment.image = load.image("reallybigapartments.png").convert_alpha()
+    #CSkyScraperB.image = load.image("concreteskyscraper-bottom.png").convert_alpha()
+    
     BridgeRoad.image = load.image("bridgeroad.png").convert_alpha()
     BridgeGrate.image = load.image("bridgegrate.png").convert_alpha()
     BridgePillars.image = load.image("bridgepillars.png").convert_alpha()
@@ -473,7 +485,10 @@ class TileMap():
                 (210, 202, 180): [CSkyScraper],
                 (222, 214, 194): [CSkyScraperT],
                 (191, 184, 165): [CSkyScraperB],
-                (220, 220, 220): [ParkingLot]}
+                (220, 220, 220): [ParkingLot],
+                (64, 61, 167): [BlueApartment],
+                (226, 198, 106): [GiantApartment]
+                }
 
     def _tile_from_color(self, color, x, y):
         if color in self.colormap:
