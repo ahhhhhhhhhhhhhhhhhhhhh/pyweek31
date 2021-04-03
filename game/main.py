@@ -302,6 +302,7 @@ class LevelSelect(Scene):
 
         self.city_image = load.image("very_very_bad_city_map.png")
 
+        
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
         self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
