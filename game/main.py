@@ -92,6 +92,8 @@ class Game(Scene):
         self.id = "game"
         self.screen = screen
 
+        self.description = ""
+
         bg_image_path = "maps/" + image_name + "_bg.png"
         blocking_image_path = "maps/" + image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
@@ -327,6 +329,7 @@ class LevelSelect(Scene):
 
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
+        self.level1.description = "classic rural tutorial level, you gotta get in there and kill some zombies am i right? just gotta fill up this space so i know if the description popup works correctly. Yada yada kill zombies. you can do it inspirational yay"
         self.level2 = Game(screen, "level2", "maps/1wave.txt") # suburbs/planned community
         self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
 
