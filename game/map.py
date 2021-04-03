@@ -154,6 +154,15 @@ class HouseVariant1(House):
 class BrickHouse(House):
     pass
 
+class BridgeRoad(Road):
+    pass
+
+class BridgeGrate(Tile):
+    pass
+
+class BridgePillars(Tile):
+    pass
+
 class Bridge(MultiTile):
     xdim = 1
     ydim = 5
@@ -204,7 +213,7 @@ class ShortGrass(Tile):
 class Sand(Tile):
     pass
 
-Road.touchgroup = [Road, Start, End, Bridge]
+Road.touchgroup = [Road, Start, End]
 
 class Tower(Tile):
     name = "Officer"
@@ -335,7 +344,9 @@ def ready_tiles():
     Farm.image = load.image("farm.png").convert_alpha()
     
     
-    Bridge.image = load.image("bridge.png").convert_alpha()
+    BridgeRoad.image = load.image("bridgeroad.png").convert_alpha()
+    BridgeGrate.image = load.image("bridgegrate.png").convert_alpha()
+    BridgePillars.image = load.image("bridgepillars.png").convert_alpha()
     
     House.image = load.image("smallhouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
@@ -407,7 +418,9 @@ class TileMap():
                 (127, 127, 127): [Sidewalk],
                 (127, 127, 0): [Farm],
                 (0, 127, 0): [ShortGrass],
-                (200,200,200): [Bridge]}
+                (20,20,20): [BridgeRoad],
+                (200, 200, 200): [BridgeGrate],
+                (100,100,100): [BridgePillars]}
 
     def _tile_from_color(self, color, x, y):
         if color in self.colormap:
