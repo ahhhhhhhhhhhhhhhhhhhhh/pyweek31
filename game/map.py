@@ -154,6 +154,10 @@ class HouseVariant1(House):
 class BrickHouse(House):
     pass
 
+class Bridge(MultiTile):
+    xdim = 1
+    ydim = 5
+
 class BigHouse(MultiTile):
     xdim = 2
     ydim = 2
@@ -177,6 +181,12 @@ class Bush2(Tile):
 class Water(Tile):
     pass
 
+class WaterRight(Tile):
+    pass
+
+class WaterLeft(Tile):
+    pass
+
 class Apartment(MultiTile):
     xdim = 1
     ydim = 2
@@ -191,7 +201,10 @@ class Farm(Tile):
 class ShortGrass(Tile):
     pass
 
-Road.touchgroup = [Road, Start, End]
+class Sand(Tile):
+    pass
+
+Road.touchgroup = [Road, Start, End, Bridge]
 
 class Tower(Tile):
     name = "Officer"
@@ -315,10 +328,14 @@ def _replace_color(surf, old, new):
 
 def ready_tiles():
     Grass.image = load.image("grass3.png").convert_alpha()
+    Sand.image = load.image("sand.png").convert_alpha()
     ShortGrass.image = load.image("grass6.png").convert_alpha()
     Sand.image = load.image("sand.png").convert_alpha()
     Sidewalk.image = load.image("concrete.png").convert_alpha()
     Farm.image = load.image("farm.png").convert_alpha()
+    
+    
+    Bridge.image = load.image("bridge.png").convert_alpha()
     
     House.image = load.image("smallhouse.png").convert_alpha()
     HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
@@ -350,7 +367,9 @@ def ready_tiles():
     SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
 
     Water.image = load.image("watertilecenter.png").convert_alpha()
-
+    WaterLeft.image = load.image("watertileleftedge.png").convert_alpha()
+    WaterRight.image = load.image("watertilerightedge.png").convert_alpha()
+    
     Apartment.image = load.image("apartments.png").convert_alpha()
     BigApartment.image = load.image("bigapartments.png").convert_alpha()
 
@@ -374,17 +393,21 @@ class TileMap():
                 (0,38,255): [End],
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
+                (255,255,0): [Sand],
                 (0, 127, 70): [House, HouseVariant1, BrickHouse],
                 (0, 127, 127): [BigHouse, BigHouse2, BigHouse3, BigHouse4],
                 (255, 0, 220): [Bush1, Bush2],
                 (0, 255, 255): [Water],
+                (0, 127, 255): [WaterLeft],
+                (0, 255, 127): [WaterRight],
                 (255, 216, 0): [Apartment],
                 (87, 0, 127): [BigApartment],
                 (0, 255, 0): [Grass],
                 (127,127,0): [Sand],
                 (127, 127, 127): [Sidewalk],
                 (127, 127, 0): [Farm],
-                (0, 127, 0): [ShortGrass]}
+                (0, 127, 0): [ShortGrass],
+                (200,200,200): [Bridge]}
 
     def _tile_from_color(self, color, x, y):
         if color in self.colormap:
