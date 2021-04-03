@@ -1,3 +1,0 @@
-[["carry", 1, "baby", 5]]
-[["giant", 1, "shield", 3]]
-[["zombie", 10]]
