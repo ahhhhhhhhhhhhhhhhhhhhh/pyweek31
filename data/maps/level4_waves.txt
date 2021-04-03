@@ -1,0 +1,1 @@
+[["fast", 8], ["zombie", 4], ["baby", 2], ["zombie", 5], ["zombie", 5]]

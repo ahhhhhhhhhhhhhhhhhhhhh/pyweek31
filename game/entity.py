@@ -104,7 +104,7 @@ class GiantZombie(ZombieBase):
     max_health = 2000
     reward = 100
     healthbar_off_y = 40
-    lives_impact = 10
+    lives_impact = 5
 
 class BabyZombie(ZombieBase):
     image = load.image("babyzombie.png")
@@ -148,7 +148,7 @@ class SummonerZombie(ZombieBase):
     spawn_group = 3
     reward = 150
     spawntype = Zombie
-    lives_impact = 5
+    lives_impact = 10
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
