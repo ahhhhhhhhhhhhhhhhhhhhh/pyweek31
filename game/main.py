@@ -372,28 +372,16 @@ class LevelSelect(Scene):
         self.city_image.set_colorkey((255,255,255))
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt", 25, 500) # rural
-        self.level1.description = ("After a long and arduous search, it’s clear that you’re the "
-                                   "only one to even accept the job of "
-                                   "police commissioner here in Riverton. "
-                                   "No sooner than you pick up the uniform from its former "
-                                   "occupant, the rural area you’ve retreated to is attacked by zombies.")
+        self.level1.description = "After a long and arduous search, it's clear that you're the only one to even apply for the job of police commissioner here in Riverton. The moment you pick up the uniform from its former occupant, the rural area surrounding you is attacked by zombies!"
         
         self.level2 = Game(screen, "level2", "maps/level2_waves.txt", 25, 600) # suburbs/planned community
-        self.level2.description = ("With the help of the PR people, all of whom somehow managed "
-                                   "to survive, the department has embarked on a public campaign "
-                                   "to rid the city of zombies in 6 months. "
-                                   "Our first target: the suburb on the way into town.")
+        self.level2.description = "With the help of the PR people (who all somehow managed to survive the first attack), the police department has embarked on an ambitious public campaign to rid the city of zombies within 6 months. The first area on the list on the to-clear list: the suburb on the way into town!"
         
         self.level3 = Game(screen, "level3", "maps/level3_waves.txt", 25, 800) # river
-        self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
-                                   "in their lab downtown. "
-                                   "They’ve been studying the virus that causes zombieism, "
-                                   "maybe helping them will help us. "
-                                   "To get downtown, we first need to cross the bridge that we’ve come to.")
+        self.level3.description = "We've received word that a bunch of scientist eggheads are trapped in their lab downtown! They've been studying the virus that causes zombieism; maybe they've discovered something that could help fight off the horde! To get to the lab, we'll first need to clear a path across the bridge."
+
         self.level4 = Game(screen, "level4", "maps/level4_waves.txt", 25, 1200) # downtown
-        self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
-                                    "it will be our most dangerous challenge yet. What a way to get to know a new job. "
-                                    "At least the scientists say they’re close to a breakthrough.")
+        self.level4.description = "After a heated campaign, we've finally reached the city center, which has become a zombie stronghold since it started as the early epicenter of the virus. It looks to be the most dangerous challenge yet; what a way to get to know a new job! At least the scientists say they're close to a breakthrough."
 
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
