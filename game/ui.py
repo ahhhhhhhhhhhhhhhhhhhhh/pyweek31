@@ -238,7 +238,7 @@ class LevelSelectButton:
 		self.surf = pygame.Surface(self.rect.size)
 		self.surf.set_alpha(100)
 
-		self.desc = Description(self.screen, level.description, (800, 500))
+		self.desc = Description(self.screen,self.label_text, self.level.description, (366, 384))
 
 	def update(self, loop):
 		if not self.unlocked:
@@ -264,18 +264,22 @@ class LevelSelectButton:
 		
 
 class Description:
-	def __init__(self, screen, description, pos):
+	def __init__(self, screen, title, description, pos):
 		self.screen = screen
 		self.description = description
+		self.title = title
 		self.pos = pos
 
-		self.size = (400, 100)
+		self.size = (664, 283)
 		self.panel = pygame.Surface(self.size)
 		self.panel.fill(PANEL_COLOR)
 
-		self.text = LinedText(self.description, [self.pos[0] + 5, self.pos[1] + 5], 48, spacing=1)
+		self.title = Text(self.title, (self.pos[0] + self.size[0]/2, self.pos[1] + 20), 40, centered=True)
+		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, spacing=1, size=24)
 
 	def draw(self):
-
 		self.screen.blit(self.panel, self.pos)
+		pygame.draw.rect(self.screen, PANEL_BORDER_COLOR, (self.pos, self.size), width=2)
+
+		self.title.draw(self.screen)
 		self.text.draw(self.screen)

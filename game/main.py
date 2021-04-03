@@ -325,9 +325,11 @@ class LevelSelect(Scene):
         self.screen = screen
         self.id = "level_select"
 
-        self.title_text = Text("Level Select", [640, 15], 64, centered=True)
+        self.title_text = Text("Riverton", [640, 15], 64, centered=True)
+        self.title_panel = pygame.Surface((1280, 80))
+        self.title_panel.fill((75, 75, 75))
 
-        self.city_image = load.image("map.png").convert()
+        self.city_image = load.image("map_enlarged.png").convert()
         self.city_image.set_colorkey((255,255,255))
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
@@ -349,21 +351,26 @@ class LevelSelect(Scene):
                                    "They’ve been studying the virus that causes zombieism, "
                                    "maybe helping them will help us. "
                                    "To get downtown, we first need to cross the bridge that we’ve come to.")
+        self.level4 = Game(screen, "level3", "maps/1wave.txt") # downtown
+        self.level4.description = ("TODO")
 
-        self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(135, 350, 250, 250), "Level 1")
+        self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level1_b.unlocked = True
-        self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(300, 100, 300, 200), "Level 2")
+        self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
         self.level2_b.unlocked = True
-        self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(690, 85, 300, 170), "Level 3")
+        self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(709, 93, 336, 196), "Level 3")
         self.level3_b.unlocked = True
+        self.level4_b = LevelSelectButton(self.screen, self.level4, pygame.Rect(1071, 101, 195, 316), "Level 4")
+        self.level4_b.unlocked = True
 
-        self.buttons = [self.level1_b, self.level2_b, self.level3_b]
+        self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
         self.most_recent_played = None
 
     def update(self, loop):
-        self.title_text.draw(self.screen)
         self.screen.blit(self.city_image, (0, 0))
+        self.screen.blit(self.title_panel, (0, 0))
+        self.title_text.draw(self.screen)
 
         for b in self.buttons:
             b.update(loop)
