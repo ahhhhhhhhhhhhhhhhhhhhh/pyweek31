@@ -342,7 +342,7 @@ class LevelSelect(Scene):
         self.level2 = Game(screen, "level2", "maps/level2_waves.txt") # suburbs/planned community
         self.level2.description = ("With the help of the PR people, all of whom somehow managed "
                                    "to survive, the department has embarked on a public campaign "
-                                   "to rid the city of zombies in 6 months"
+                                   "to rid the city of zombies in 6 months. "
                                    "Our first target: the suburb on the way into town.")
         
         self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
@@ -355,15 +355,13 @@ class LevelSelect(Scene):
         self.level4.description = ("TODO")
 
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
-        self.level1_b.unlocked = True
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
-        self.level2_b.unlocked = True
         self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(709, 93, 336, 196), "Level 3")
-        self.level3_b.unlocked = True
         self.level4_b = LevelSelectButton(self.screen, self.level4, pygame.Rect(1071, 101, 195, 316), "Level 4")
-        self.level4_b.unlocked = True
 
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
+
+        self.current_level = 0
 
         self.most_recent_played = None
 
@@ -371,6 +369,9 @@ class LevelSelect(Scene):
         self.screen.blit(self.city_image, (0, 0))
         self.screen.blit(self.title_panel, (0, 0))
         self.title_text.draw(self.screen)
+
+        if self.current_level < len(self.buttons) and not self.buttons[self.current_level].unlocked:
+            self.buttons[self.current_level].unlocked = True
 
         for b in self.buttons:
             b.update(loop)
@@ -439,7 +440,8 @@ class EndScreen(Scene):
     def set_won(self, won, loop):
         if won:
             self.outcome_display.update_text("You won!")
-            loop.scenedict["level_select"].most_recent_played.completed = True
+            loop.get_scene("level_select").most_recent_played.completed = True
+            loop.get_scene("level_select").current_level += 1
         else:
             self.outcome_display.update_text("You lost!")
             

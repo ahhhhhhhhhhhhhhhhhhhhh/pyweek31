@@ -1,4 +1,4 @@
 [["zombie", 5]]
-[["zombie", 10, "baby", 3, "zombie", 10]]
-[["baby", 8, "giant", 2, "zombie", 12]]
-[["zombie", 5, "giant", 3, "baby", 3, "zombie", 15, "giant", 6]]
+[["zombie", 10, "fast", 3, "zombie", 10]]
+[["fast", 8, "giant", 2, "zombie", 12]]
+[["zombie", 5, "giant", 3, "fast", 3, "zombie", 15, "giant", 6]]

@@ -251,6 +251,7 @@ class LevelSelectButton:
 				self.desc.draw()
 		else:
 			self.current_color = self.completed_color
+			
 
 		if self.surf.get_at((0,0)) != self.current_color:
 			self.surf.fill(self.current_color)
