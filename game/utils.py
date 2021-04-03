@@ -97,6 +97,7 @@ class TextButton(Text):
 class Button:
     #args are [pygame.Rect] or [location, surface]
     def __init__(self, *args):
+        self.change_cursor = True
         if len(args) == 1:
             self.rect = pygame.Rect(args[0])
         elif len(args) == 2:
@@ -116,7 +117,8 @@ class Button:
         self.hovered = False
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             self.hovered = True
-            TextButton.loop.request_cursor(pygame.SYSTEM_CURSOR_HAND)
+            if self.change_cursor:
+                TextButton.loop.request_cursor(pygame.SYSTEM_CURSOR_HAND)
 
     def update_location(self, newloc):
         self.location = newloc
