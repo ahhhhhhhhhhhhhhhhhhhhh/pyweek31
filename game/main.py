@@ -140,13 +140,6 @@ class Game(Scene):
           
         self.tmap.render(self.screen, self.tmap_offset)
 
-        wl, wp = self.waves.get_progress()
-        self.waves_display.update_text(f"Wave {wl}/{wp}")
-        self.waves_display.draw(self.screen)
-        self.waves_button.draw(self.screen)
-        if self.waves_button.clicked:
-            self.waves.call_next(self.tmap)
-
         # updating lives/currency text
         self.display_lives.update_text("Lives: " + str(self.lives))
         self.display_lives.draw(self.screen)
@@ -158,8 +151,6 @@ class Game(Scene):
         if tile:
             for event in loop.get_events():
                 if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                    event.used = True
-
                     # building/selecting towers
                     if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower):
                         self.build_mode = False
@@ -194,21 +185,6 @@ class Game(Scene):
             else:
                 self.screen.blit(self.tmap.selector_closed, draw_coords)
                 pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
-
-        # updating tower info and buy panel
-        if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
-        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
-        self.tower_info_panel.draw(self.tmap_offset)
-
-        self.buy_panel.update()
-        self.buy_panel.draw()
-        for i, b in enumerate(self.buy_panel.buttons):
-            b = b.button
-            if b.clicked:
-                self.selected_towertype = self.towertypes[i]
-                self.build_mode = True
-                self.selected_tower = None
 
         # updating zombies and deleting zombies that reach end
         to_del = []
@@ -273,6 +249,29 @@ class Game(Scene):
                 to_del.append(p)
         for p in to_del:
             self.projectiles.remove(p)
+
+        # waves UI
+        wl, wp = self.waves.get_progress()
+        self.waves_display.update_text(f"Wave {wl}/{wp}")
+        self.waves_display.draw(self.screen)
+        self.waves_button.draw(self.screen)
+        if self.waves_button.clicked:
+            self.waves.call_next(self.tmap)
+
+        # updating tower info and buy panel
+        if self.selected_tower != self.tower_info_panel.tower:
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1050, 75))
+        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
+        self.tower_info_panel.draw(self.tmap_offset)
+
+        self.buy_panel.update()
+        self.buy_panel.draw()
+        for i, b in enumerate(self.buy_panel.buttons):
+            b = b.button
+            if b.clicked:
+                self.selected_towertype = self.towertypes[i]
+                self.build_mode = True
+                self.selected_tower = None
 
         # game end conditions
         if self.lives < 1:
