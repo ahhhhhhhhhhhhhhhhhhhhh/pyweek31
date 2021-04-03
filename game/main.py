@@ -384,7 +384,7 @@ class LevelSelect(Scene):
                                    "They’ve been studying the virus that causes zombieism, "
                                    "maybe helping them will help us. "
                                    "To get downtown, we first need to cross the bridge that we’ve come to.")
-        self.level4 = Game(screen, "level3", "maps/1wave.txt") # downtown
+        self.level4 = Game(screen, "level4", "maps/level4_waves.txt") # downtown
         self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
                                     "it will be our most dangerous challenge yet. What a way to get to know a new job. "
                                     "At least the scientists say they’re close to a breakthrough.")
