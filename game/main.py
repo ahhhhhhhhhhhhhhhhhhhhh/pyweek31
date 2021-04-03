@@ -11,6 +11,8 @@ from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
 import game.entity as entity
 
+OVERLAY_COLOR = (120,120,120,120)
+
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
         self.musicManager = musicManager
@@ -42,8 +44,8 @@ class Loop:
             self.musicManager.update(self)
 
             self.handle_cursor()
-            self.fps_text.update_text(str(round(self.clock.get_fps())))
-            self.fps_text.draw(self.screen)
+            #self.fps_text.update_text(str(round(self.clock.get_fps())))
+            #self.fps_text.draw(self.screen)
             
             pygame.display.flip()
             self.ticktime = self.clock.tick(144) / 1000
@@ -90,13 +92,15 @@ class Game(Scene):
     def __init__(self, screen, image_name, wave_txt_path):
         self.id = "game"
         self.screen = screen
+        self.image_name = image_name
+        self.wave_txt_path = wave_txt_path
 
         self.description = ""
 
-        bg_image_path = "maps/" + image_name + "_bg.png"
-        blocking_image_path = "maps/" + image_name + "_blocking.png"
+        bg_image_path = "maps/" + self.image_name + "_bg.png"
+        blocking_image_path = "maps/" + self.image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(self, wave_txt_path, self.tmap)
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
         self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
         CENTER_AT = [515, 260]
@@ -108,7 +112,7 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
-        self.lives = 30
+        self.lives = 20
         self.currency = 500
 
         self.info_display = InfoDisplay(self.screen, (1030, 0))
@@ -126,6 +130,31 @@ class Game(Scene):
         self.endWinTime = None
         self.endLoseTime = None
         self.time = 0
+
+    # resetting the level after a loss so it can be played again
+    def reset(self):
+        bg_image_path = "maps/" + self.image_name + "_bg.png"
+        blocking_image_path = "maps/" + self.image_name + "_blocking.png"
+        self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
+
+        self.zombies = []
+
+        self.towers = []
+        self.projectiles = []
+
+        self.lives = 20
+        self.currency = 500
+
+        self.selected_tower = None
+        self.build_mode = False
+        self.is_tower_unlocked = [True, True, False, False]
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
+
+        self.endWinTime = None
+        self.endLoseTime = None
+        self.time = 0
+
     
     def update(self, loop):
         deltatime = loop.get_ticktime()
@@ -298,6 +327,7 @@ class Game(Scene):
 
         if self.endLoseTime != None and (self.time - self.endLoseTime) >= 3:
             loop.get_scene("endscreen").set_won(False, loop)
+            loop.get_scene("endscreen").ready(self.screen.copy())
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
             loop.soundManager.playLevelLoseSound()
@@ -308,6 +338,7 @@ class Game(Scene):
         
         if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
             loop.get_scene("endscreen").set_won(True, loop)
+            loop.get_scene("endscreen").ready(self.screen.copy())
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
             loop.soundManager.playLevelWinSound()
@@ -316,6 +347,7 @@ class Game(Scene):
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
                 loop.get_scene("pause").set_return(self)
+                loop.get_scene("pause").ready(self.screen.copy())
                 loop.switch_scene("pause")
                 event.used = True
 
@@ -345,14 +377,17 @@ class LevelSelect(Scene):
                                    "to rid the city of zombies in 6 months. "
                                    "Our first target: the suburb on the way into town.")
         
-        self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
+        self.level3 = Game(screen, "level3", "maps/level3_waves.txt") # river
+        self.level3.currency = 700
         self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
                                    "in their lab downtown. "
                                    "They’ve been studying the virus that causes zombieism, "
                                    "maybe helping them will help us. "
                                    "To get downtown, we first need to cross the bridge that we’ve come to.")
         self.level4 = Game(screen, "level3", "maps/1wave.txt") # downtown
-        self.level4.description = ("TODO")
+        self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
+                                    "it will be our most dangerous challenge yet. What a way to get to know a new job. "
+                                    "At least the scientists say they’re close to a breakthrough.")
 
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
@@ -361,7 +396,7 @@ class LevelSelect(Scene):
 
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
-        self.current_level = 1
+        self.current_level = 0
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
@@ -398,8 +433,12 @@ class Pause(Scene):
         self.exit_button = TextButton("[Exit to Menu]", [640, 470], 40, centered=True)
         self.quit_button = TextButton("[Quit Game]", [640, 540], 40, centered=True)
         self.ret_scene = "game" #should be overwritten, this is merely a default
+        self.bgsurf = None
 
     def update(self, loop):
+        if self.bgsurf:
+            self.screen.blit(self.bgsurf, (0,0))
+        
         self.title.draw(self.screen)
         self.ret_button.draw(self.screen)
         self.exit_button.draw(self.screen)
@@ -418,6 +457,13 @@ class Pause(Scene):
                 loop.switch_scene(self.ret_scene)
                 event.used = True
 
+    def ready(self, bgsurf):
+        opa_layer = pygame.Surface(bgsurf.get_size())
+        opa_layer.fill(OVERLAY_COLOR[0:3])
+        opa_layer.set_alpha(OVERLAY_COLOR[3])
+        bgsurf.blit(opa_layer, (0,0))
+        self.bgsurf = bgsurf
+
     def set_return(self, ret):
         self.ret_scene = ret
 
@@ -428,8 +474,12 @@ class EndScreen(Scene):
         self.outcome_display = Text("", [640, 90], 90, centered=True)
         self.exit_button = TextButton("[Back to Map]", [640, 400], 40, centered=True)
         self.quit_button = TextButton("[Quit Game]", [640, 470], 40, centered=True)
+        self.bgsurf = None
 
     def update(self, loop):
+        if self.bgsurf:
+            self.screen.blit(self.bgsurf, (0,0))
+        
         self.outcome_display.draw(self.screen)
         self.exit_button.draw(self.screen)
         self.quit_button.draw(self.screen)
@@ -440,6 +490,13 @@ class EndScreen(Scene):
         if self.quit_button.clicked:
             loop.end_game()
 
+    def ready(self, bgsurf):
+        opa_layer = pygame.Surface(bgsurf.get_size())
+        opa_layer.fill(OVERLAY_COLOR[0:3])
+        opa_layer.set_alpha(OVERLAY_COLOR[3])
+        bgsurf.blit(opa_layer, (0,0))
+        self.bgsurf = bgsurf
+
     def set_won(self, won, loop):
         if won:
             self.outcome_display.update_text("You won!")
@@ -447,6 +504,7 @@ class EndScreen(Scene):
             loop.get_scene("level_select").current_level += 1
         else:
             self.outcome_display.update_text("You lost!")
+            loop.get_scene("level_select").most_recent_played.level.reset()
             
 class MainMenu(Scene):
     def __init__(self, screen):
@@ -455,6 +513,7 @@ class MainMenu(Scene):
         self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
         self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [840, 250], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -471,6 +530,7 @@ class MainMenu(Scene):
         self.t.draw(self.screen)
         self.b.draw(self.screen)
         self.sb.draw(self.screen)
+        self.quit_button.draw(self.screen)
 
         if self.b.clicked:
             loop.switch_scene("level_select")
@@ -478,6 +538,10 @@ class MainMenu(Scene):
         if self.sb.clicked:
             loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
+
+        if self.quit_button.clicked:
+            loop.end_game()
+        
 
 class Settings(Scene):
     def __init__(self, screen):
@@ -492,7 +556,7 @@ class Settings(Scene):
         self.musicHigherButton = TextButton("[+]", [1100, 130], 32, centered=True)
         self.soundLowerButton = TextButton("[-]", [900, 190], 32, centered=True)
         self.soundHigherButton = TextButton("[+]", [1100, 190], 32, centered=True)
-        self.leaveButton = TextButton("Return to Main Menu", [840, 250], 32, centered=True)
+        self.leaveButton = TextButton("[Return to Main Menu]", [840, 250], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()

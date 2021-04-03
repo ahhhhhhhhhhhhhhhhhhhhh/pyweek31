@@ -95,12 +95,12 @@ class Zombie(ZombieBase):
 
 class FastZombie(ZombieBase):
     image = load.image("fastzombie.png")
-    speed = 2
-    reward = 30
+    speed = 1.75
+    reward = 25
 
 class GiantZombie(ZombieBase):
     image = load.image("buffzombie.png")
-    speed = 0.5
+    speed = 0.6
     max_health = 2000
     reward = 100
     healthbar_off_y = 40
@@ -110,7 +110,7 @@ class BabyZombie(ZombieBase):
     image = load.image("babyzombie.png")
     speed = 2.5
     max_health = 100
-    reward = 40
+    reward = 30
 
 class ShieldZombie(ZombieBase):
     image = load.image("smallzombie.png")
@@ -143,7 +143,8 @@ class ShieldZombie(ZombieBase):
 class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
     max_health = 500
-    spawn_rate = 10 # time between spawns
+    speed = 0.5
+    spawn_rate = 3 # time between spawns
     spawn_group = 3
     reward = 150
     spawntype = Zombie

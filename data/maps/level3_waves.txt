@@ -1,0 +1,6 @@
+[["shield", 3, "zombie", 3], ["zombie", 4]]
+[["zombie", 6], ["fast", 3, "shield", 3]]
+[["zombie", 4, "fast", 4], ["zombie", 6, "baby", 4, "giant", 1]]
+[["fast", 8, "carry", 1], ["giant", 3]]
+[["giant", 3, "shield", 6, "baby", 2], ["zombie", 12, "carry", 3]]
+[["giant", 3, "baby", 8], ["zombie", 6, "summoner", 2]]

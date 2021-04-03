@@ -25,7 +25,7 @@ class TowerInfoPanel:
 		self.make_upgrade_button()
 
 		self.info_image = pygame.transform.scale(self.tower.info_image, (275,275))
-		self.flavor_text = LinedText(self.tower.text, (self.pos[0] + 15, self.pos[1] + 330), 30, spacing=1, size=14)
+		self.flavor_text = LinedText(self.tower.text, (self.pos[0] + 15, self.pos[1] + 330), 30, size=14)
 
 	# updates tower info text, needs to be called when tower is upgraded so info panel is accurate
 	def make_info_text(self):
@@ -231,13 +231,13 @@ class LevelSelectButton:
 
 		self.locked_color = (255, 0, 0)
 		self.unlocked_color = (255, 242, 0)
-		self.completed_color = (60, 255, 0)
+		self.completed_color = (30, 255, 0)
 
 		self.current_color = self.locked_color
 
 		self.b = Button(self.rect)
 		self.surf = pygame.Surface(self.rect.size)
-		self.surf.set_alpha(100)
+		self.surf.set_alpha(160)
 
 		self.desc = Description(self.screen,self.label_text, self.level.description, (366, 384))
 
@@ -248,14 +248,18 @@ class LevelSelectButton:
 			self.current_color = self.unlocked_color
 			self.b.draw(self.screen)
 			if self.b.hovered and self.desc.text.text != "":
-				self.desc.draw()
+				self.desc.draw(self.completed)
 		else:
 			self.current_color = self.completed_color
+			self.b.change_cursor = False
+			self.b.draw(self.screen)
+			if self.b.hovered and self.desc.text.text != "":
+				self.desc.draw(self.completed)
 			
 
 		if self.surf.get_at((0,0)) != self.current_color:
 			self.surf.fill(self.current_color)
-			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=(0,0,0), centered=True)	
+			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 30, color=(0,0,0), centered=True)	
 		
 
 	def draw(self):
@@ -277,11 +281,15 @@ class Description:
 		self.panel.fill(PANEL_COLOR)
 
 		self.title = Text(self.title, (self.pos[0] + self.size[0]/2, self.pos[1] + 20), 40, centered=True)
-		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, spacing=1, size=24)
+		self.completed_text = Text("(Completed!)", (self.pos[0] + 410, self.pos[1] + 26), 28, color=(0,255,0))
+		self.text = LinedText(self.description, [self.pos[0] + 50, self.pos[1] + 70], 45, size=24)
 
-	def draw(self):
+	def draw(self, completed):
 		self.screen.blit(self.panel, self.pos)
 		pygame.draw.rect(self.screen, PANEL_BORDER_COLOR, (self.pos, self.size), width=2)
 
 		self.title.draw(self.screen)
 		self.text.draw(self.screen)
+
+		if completed:
+			self.completed_text.draw(self.screen)
