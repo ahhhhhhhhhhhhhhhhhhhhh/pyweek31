@@ -13,6 +13,7 @@ from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, Wa
 import game.entity as entity
 
 OVERLAY_COLOR = (130,130,130,155)
+GAMESPACE = pygame.Rect(0, 0, 1030, 520)
 
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
@@ -186,6 +187,7 @@ class Game(Scene):
         self.tmap.render(self.screen, self.tmap_offset)
 
         tile = self.tmap.screen_to_tile_coords(pygame.mouse.get_pos())
+        tile = tile if GAMESPACE.collidepoint(pygame.mouse.get_pos()) else False
 
         if tile:
             for event in loop.get_events():
