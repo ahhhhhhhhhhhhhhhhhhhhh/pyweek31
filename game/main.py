@@ -88,15 +88,17 @@ class Scene(ABC):
 
 
 class Game(Scene):
-    def __init__(self, screen, bg_image_path, blocking_image_path, wave_txt_path):
+    def __init__(self, screen, image_name, wave_txt_path):
         self.id = "game"
         self.screen = screen
-        
+
+        bg_image_path = "maps/" + image_name + "_bg.png"
+        blocking_image_path = "maps/" + image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
         self.waves = entity.Waves(self, wave_txt_path, self.tmap)
         self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
-        self.tmap_offset = [25,25]
+        self.tmap_offset = [5,5]
         self.zombies = []
 
         self.towers = []
@@ -124,15 +126,17 @@ class Game(Scene):
                 if event.key == pygame.K_g:
                     self.currency += 100
 
+        camera_freedom = (150, 150) # how far the camera can go outside the tilemap
+        scrolling_speed = 500 # how fast camera moves
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_LEFT]:
-            self.tmap_offset[0] += loop.get_ticktime() * 300
-        if pressed[pygame.K_RIGHT]:
-            self.tmap_offset[0] -= loop.get_ticktime() * 300
-        if pressed[pygame.K_UP]:
-            self.tmap_offset[1] += loop.get_ticktime() * 300
-        if pressed[pygame.K_DOWN]:
-            self.tmap_offset[1] -= loop.get_ticktime() * 300
+        if pressed[pygame.K_LEFT] and self.tmap_offset[0] < camera_freedom[0]:
+            self.tmap_offset[0] += loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_RIGHT] and self.tmap_offset[0] > -(self.tmap.xdim * self.tmap.SCALE - 1030) - camera_freedom[0]:
+            self.tmap_offset[0] -= loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_UP] and self.tmap_offset[1] < camera_freedom[1]:
+            self.tmap_offset[1] += loop.get_ticktime() * scrolling_speed
+        if pressed[pygame.K_DOWN] and self.tmap_offset[1] > -(self.tmap.ydim * self.tmap.SCALE - 520) - camera_freedom[1]:
+            self.tmap_offset[1] -= loop.get_ticktime() * scrolling_speed
 
         self.waves.update(self.zombies)
           
@@ -210,7 +214,11 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color, tower.bullet_duration))
+            # adjusted positions are so projectiles can move with offset
+            adjusted_tower_pos = [tower_pos[0] - self.tmap_offset[0], tower_pos[1] - self.tmap_offset[1]]
+            adjusted_target_pos = [target.center_pos()[0] - self.tmap_offset[0], target.center_pos()[1] - self.tmap_offset[1]]
+
+            self.projectiles.append(entity.BulletTrail(adjusted_tower_pos, adjusted_target_pos, tower.bullet_color, tower.bullet_duration))
             tower.fire(target)
             target.hit(tower.damage)
 
@@ -236,7 +244,7 @@ class Game(Scene):
         to_del = []
         for p in self.projectiles:
             p.timestep(deltatime)
-            p.render(self.screen)
+            p.render(self.screen, self.tmap_offset)
             if p.is_done():
                 to_del.append(p)
         for p in to_del:
@@ -296,26 +304,29 @@ class LevelSelect(Scene):
         self.city_image = load.image("very_very_bad_city_map.png")
 
         
-        self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
-        self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
-        self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
-        self.rivermap = Game(screen, "maps/river_bg.png", "maps/river_blocking.png", "maps/1wavetest.txt")
+        self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
+        self.level2 = Game(screen, "level2", "maps/1wave.txt") # suburbs/planned community
+        self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
+
+        self.test = Game(screen, "test", "maps/test_waves.txt")
+        self.onewave = Game(screen, "level1", "maps/1wave.txt")
+
+        self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(420, 200, 150, 200), "Level 1")
+        self.level1_b.unlocked = True
+        self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(420, 400, 150, 200), "Level 2")
+        self.level2_b.unlocked = True
+        self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(600, 350, 200, 125), "Level 3")
+        self.level3_b.unlocked = True
 
 
+        self.test_b = LevelSelectButton(self.screen, self.test, pygame.Rect(200, 400, 100, 100), "test map (old)")
+        self.test_b.unlocked = True
 
-        self.start_map_button = LevelSelectButton(self.screen, self.start_map, pygame.Rect(420, 200, 150, 200), "Start map")
-        self.start_map_button.unlocked = True
+        self.onewave_b = LevelSelectButton(self.screen, self.onewave, pygame.Rect(200, 200, 100, 100), "1 wave")
+        self.onewave_b.unlocked = True
 
-        self.map1_button = LevelSelectButton(self.screen, self.map1, pygame.Rect(780, 175, 100, 100), "Map 1")
-        self.map1_button.unlocked = True
 
-        self.river_map_button = LevelSelectButton(self.screen, self.rivermap, pygame.Rect(600, 350, 200, 125), "River")
-        self.river_map_button.unlocked = True
-
-        self.onewavetest_b = LevelSelectButton(self.screen, self.onewavetest, pygame.Rect(500, 500, 50, 50), "1 wave")
-        self.onewavetest_b.unlocked = True
-
-        self.buttons = [self.start_map_button, self.map1_button, self.river_map_button, self.onewavetest_b]
+        self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.test_b, self.onewave_b]
 
         self.most_recent_played = None
 

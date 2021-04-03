@@ -158,6 +158,7 @@ class InfoDisplay:
 		self.lives_text.draw(self.screen)
 		self.currency_text.draw(self.screen)
 
+
 class WavesDisplay:
 	def __init__(self, screen, pos):
 		self.screen = screen
@@ -183,8 +184,6 @@ class WavesDisplay:
 
 		self.waves_text.draw(self.screen)
 		self.next_wave.draw(self.screen)
-
-
 
 
 class LevelSelectButton:
