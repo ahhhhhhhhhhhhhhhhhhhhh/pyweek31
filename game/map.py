@@ -348,7 +348,7 @@ def ready_tiles():
     grey_officer = _replace_color(grey_officer, (176,6,145), (72,72,75))
     SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
 
-    Water.image = load.image("watertile.png").convert_alpha()
+    Water.image = load.image("watertilecenter.png").convert_alpha()
 
     Apartment.image = load.image("apartments.png").convert_alpha()
     BigApartment.image = load.image("bigapartments.png").convert_alpha()
