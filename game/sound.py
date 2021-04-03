@@ -45,12 +45,22 @@ class MusicManager:
 
     def loadVolume(self):
         if load.path_exists("persistence.json"):
+            rewriteData = False
+            data = None
             with open(load.handle_path("persistence.json"), "r") as read_file:
-                return json.load(read_file)
+                try: 
+                    data = json.load(read_file)
+                except:
+                    rewriteData = True
+            if rewriteData or (not load.check_value_exist(data, "Volume")):
+                with io.open(load.handle_path("persistence.json"), "w") as write_file:
+                    data = {"Volume": {"musicVolume": 1, "soundVolume": 1}}
+                    json.dump(data, write_file)
+            return data
         else:
             with io.open(load.handle_path("persistence.json"), "w") as write_file:
                 data = {"Volume": {"musicVolume": 1, "soundVolume": 1}}
-                write_file.write(json.dumps(data))   
+                json.dump(data, write_file)   
             with open(load.handle_path("persistence.json"), "r") as read_file:
                 return json.load(read_file)
 
@@ -144,11 +154,21 @@ class SoundEffectsManager:
 
     def loadVolume(self):
         if load.path_exists("persistence.json"):
+            rewriteData = False
+            data = None
             with open(load.handle_path("persistence.json"), "r") as read_file:
-                return json.load(read_file)
+                try: 
+                    data = json.load(read_file)
+                except:
+                    rewriteData = True
+            if rewriteData or (not load.check_value_exist(data, "Volume")):
+                with io.open(load.handle_path("persistence.json"), "w") as write_file:
+                    data = {"Volume": {"musicVolume": 1, "soundVolume": 1}}
+                    json.dump(data, write_file)
+            return data
         else:
             with io.open(load.handle_path("persistence.json"), "w") as write_file:
                 data = {"Volume": {"musicVolume": 1, "soundVolume": 1}}
-                write_file.write(json.dumps(data))   
+                json.dump(data, write_file)   
             with open(load.handle_path("persistence.json"), "r") as read_file:
                 return json.load(read_file)

@@ -20,3 +20,12 @@ def sound(filepath):
 def path_exists(filepath):
     path = handle_path(filepath)
     return os.path.exists(path)
+
+def check_value_exist(test_dict, value):
+    do_exist = True
+    try:
+        test_dict[value]
+    except:
+        do_exist = False
+        print("works")
+    return do_exist
