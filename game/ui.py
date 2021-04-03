@@ -54,6 +54,7 @@ class TowerInfoPanel:
 			self.tower.upgrade()
 			self.make_info_text()
 			self.make_upgrade_button()
+			loop.soundManager.playBuildingSound()
 			return currency - cost
 		elif not self.tower.is_max_level() and self.upgrade_button.clicked:
 			loop.soundManager.playFailSound()
