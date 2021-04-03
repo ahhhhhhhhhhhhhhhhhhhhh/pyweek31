@@ -11,7 +11,7 @@ from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
 import game.entity as entity
 
-OVERLAY_COLOR = (120,120,120,120)
+OVERLAY_COLOR = (130,130,130,155)
 
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
@@ -361,6 +361,8 @@ class LevelSelect(Scene):
         self.title_panel = pygame.Surface((1280, 80))
         self.title_panel.fill((75, 75, 75))
 
+        self.back_button = TextButton("[<- Back to Menu]", [10,15], 26)
+
         self.city_image = load.image("map_enlarged.png").convert()
         self.city_image.set_colorkey((255,255,255))
         
@@ -407,6 +409,7 @@ class LevelSelect(Scene):
         self.screen.blit(self.city_image, (0, 0))
         self.screen.blit(self.title_panel, (0, 0))
         self.title_text.draw(self.screen)
+        self.back_button.draw(self.screen)
 
         if self.current_level < len(self.buttons) and not self.buttons[self.current_level].unlocked:
             self.buttons[self.current_level].unlocked = True
@@ -422,6 +425,9 @@ class LevelSelect(Scene):
             if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
                 loop.switch_scene("menu")
                 event.used = True
+
+        if self.back_button.clicked:
+            loop.switch_scene("menu")
     
 
 class Pause(Scene):
@@ -429,9 +435,9 @@ class Pause(Scene):
         self.screen = screen
         self.id = "pause"
         self.title = Text("Paused", [640, 90], 90, centered=True)
-        self.ret_button = TextButton("[Return to Game]", [640, 400], 40, centered=True)
-        self.exit_button = TextButton("[Exit to Menu]", [640, 470], 40, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [640, 540], 40, centered=True)
+        self.ret_button = TextButton("[Return to Game]", [640, 230], 40, centered=True)
+        self.exit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [640, 370], 40, centered=True)
         self.ret_scene = "game" #should be overwritten, this is merely a default
         self.bgsurf = None
 
@@ -472,8 +478,8 @@ class EndScreen(Scene):
         self.screen = screen
         self.id = "endscreen"
         self.outcome_display = Text("", [640, 90], 90, centered=True)
-        self.exit_button = TextButton("[Back to Map]", [640, 400], 40, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [640, 470], 40, centered=True)
+        self.exit_button = TextButton("[Back to Map]", [640, 230], 40, centered=True)
+        self.quit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
         self.bgsurf = None
 
     def update(self, loop):
@@ -488,7 +494,7 @@ class EndScreen(Scene):
             loop.switch_scene("level_select")
             loop.soundManager.stopSound()
         if self.quit_button.clicked:
-            loop.end_game()
+            loop.switch_scene("menu")
 
     def ready(self, bgsurf):
         opa_layer = pygame.Surface(bgsurf.get_size())
