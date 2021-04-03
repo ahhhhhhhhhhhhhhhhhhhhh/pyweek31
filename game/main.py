@@ -269,11 +269,13 @@ class Game(Scene):
         if self.lives < 1:
             loop.get_scene("endscreen").set_won(False, loop)
             loop.switch_scene("endscreen")
+            loop.soundManager.stopSound()
             loop.soundManager.playLevelLoseSound()
 
         if self.waves.get_finished() and not len(self.zombies):
             loop.get_scene("endscreen").set_won(True, loop)
             loop.switch_scene("endscreen")
+            loop.soundManager.stopSound()
             loop.soundManager.playLevelWinSound()
 
         # pausing
