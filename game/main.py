@@ -528,7 +528,7 @@ class MainMenu(Scene):
 
     def update(self, loop):
         self.i += 1.5 * loop.get_ticktime()
-        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
         self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
         self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
@@ -598,7 +598,7 @@ class Settings(Scene):
 
     def update(self, loop):
         self.i += 1.5 * loop.get_ticktime()
-        rotated = pygame.transform.rotate(self.zombie, math.sin(self.i) * 10)
+        rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
         self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
         self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
