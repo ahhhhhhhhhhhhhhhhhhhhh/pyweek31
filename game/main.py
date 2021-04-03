@@ -11,6 +11,8 @@ from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
 import game.entity as entity
 
+OVERLAY_COLOR = (120,120,120,120)
+
 class Loop:
     def __init__(self, screen, scene, scenedict, musicManager):
         self.musicManager = musicManager
@@ -298,6 +300,7 @@ class Game(Scene):
 
         if self.endLoseTime != None and (self.time - self.endLoseTime) >= 3:
             loop.get_scene("endscreen").set_won(False, loop)
+            loop.get_scene("endscreen").ready(self.screen.copy())
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
             loop.soundManager.playLevelLoseSound()
@@ -308,6 +311,7 @@ class Game(Scene):
         
         if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
             loop.get_scene("endscreen").set_won(True, loop)
+            loop.get_scene("endscreen").ready(self.screen.copy())
             loop.switch_scene("endscreen")
             loop.soundManager.stopSound()
             loop.soundManager.playLevelWinSound()
@@ -316,6 +320,7 @@ class Game(Scene):
         for event in loop.get_events():
             if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
                 loop.get_scene("pause").set_return(self)
+                loop.get_scene("pause").ready(self.screen.copy())
                 loop.switch_scene("pause")
                 event.used = True
 
@@ -364,7 +369,7 @@ class LevelSelect(Scene):
 
         self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
 
-        self.current_level = 2
+        self.current_level = 0
         for i in range(self.current_level):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
@@ -401,8 +406,12 @@ class Pause(Scene):
         self.exit_button = TextButton("[Exit to Menu]", [640, 470], 40, centered=True)
         self.quit_button = TextButton("[Quit Game]", [640, 540], 40, centered=True)
         self.ret_scene = "game" #should be overwritten, this is merely a default
+        self.bgsurf = None
 
     def update(self, loop):
+        if self.bgsurf:
+            self.screen.blit(self.bgsurf, (0,0))
+        
         self.title.draw(self.screen)
         self.ret_button.draw(self.screen)
         self.exit_button.draw(self.screen)
@@ -421,6 +430,13 @@ class Pause(Scene):
                 loop.switch_scene(self.ret_scene)
                 event.used = True
 
+    def ready(self, bgsurf):
+        opa_layer = pygame.Surface(bgsurf.get_size())
+        opa_layer.fill(OVERLAY_COLOR[0:3])
+        opa_layer.set_alpha(OVERLAY_COLOR[3])
+        bgsurf.blit(opa_layer, (0,0))
+        self.bgsurf = bgsurf
+
     def set_return(self, ret):
         self.ret_scene = ret
 
@@ -431,8 +447,12 @@ class EndScreen(Scene):
         self.outcome_display = Text("", [640, 90], 90, centered=True)
         self.exit_button = TextButton("[Back to Map]", [640, 400], 40, centered=True)
         self.quit_button = TextButton("[Quit Game]", [640, 470], 40, centered=True)
+        self.bgsurf = None
 
     def update(self, loop):
+        if self.bgsurf:
+            self.screen.blit(self.bgsurf, (0,0))
+        
         self.outcome_display.draw(self.screen)
         self.exit_button.draw(self.screen)
         self.quit_button.draw(self.screen)
@@ -442,6 +462,13 @@ class EndScreen(Scene):
             loop.soundManager.stopSound()
         if self.quit_button.clicked:
             loop.end_game()
+
+    def ready(self, bgsurf):
+        opa_layer = pygame.Surface(bgsurf.get_size())
+        opa_layer.fill(OVERLAY_COLOR[0:3])
+        opa_layer.set_alpha(OVERLAY_COLOR[3])
+        bgsurf.blit(opa_layer, (0,0))
+        self.bgsurf = bgsurf
 
     def set_won(self, won, loop):
         if won:
