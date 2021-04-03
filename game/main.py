@@ -143,8 +143,6 @@ class Game(Scene):
         if tile:
             for event in loop.get_events():
                 if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
-                    event.used = True
-
                     # building/selecting towers
                     if isinstance(self.tmap.blocking[tile[0]][tile[1]], Tower):
                         self.build_mode = False
@@ -179,29 +177,6 @@ class Game(Scene):
             else:
                 self.screen.blit(self.tmap.selector_closed, draw_coords)
                 pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
-
-        # updating ui (buy panel, tower info, lives/currency display, waves display)
-        self.waves_display.update(self.waves)
-        self.waves_display.draw()
-        if self.waves_display.next_wave.clicked:
-            self.waves.call_next(self.tmap)
-
-        self.info_display.update(self.lives, self.currency)
-        self.info_display.draw()
-
-        if self.selected_tower != self.tower_info_panel.tower:
-            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
-        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
-        self.tower_info_panel.draw(self.tmap_offset)
-
-        self.buy_panel.update()
-        self.buy_panel.draw()
-        for i, b in enumerate(self.buy_panel.buttons):
-            b = b.button
-            if b.clicked:
-                self.selected_towertype = self.towertypes[i]
-                self.build_mode = True
-                self.selected_tower = None
 
         # updating zombies and deleting zombies that reach end
         to_del = []
@@ -267,6 +242,29 @@ class Game(Scene):
         for p in to_del:
             self.projectiles.remove(p)
 
+        # updating ui (buy panel, tower info, lives/currency display, waves display)
+        self.waves_display.update(self.waves)
+        self.waves_display.draw()
+        if self.waves_display.next_wave.clicked:
+            self.waves.call_next(self.tmap)
+
+        self.info_display.update(self.lives, self.currency)
+        self.info_display.draw()
+
+        if self.selected_tower != self.tower_info_panel.tower:
+            self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
+        self.currency = self.tower_info_panel.update(self.currency) # passes back any changes to currency becuase of upgrades
+        self.tower_info_panel.draw(self.tmap_offset)
+
+        self.buy_panel.update()
+        self.buy_panel.draw()
+        for i, b in enumerate(self.buy_panel.buttons):
+            b = b.button
+            if b.clicked:
+                self.selected_towertype = self.towertypes[i]
+                self.build_mode = True
+                self.selected_tower = None
+
         # game end conditions
         if self.lives < 1:
             loop.get_scene("endscreen").set_won(False, loop)
@@ -295,6 +293,7 @@ class LevelSelect(Scene):
 
         self.city_image = load.image("very_very_bad_city_map.png")
 
+        
         self.start_map = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/startmap_waves.txt")
         self.map1 = Game(screen, "maps/map1_bg.png", "maps/map1_blocking.png", "maps/map1_waves.txt")
         self.onewavetest = Game(screen, "maps/startmap_bg.png", "maps/startmap_blocking.png", "maps/1wavetest.txt")
@@ -328,6 +327,11 @@ class LevelSelect(Scene):
                 self.most_recent_played = b
                 loop.switch_scene(b.level)
             b.draw()
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
     
 
 class Pause(Scene):
@@ -468,6 +472,11 @@ class Settings(Scene):
             loop.soundManager.changeVolume(.05)
         elif self.leaveButton.clicked:
             loop.switch_scene("menu")
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
 
 
         

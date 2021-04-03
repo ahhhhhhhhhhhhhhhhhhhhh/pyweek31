@@ -11,6 +11,8 @@ SCALE = 50
 
 # Abstract class fot every thing on the grid
 class Tile(ABC):
+    xdim = 1
+    ydim = 1
     #passes in x and y pos
     def __init__(self, x, y):
         self.x, self.y = x, y
@@ -34,15 +36,20 @@ class MultiTile(Tile):
     
     def link(self, tilemap, x, y):
         distx = 0
-        while type(tilemap[x+distx, y]) == type(self):
+        while type(tilemap[x-distx-1, y]) == type(self):
             distx += 1
         
         disty = 0
-        while type(tilemap[x, y+disty]) == type(self):
+        while type(tilemap[x, y-disty-1]) == type(self):
             disty += 1
+        
         
         if distx%self.xdim == 0 and disty%self.ydim == 0:
             self.corner = True
+            for ox in range(self.xdim):
+                for oy in range(self.ydim):
+                    if (type(tilemap[self.x+ox, self.y+oy]) != type(self)):
+                        tilemap.map[self.x+ox][self.y+oy] = type(self)(self.x+ox, self.y+oy)
     
     def render(self, screen, x, y, offset):
         if self.corner:
@@ -339,15 +346,19 @@ class TileMap():
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
                 (0, 127, 70): [House, HouseVariant1, BrickHouse],
-                (0, 127, 127): [BigHouse],
+                (0, 127, 127): [BigHouse, BigHouse2, BigHouse3, BigHouse4],
                 (255, 0, 220): [Bush1, Bush2],
                 (0, 255, 255): [Water],
                 (255, 216, 0): [Apartment],
                 (87, 0, 127): [BigApartment]}
 
-    def _tile_from_color(self, color):
+    def _tile_from_color(self, color, x, y):
         if color in self.colormap:
             ret = TileMap.colormap[color]
+            # pos = (x // ret[0].xdim, y // ret[0].ydim)
+            # if ret[0].xdim > 1:
+            #     print(x, y, pos, hash(pos))
+            # choice = ret[hash(pos)%len(ret)]
             return random.choice(ret)
         print("WARNING: no tile found for color", color)
         return NoTile
@@ -388,7 +399,7 @@ class TileMap():
             row = []
             for y in range(self.ydim):
                 color = surf.get_at((x,y))[0:3]
-                row.append(self._tile_from_color(color)(x, y))
+                row.append(self._tile_from_color(color, x, y)(x, y))
                 if (type(row[-1]) == Start):
                     self.starts.append(row[-1])
             map.append(row)
