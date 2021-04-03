@@ -6,9 +6,17 @@ Team: #TODO
 Members: Vanessa1104, njbradley, icemoon97, ccolbysmith, Starbuck5
 
 DEPENDENCIES:
+This entry just requires stock pygame. However it uses one mouse cursor system only available in
+pygame 2.0.1, so running it on pygame 2.0.0 or below will result in an error.
 
 RUNNING THE GAME:
+The game can be run by executing run_game.py
 
 HOW TO PLAY THE GAME:
+Since it is a tower defense, most of our controls are pretty self evident.
+You click on towers to buy them, you click on a valid map space to place.
+You click on a placed tower to see its information.
+
+To scroll around the larger maps, you can use the arrow keys.
 
 LICENSE:
