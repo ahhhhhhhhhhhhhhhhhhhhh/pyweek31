@@ -325,41 +325,45 @@ class LevelSelect(Scene):
         self.screen = screen
         self.id = "level_select"
 
-        self.title_text = Text("Level Select", [640, 40], 64, centered=True)
+        self.title_text = Text("Level Select", [640, 15], 64, centered=True)
 
-        self.city_image = load.image("very_very_bad_city_map.png")
-
+        self.city_image = load.image("map.png").convert()
+        self.city_image.set_colorkey((255,255,255))
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
-        self.level1.description = "classic rural tutorial level, you gotta get in there and kill some zombies am i right? just gotta fill up this space so i know if the description popup works correctly. Yada yada kill zombies. you can do it inspirational yay"
+        self.level1.description = ("After a long and arduous search, it’s clear that you’re the "
+                                   "only one to even accept the job of "
+                                   "police commissioner here in Riverton. "
+                                   "No sooner than you pick up the uniform from its former "
+                                   "occupant, the rural area you’ve retreated to is attacked by zombies.")
+        
         self.level2 = Game(screen, "level2", "maps/level2_waves.txt") # suburbs/planned community
+        self.level2.description = ("With the help of the PR people, all of whom somehow managed "
+                                   "to survive, the department has embarked on a public campaign "
+                                   "to rid the city of zombies in 6 months"
+                                   "Our first target: the suburb on the way into town.")
+        
         self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
+        self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
+                                   "in their lab downtown. "
+                                   "They’ve been studying the virus that causes zombieism, "
+                                   "maybe helping them will help us. "
+                                   "To get downtown, we first need to cross the bridge that we’ve come to.")
 
-        self.test = Game(screen, "test", "maps/test_waves.txt")
-        self.onewave = Game(screen, "level1", "maps/1wave.txt")
-
-        self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(420, 200, 150, 200), "Level 1")
+        self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(135, 350, 250, 250), "Level 1")
         self.level1_b.unlocked = True
-        self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(420, 400, 150, 200), "Level 2")
+        self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(300, 100, 300, 200), "Level 2")
         self.level2_b.unlocked = True
-        self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(600, 350, 200, 125), "Level 3")
+        self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(690, 85, 300, 170), "Level 3")
         self.level3_b.unlocked = True
 
-
-        self.test_b = LevelSelectButton(self.screen, self.test, pygame.Rect(200, 400, 100, 100), "test map (old)")
-        self.test_b.unlocked = True
-
-        self.onewave_b = LevelSelectButton(self.screen, self.onewave, pygame.Rect(200, 200, 100, 100), "1 wave")
-        self.onewave_b.unlocked = True
-
-
-        self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.test_b, self.onewave_b]
+        self.buttons = [self.level1_b, self.level2_b, self.level3_b]
 
         self.most_recent_played = None
 
     def update(self, loop):
         self.title_text.draw(self.screen)
-        self.screen.blit(self.city_image, (400, 150))
+        self.screen.blit(self.city_image, (0, 0))
 
         for b in self.buttons:
             b.update(loop)
