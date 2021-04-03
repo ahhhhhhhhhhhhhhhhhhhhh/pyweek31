@@ -495,6 +495,7 @@ class EndScreen(Scene):
             loop.soundManager.stopSound()
         if self.quit_button.clicked:
             loop.switch_scene("menu")
+            loop.soundManager.stopSound()
 
     def ready(self, bgsurf):
         opa_layer = pygame.Surface(bgsurf.get_size())
