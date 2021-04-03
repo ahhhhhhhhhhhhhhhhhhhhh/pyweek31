@@ -112,10 +112,11 @@ class Game(Scene):
         self.selected_tower = None
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
 
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
+        self.is_tower_unlocked = [True, True, False, False]
         self.selected_towertype = Tower
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked)
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -273,7 +274,7 @@ class Game(Scene):
         self.buy_panel.draw()
         for i, b in enumerate(self.buy_panel.buttons):
             b = b.button
-            if b.clicked:
+            if self.is_tower_unlocked[i] and b.clicked:
                 self.selected_towertype = self.towertypes[i]
                 self.build_mode = True
                 self.selected_tower = None
