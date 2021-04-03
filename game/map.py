@@ -257,7 +257,7 @@ class Tower(Tile):
     text = "Just a standard cop trying to fend off the zombies"
     damage = [50, 75, 100]
     max_range = [175, 200, 225]
-    fire_speed = [2, 1.75, 1.5]  # how many seconds between shots
+    fire_speed = [1.5, 1.25, 1]  # how many seconds between shots
     bullet_color = (255,255,255)
     bullet_duration = 0.1
 
@@ -323,7 +323,7 @@ class Tower(Tile):
 class FastTower(Tower):
     name = "Hotshot"
     text = "Takes down zombies quickly, but can only focus on what is right in front of them"
-    damage = [25, 30, 35]
+    damage = [35, 45, 50]
     fire_speed = [0.5, 0.4, 0.3]
     max_range = [110, 120, 130]
     bullet_color = (255, 0, 0)
@@ -352,7 +352,7 @@ class StunTower(Tower):
     name = "TASER"
     text = "Apparently tasers work on zombies. Who knew? (Upgrades increase stun duration)"
     damage = [10, 15, 20]
-    fire_speed = [2, 2, 2]
+    fire_speed = [2, 1.75, 1.5]
     max_range = [125, 140, 160]
     stun_duration = [1, 1.25, 1.5]
     bullet_color = (0, 0, 255)

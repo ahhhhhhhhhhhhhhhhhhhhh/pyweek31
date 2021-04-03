@@ -89,11 +89,13 @@ class Scene(ABC):
         pass
 
 class Game(Scene):
-    def __init__(self, screen, image_name, wave_txt_path):
+    def __init__(self, screen, image_name, wave_txt_path, starting_lives, starting_currency):
         self.id = "game"
         self.screen = screen
         self.image_name = image_name
         self.wave_txt_path = wave_txt_path
+        self.starting_lives = starting_lives
+        self.starting_currency = starting_currency
 
         self.description = ""
 
@@ -112,8 +114,8 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
-        self.lives = 20
-        self.currency = 500
+        self.lives = self.starting_lives
+        self.currency = self.starting_currency
 
         self.info_display = InfoDisplay(self.screen, (1030, 0))
 
@@ -143,8 +145,8 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
-        self.lives = 20
-        self.currency = 500
+        self.lives = self.starting_lives
+        self.currency = self.starting_currency
 
         self.selected_tower = None
         self.build_mode = False
@@ -366,27 +368,26 @@ class LevelSelect(Scene):
         self.city_image = load.image("map_enlarged.png").convert()
         self.city_image.set_colorkey((255,255,255))
         
-        self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
+        self.level1 = Game(screen, "level1", "maps/level1_waves.txt", 25, 500) # rural
         self.level1.description = ("After a long and arduous search, it’s clear that you’re the "
                                    "only one to even accept the job of "
                                    "police commissioner here in Riverton. "
                                    "No sooner than you pick up the uniform from its former "
                                    "occupant, the rural area you’ve retreated to is attacked by zombies.")
         
-        self.level2 = Game(screen, "level2", "maps/level2_waves.txt") # suburbs/planned community
+        self.level2 = Game(screen, "level2", "maps/level2_waves.txt", 25, 600) # suburbs/planned community
         self.level2.description = ("With the help of the PR people, all of whom somehow managed "
                                    "to survive, the department has embarked on a public campaign "
                                    "to rid the city of zombies in 6 months. "
                                    "Our first target: the suburb on the way into town.")
         
-        self.level3 = Game(screen, "level3", "maps/level3_waves.txt") # river
-        self.level3.currency = 700
+        self.level3 = Game(screen, "level3", "maps/level3_waves.txt", 25, 800) # river
         self.level3.description = ("We’ve received word that a bunch of scientist eggheads are trapped "
                                    "in their lab downtown. "
                                    "They’ve been studying the virus that causes zombieism, "
                                    "maybe helping them will help us. "
                                    "To get downtown, we first need to cross the bridge that we’ve come to.")
-        self.level4 = Game(screen, "level4", "maps/level4_waves.txt") # downtown
+        self.level4 = Game(screen, "level4", "maps/level4_waves.txt", 25, 1200) # downtown
         self.level4.description = ("After a heated campaign, we’ve reached downtown. Lost early to the zombies, "
                                     "it will be our most dangerous challenge yet. What a way to get to know a new job. "
                                     "At least the scientists say they’re close to a breakthrough.")
