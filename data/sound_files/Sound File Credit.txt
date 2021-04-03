@@ -15,9 +15,11 @@ Music promoted by Audio Library https://youtu.be/Q8773hTncoM
 https://freesound.org/people/FunWithSound/sounds/456968/
 FunWithSound
 https://freesound.org/people/FunWithSound/
+(Audio has been amplified)
 --levelWinMusic
 
 http://thinksoundeffects.com
+(Audio has been amplified)
 --levelLoseSound
 
 Creator: ccssmith
