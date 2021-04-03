@@ -286,7 +286,7 @@ class Tower(Tile):
 class FastTower(Tower):
     name = "Hotshot"
     text = "Takes down zombies quickly, but can only focus on what is right in front of them"
-    damage = [35, 40, 50]
+    damage = [25, 30, 35]
     fire_speed = [0.5, 0.4, 0.3]
     max_range = [110, 120, 130]
     bullet_color = (255, 0, 0)
