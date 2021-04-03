@@ -46,7 +46,7 @@ class TowerInfoPanel:
 			self.upgrade_button = Text("Max Level", [self.pos[0] + self.size[0] / 2, self.pos[1] + 465], 38, centered=True, color=(255, 204, 0))
 			self.upgrade_cost_text = Text("", self.pos)
 
-	def update(self, currency):
+	def update(self, currency, loop):
 		if self.tower == None:
 			return currency
 
@@ -56,6 +56,8 @@ class TowerInfoPanel:
 			self.make_info_text()
 			self.make_upgrade_button()
 			return currency - cost
+		elif self.upgrade_button.clicked:
+			loop.soundManager.playFailSound()
 
 		return currency
 

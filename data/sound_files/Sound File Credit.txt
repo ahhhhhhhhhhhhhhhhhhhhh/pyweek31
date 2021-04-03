@@ -30,4 +30,5 @@ Creator: ccssmith
 --zombieEndSound
 --taserSound
 --sniperSound
+--failSound
 

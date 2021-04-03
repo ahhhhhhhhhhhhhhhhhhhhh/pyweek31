@@ -79,6 +79,7 @@ class SoundEffectsManager:
             load.sound("sound_files/sniperSound.wav"),
             load.sound("sound_files/levelWinSound.wav"),
             load.sound("sound_files/levelLoseSound.wav"),
+            load.sound("sound_files/failSound.wav"),
         ]
         data = self.loadVolume()
         self.volume = data["Volume"]["soundVolume"]
@@ -111,6 +112,9 @@ class SoundEffectsManager:
 
     def playLevelLoseSound(self):
         pygame.mixer.Sound.play(self.sounds[8])
+
+    def playFailSound(self):
+        pygame.mixer.Sound.play(self.sounds[9])
 
     def stopSound(self):
         for i in self.sounds:
