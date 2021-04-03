@@ -42,8 +42,8 @@ class Loop:
             self.musicManager.update(self)
 
             self.handle_cursor()
-            self.fps_text.update_text(str(round(self.clock.get_fps())))
-            self.fps_text.draw(self.screen)
+            #self.fps_text.update_text(str(round(self.clock.get_fps())))
+            #self.fps_text.draw(self.screen)
             
             pygame.display.flip()
             self.ticktime = self.clock.tick(144) / 1000
@@ -458,6 +458,7 @@ class MainMenu(Scene):
         self.t = Text("The Last Commissioner", [840, 40], 64, centered=True)
         self.b = TextButton("[Play if you dare...]", [840, 130], 32, centered=True)
         self.sb = TextButton("[Settings]", [840, 190], 32, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [840, 250], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -474,6 +475,7 @@ class MainMenu(Scene):
         self.t.draw(self.screen)
         self.b.draw(self.screen)
         self.sb.draw(self.screen)
+        self.quit_button.draw(self.screen)
 
         if self.b.clicked:
             loop.switch_scene("level_select")
@@ -481,6 +483,10 @@ class MainMenu(Scene):
         if self.sb.clicked:
             loop.scenedict["settings"].i = self.i
             loop.switch_scene("settings")
+
+        if self.quit_button.clicked:
+            loop.end_game()
+        
 
 class Settings(Scene):
     def __init__(self, screen):
@@ -495,7 +501,7 @@ class Settings(Scene):
         self.musicHigherButton = TextButton("[+]", [1100, 130], 32, centered=True)
         self.soundLowerButton = TextButton("[-]", [900, 190], 32, centered=True)
         self.soundHigherButton = TextButton("[+]", [1100, 190], 32, centered=True)
-        self.leaveButton = TextButton("Return to Main Menu", [840, 250], 32, centered=True)
+        self.leaveButton = TextButton("[Return to Main Menu]", [840, 250], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
