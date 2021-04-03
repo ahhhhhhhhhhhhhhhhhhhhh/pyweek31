@@ -432,8 +432,9 @@ class Pause(Scene):
         self.id = "pause"
         self.title = Text("Paused", [640, 90], 90, centered=True)
         self.ret_button = TextButton("[Return to Game]", [640, 230], 40, centered=True)
-        self.exit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
-        self.quit_button = TextButton("[Quit Game]", [640, 370], 40, centered=True)
+        self.restart_button = TextButton("[Restart Level]", [640, 300], 40, centered=True)
+        self.exit_button = TextButton("[Exit to Main Menu]", [640, 370], 40, centered=True)
+        self.quit_button = TextButton("[Quit Game]", [640, 440], 40, centered=True)
         self.ret_scene = "game" #should be overwritten, this is merely a default
         self.bgsurf = None
 
@@ -443,11 +444,15 @@ class Pause(Scene):
         
         self.title.draw(self.screen)
         self.ret_button.draw(self.screen)
+        self.restart_button.draw(self.screen)
         self.exit_button.draw(self.screen)
         self.quit_button.draw(self.screen)
 
         if self.exit_button.clicked:
             loop.switch_scene("menu")
+        if self.restart_button.clicked:
+            loop.get_scene("level_select").most_recent_played.level.reset()
+            loop.switch_scene(self.ret_scene)
         if self.quit_button.clicked:
             loop.end_game()
         if self.ret_button.clicked:
@@ -475,7 +480,6 @@ class EndScreen(Scene):
         self.id = "endscreen"
         self.outcome_display = Text("", [640, 90], 90, centered=True)
         self.exit_button = TextButton("[Back to Map]", [640, 230], 40, centered=True)
-        self.quit_button = TextButton("[Exit to Menu]", [640, 300], 40, centered=True)
         self.bgsurf = None
 
     def update(self, loop):
@@ -484,13 +488,9 @@ class EndScreen(Scene):
         
         self.outcome_display.draw(self.screen)
         self.exit_button.draw(self.screen)
-        self.quit_button.draw(self.screen)
 
         if self.exit_button.clicked:
             loop.switch_scene("level_select")
-            loop.soundManager.stopSound()
-        if self.quit_button.clicked:
-            loop.switch_scene("menu")
             loop.soundManager.stopSound()
 
     def ready(self, bgsurf):
@@ -530,8 +530,8 @@ class MainMenu(Scene):
         self.i += 1.5 * loop.get_ticktime()
         rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
-        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
-        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+        self.screen.blit(self.officer, self.officer.get_rect(center=(400,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(1100,500)))
 
         self.t.draw(self.screen)
         self.b.draw(self.screen)
@@ -600,8 +600,8 @@ class Settings(Scene):
         self.i += 1.5 * loop.get_ticktime()
         rotated = pygame.transform.rotozoom(self.zombie, math.sin(self.i) * 10, 1)
         self.screen.blit(self.house, [-240,-270])
-        self.screen.blit(self.officer, self.officer.get_rect(center=(300,500)))
-        self.screen.blit(rotated, rotated.get_rect(center=(980,500)))
+        self.screen.blit(self.officer, self.officer.get_rect(center=(400,500)))
+        self.screen.blit(rotated, rotated.get_rect(center=(1100,500)))
 
         self.musicVolumeText.update_text(str(round(loop.musicManager.volume*100)))
         self.soundVolumeText.update_text(str(round(loop.soundManager.volume*100)))
