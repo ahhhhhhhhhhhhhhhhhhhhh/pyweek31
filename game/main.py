@@ -344,7 +344,12 @@ class Game(Scene):
         if self.endWinTime != None and (self.time - self.endWinTime) >= 3:
             loop.get_scene("endscreen").set_won(True, loop)
             loop.get_scene("endscreen").ready(self.screen.copy())
-            loop.switch_scene("endscreen")
+            
+            if loop.get_scene("level_select").current_level == 4:
+                loop.switch_scene("final")
+            else:
+                loop.switch_scene("endscreen")
+
             loop.soundManager.stopSound()
             loop.soundManager.playLevelWinSound()
 
@@ -508,9 +513,6 @@ class EndScreen(Scene):
             with open(load.handle_path("gamestate.json"), "w") as file:
                 json.dump({"current_level": loop.get_scene("level_select").current_level}, file)
 
-            if loop.get_scene("level_select").current_level == 4:
-                loop.switch_scene("final")
-
         else:
             self.outcome_display.update_text("You lost!")
             loop.get_scene("level_select").most_recent_played.level.reset()
@@ -531,7 +533,6 @@ class FinalScreen(Scene):
         self.screen.blit(self.image, (0,0))
         self.title.draw(self.screen)
         self.text.draw(self.screen)
-        
 
         self.back_button.draw(self.screen)
         if self.back_button.clicked:
