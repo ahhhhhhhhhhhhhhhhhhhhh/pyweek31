@@ -337,7 +337,6 @@ def _replace_color(surf, old, new):
 
 def ready_tiles():
     Grass.image = load.image("grass3.png").convert_alpha()
-    Sand.image = load.image("sand.png").convert_alpha()
     ShortGrass.image = load.image("grass6.png").convert_alpha()
     Sand.image = load.image("sand.png").convert_alpha()
     Sidewalk.image = load.image("concrete.png").convert_alpha()
@@ -404,7 +403,6 @@ class TileMap():
                 (0,38,255): [End],
                 (64,64,64): [Road],
                 (255,255,255): [NoTile],
-                (255,255,0): [Sand],
                 (0, 127, 70): [House, HouseVariant1, BrickHouse],
                 (0, 127, 127): [BigHouse, BigHouse2, BigHouse3, BigHouse4],
                 (255, 0, 220): [Bush1, Bush2],
@@ -414,7 +412,7 @@ class TileMap():
                 (255, 216, 0): [Apartment],
                 (87, 0, 127): [BigApartment],
                 (0, 255, 0): [Grass],
-                (127,127,0): [Sand],
+                (255,255,0): [Sand],
                 (127, 127, 127): [Sidewalk],
                 (127, 127, 0): [Farm],
                 (0, 127, 0): [ShortGrass],
