@@ -246,20 +246,22 @@ class LevelSelectButton:
 		elif not self.completed:
 			self.current_color = self.unlocked_color
 			self.b.draw(self.screen)
+			if self.b.hovered and self.desc.text.text != "":
+				self.desc.draw()
 		else:
 			self.current_color = self.completed_color
 
 		if self.surf.get_at((0,0)) != self.current_color:
 			self.surf.fill(self.current_color)
-			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=(0,0,0), centered=True)
+			self.label = Text(self.label_text, (self.rect.center[0], self.rect.center[1] - 10), 20, color=(0,0,0), centered=True)	
+		
 
 	def draw(self):
 		self.screen.blit(self.surf, (self.rect.x, self.rect.y))
 		pygame.draw.rect(self.screen, self.current_color, self.rect, width=2)
 
 		self.label.draw(self.screen)
-
-		self.desc.draw()
+		
 
 class Description:
 	def __init__(self, screen, description, pos):
@@ -271,7 +273,7 @@ class Description:
 		self.panel = pygame.Surface(self.size)
 		self.panel.fill(PANEL_COLOR)
 
-		self.text = LinedText(self.description, self.pos, 50, color=(255,0,0))
+		self.text = LinedText(self.description, [self.pos[0] + 5, self.pos[1] + 5], 48, spacing=1)
 
 	def draw(self):
 
