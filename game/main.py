@@ -214,7 +214,11 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            self.projectiles.append(entity.BulletTrail(tower_pos, target.center_pos(), tower.bullet_color, tower.bullet_duration))
+            # adjusted positions are so projectiles can move with offset
+            adjusted_tower_pos = [tower_pos[0] - self.tmap_offset[0], tower_pos[1] - self.tmap_offset[1]]
+            adjusted_target_pos = [target.center_pos()[0] - self.tmap_offset[0], target.center_pos()[1] - self.tmap_offset[1]]
+
+            self.projectiles.append(entity.BulletTrail(adjusted_tower_pos, adjusted_target_pos, tower.bullet_color, tower.bullet_duration))
             tower.fire(target)
             target.hit(tower.damage)
 
@@ -240,7 +244,7 @@ class Game(Scene):
         to_del = []
         for p in self.projectiles:
             p.timestep(deltatime)
-            p.render(self.screen)
+            p.render(self.screen, self.tmap_offset)
             if p.is_done():
                 to_del.append(p)
         for p in to_del:

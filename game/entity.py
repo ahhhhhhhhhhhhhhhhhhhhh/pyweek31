@@ -278,6 +278,6 @@ class BulletTrail(ProjectileBase):
         self.color = color
         self.lifetime = lifetime
 
-    def render(self, screen):
-        pygame.draw.line(screen, self.color, self.start, self.end, width=1)
+    def render(self, screen, offset):
+        pygame.draw.line(screen, self.color, [self.start[0] + offset[0], self.start[1] + offset[1]], [self.end[0] + offset[0], self.end[1] + offset[1]], width=1)
     
