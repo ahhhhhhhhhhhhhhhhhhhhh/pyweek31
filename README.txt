@@ -9,6 +9,8 @@ DEPENDENCIES:
 This entry just requires stock pygame. However it uses one mouse cursor system only available in
 pygame 2.0.1, so running it on pygame 2.0.0 or below will result in an error.
 
+This game is built for Python 3.6 and above, but it has only been tested on Python 3.7 and above.
+
 RUNNING THE GAME:
 The game can be run by executing run_game.py
 Note: This pygame uses pygame.SCALED and the vsync setting in `pygame.display.set_mode()` to aim
