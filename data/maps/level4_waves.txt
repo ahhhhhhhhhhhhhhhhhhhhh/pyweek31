@@ -1,1 +1,5 @@
-[["fast", 8], ["zombie", 4], ["baby", 2], ["zombie", 5], ["zombie", 5]]
+[["zombie", 4], ["baby", 2], ["shield", 2], ["fast", 4], ["zombie", 6]]
+[["baby", 2, "zombie", 6], ["baby", 4], ["shield", 4, "fast", 2], ["zombie", 10], ["fast", 6]]
+[["zombie", 10, "carry", 1], ["baby", 8], ["giant", 1, "shield", 4], ["fast", 3, "zombie", 6, "fast", 3], ["zombie", 6, "giant", 2]]
+[["giant", 3, "zombie", 5], ["shield", 2, "fast", 8, "baby", 4], ["carry", 2, "shield", 4], ["zombie", 4, "fast", 6], ["carry", 2, "giant", 3, "baby", 4]]
+[["giant", 6, "baby", 10], ["shield", 4, "summoner", 2], ["fast", 4, "carry", 5, "fast", 4], ["summoner", 2], ["shield", 10, "giant", 6]]

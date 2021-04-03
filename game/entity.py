@@ -144,7 +144,7 @@ class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
     max_health = 500
     speed = 0.5
-    spawn_rate = 3 # time between spawns
+    spawn_rate = 5 # time between spawns
     spawn_group = 3
     reward = 150
     spawntype = Zombie
