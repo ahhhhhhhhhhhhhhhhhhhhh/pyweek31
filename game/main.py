@@ -617,7 +617,8 @@ class Settings(Scene):
         self.musicHigherButton = TextButton("[+]", [1100, 130], 32, centered=True)
         self.soundLowerButton = TextButton("[-]", [900, 190], 32, centered=True)
         self.soundHigherButton = TextButton("[+]", [1100, 190], 32, centered=True)
-        self.leaveButton = TextButton("[Return to Main Menu]", [840, 250], 32, centered=True)
+        self.resetbutton = TextButton("[Reset Progress]", [840, 250], 32, centered = True)
+        self.leaveButton = TextButton("[Return to Main Menu]", [840, 300], 32, centered=True)
 
         self.zombie = load.image("zombie.png").convert_alpha()
         self.officer = load.image("officer.png").convert_alpha()
@@ -644,6 +645,7 @@ class Settings(Scene):
         self.soundLowerButton.draw(self.screen)
         self.soundHigherButton.draw(self.screen)
         self.leaveButton.draw(self.screen)
+        self.resetbutton.draw(self.screen)
 
         if self.musicLowerButton.clicked:
            loop.musicManager.changeVolume(-.05)
@@ -653,6 +655,8 @@ class Settings(Scene):
             loop.soundManager.changeVolume(-.05)
         elif self.soundHigherButton.clicked:
             loop.soundManager.changeVolume(.05)
+        elif self.resetbutton.clicked:
+            pass
         elif self.leaveButton.clicked:
             loop.scenedict["menu"].i = self.i
             loop.switch_scene("menu")
