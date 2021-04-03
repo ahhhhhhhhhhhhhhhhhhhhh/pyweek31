@@ -11,6 +11,8 @@ pygame 2.0.1, so running it on pygame 2.0.0 or below will result in an error.
 
 RUNNING THE GAME:
 The game can be run by executing run_game.py
+Note: This pygame uses pygame.SCALED and the vsync setting in `pygame.display.set_mode()` to aim
+to provide a better experience for different display sizes.
 
 HOW TO PLAY THE GAME:
 Since it is a tower defense, most of our controls are pretty self evident.
