@@ -112,7 +112,7 @@ class Game(Scene):
         self.selected_tower = None
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
 
-        self.buy_panel = BuyPanel(self.screen, (0, 580), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)])
         self.build_mode = False
         self.towertypes = [Tower, FastTower, SniperTower, StunTower]
         self.selected_towertype = Tower
