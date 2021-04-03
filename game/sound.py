@@ -50,7 +50,7 @@ class MusicManager:
         else:
             with io.open(load.handle_path("persistence.json"), "w") as write_file:
                 data = {"Volume": {"musicVolume": 1, "soundVolume": 1}}
-                write_file.write(json.dump(data))   
+                write_file.write(json.dumps(data))   
             with open(load.handle_path("persistence.json"), "r") as read_file:
                 return json.load(read_file)
 
