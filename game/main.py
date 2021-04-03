@@ -524,7 +524,7 @@ class Settings(Scene):
         
 def main():
     pygame.init()
-    screen = pygame.display.set_mode([1280, 720])
+    screen = pygame.display.set_mode([1280, 720], pygame.SCALED, vsync = True)
     pygame.display.set_caption("The Last Commissioner")
     ready_tiles()
 
