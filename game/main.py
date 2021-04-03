@@ -336,6 +336,11 @@ class LevelSelect(Scene):
                 self.most_recent_played = b
                 loop.switch_scene(b.level)
             b.draw()
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
     
 
 class Pause(Scene):
@@ -476,6 +481,11 @@ class Settings(Scene):
             loop.soundManager.changeVolume(.05)
         elif self.leaveButton.clicked:
             loop.switch_scene("menu")
+
+        for event in loop.get_events():
+            if event.type == pygame.KEYDOWN and not getattr(event, "used", False) and event.key in [pygame.K_ESCAPE, pygame.K_p]:
+                loop.switch_scene("menu")
+                event.used = True
 
 
         

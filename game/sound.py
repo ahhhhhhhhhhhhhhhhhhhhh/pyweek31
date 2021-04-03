@@ -56,7 +56,7 @@ class MusicManager:
 
     def update(self, loop):
         if loop.scene.id != self.scene:
-            if loop.scene.id == "game":
+            if loop.scene.id == "game" and self.scene != "pause":
                 self.playGameMusic()
             elif ((loop.scene.id == "menu" or loop.scene.id == "settings" or loop.scene.id == "level_select") 
                     and self.scene == "pause" or self.scene == "endscreen"):
