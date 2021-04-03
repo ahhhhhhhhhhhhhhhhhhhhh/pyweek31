@@ -389,6 +389,7 @@ class EndScreen(Scene):
 
         if self.exit_button.clicked:
             loop.switch_scene("level_select")
+            loop.soundManager.stopSound()
         if self.quit_button.clicked:
             loop.end_game()
 

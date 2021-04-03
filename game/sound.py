@@ -95,7 +95,7 @@ class SoundEffectsManager:
 
     def playZombieDeathSound(self):
         pygame.mixer.Sound.play(self.sounds[3])
-
+    
     def playZombieEndSound(self):
         pygame.mixer.Sound.play(self.sounds[4])
 
@@ -110,6 +110,10 @@ class SoundEffectsManager:
 
     def playLevelLoseSound(self):
         pygame.mixer.Sound.play(self.sounds[8])
+
+    def stopSound(self):
+        for i in self.sounds:
+            pygame.mixer.Sound.stop(i)
 
     def changeVolume(self, changingValue):
         self.volume = self.volume + changingValue
