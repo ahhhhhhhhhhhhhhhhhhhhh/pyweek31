@@ -61,9 +61,10 @@ class MusicManager:
             elif ((loop.scene.id == "menu" or loop.scene.id == "settings" or loop.scene.id == "level_select") 
                     and self.scene == "pause" or self.scene == "endscreen"):
                 self.playMenuMusic()
-            elif loop.scene.id == "endscreen":
-                pygame.mixer.music.fadeout(1000)
             self.scene = loop.scene.id
+
+    def fadeout(self, fadeoutTime):
+        pygame.mixer.music.fadeout(fadeoutTime)
 
 class SoundEffectsManager:
     def __init__(self):
