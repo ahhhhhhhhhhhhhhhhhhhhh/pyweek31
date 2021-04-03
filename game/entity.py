@@ -13,6 +13,7 @@ class ZombieBase:
     max_health = 100
     reward = 10
     healthbar_off_y = 20
+    lives_impact = 1
     
     def __init__(self, game, tile):
         self.game = game
@@ -103,6 +104,7 @@ class GiantZombie(ZombieBase):
     max_health = 1000
     reward = 50
     healthbar_off_y = 40
+    lives_impact = 10
 
 class BabyZombie(ZombieBase):
     image = load.image("babyzombie.png")
@@ -114,6 +116,7 @@ class ShieldZombie(ZombieBase):
     shieldimage = load.image("shield.png")
     speed = 1
     max_health = 75
+    reward = 15
     shield_health = 1
     
     def __init__(self, game, tile):
@@ -139,9 +142,11 @@ class ShieldZombie(ZombieBase):
 class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
     max_health = 250
-    spawn_rate = 5 # time between spawns
+    spawn_rate = 10 # time between spawns
     spawn_group = 3
+    reward = 75
     spawntype = Zombie
+    lives_impact = 5
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
@@ -169,9 +174,11 @@ class SummonerZombie(ZombieBase):
 class CarryZombie(ZombieBase):
     image = load.image("cart.png")
     max_health = 500
-    speed = 0.3
+    speed = 0.65
+    reward = 20
     spawntype = BabyZombie
     spawn_group = 5
+    lives_impact = 5
     
     def hit(self, damage):
         if self.health > 0 and self.health < damage:

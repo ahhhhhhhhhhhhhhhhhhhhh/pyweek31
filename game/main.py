@@ -106,7 +106,7 @@ class Game(Scene):
         self.towers = []
         self.projectiles = []
 
-        self.lives = 50
+        self.lives = 30
         self.currency = 300
 
         self.info_display = InfoDisplay(self.screen, (1030, 0))
@@ -200,7 +200,7 @@ class Game(Scene):
             zombie.render(self.screen, self.tmap_offset)
             if zombie.tile == None:
                 to_del.append(zombie)
-                self.lives -= 1
+                self.lives -= zombie.lives_impact
                 loop.soundManager.playZombieEndSound()
         for zombie in to_del:
             self.zombies.remove(zombie)
@@ -330,7 +330,7 @@ class LevelSelect(Scene):
         
         self.level1 = Game(screen, "level1", "maps/level1_waves.txt") # rural
         self.level1.description = "classic rural tutorial level, you gotta get in there and kill some zombies am i right? just gotta fill up this space so i know if the description popup works correctly. Yada yada kill zombies. you can do it inspirational yay"
-        self.level2 = Game(screen, "level2", "maps/1wave.txt") # suburbs/planned community
+        self.level2 = Game(screen, "level2", "maps/level2_waves.txt") # suburbs/planned community
         self.level3 = Game(screen, "level3", "maps/1wave.txt") # river
 
         self.test = Game(screen, "test", "maps/test_waves.txt")
