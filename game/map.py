@@ -508,5 +508,6 @@ class TileMap():
         return [tile[0] * SCALE, tile[1] * SCALE]
 
     def can_build(self, tile):
-        return isinstance(self.blocking[tile[0]][tile[1]], NoTile) and not isinstance(self.map[tile[0]][tile[1]], Road)
+        return (isinstance(self.blocking[tile[0]][tile[1]], NoTile)
+        and not type(self.map[tile[0]][tile[1]]) in (Road, Water, WaterRight, WaterLeft))
    
