@@ -22,9 +22,9 @@ You click on towers to buy them, you click on a valid map space to place.
 You click on a placed tower to see its information.
 
 To scroll around the larger maps, you can use the arrow keys.
+See our "How to Play" page in game.
 
 CREDITS:
 All art was created from scratch by our team, along with many of the sound effects.
+Sound effect and music attributions are in "Sound File Credit.txt" in data/sound_files
 Obviously the game was created from scratch in stock pygame.
-
-LICENSE:
