@@ -2,6 +2,7 @@ import textwrap
 
 import pygame
 import pygame.freetype
+import pygame._sdl2.video as video
 
 import game.load as load
 from game.sound import SoundEffectsManager as SoundManager
@@ -24,26 +25,27 @@ def draw_text(screen, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTC
         screen.blit(im, (location[0], location[1]))
 
 class Text:
-    def __init__(self, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
+    def __init__(self, renderer, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
         self.text = text
         self.location = location
-        self.image = render_text(text, size, color)[0]
+        self.image = video.Texture.from_surface(renderer, render_text(text, size, color)[0])
         self.centered = centered
         self.settings = (size, color)
+        self.renderer = renderer
 
-        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
+        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.width, self.image.height)
         if self.centered:
-            self.rect.x = self.location[0] - self.image.get_width() / 2
+            self.rect.x = self.location[0] - self.image.width / 2
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+    def draw(self):
+        self.image.draw(None, self.rect)
 
     def update_text(self, newtext):
-        self.image = render_text(newtext, *self.settings)[0]
+        self.image = video.Texture.from_surface(self.renderer, render_text(newtext, *self.settings)[0])
 
-        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
+        self.rect = pygame.Rect(self.location[0], self.location[1], self.image.width, self.image.height)
         if self.centered:
-            self.rect.x = self.location[0] - self.image.get_width() / 2
+            self.rect.x = self.location[0] - self.image.width / 2
 
     def update_color(self, newcolor):
         self.settings = (self.settings[0], newcolor)
@@ -54,16 +56,16 @@ class Text:
         self.rect.topleft = newloc
 
 class TextButton(Text):
-    def __init__(self, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
-        super().__init__(text, location, size, color, centered)
+    def __init__(self, renderer, text, location, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR, centered=False):
+        super().__init__(renderer, text, location, size, color, centered)
         self.clicked = False
         self.hovered = False
         self._washovered = False
         self._hovercolor = DEFAULT_HOVERCOLOR
         self._originalcolor = None
 
-    def draw(self, screen):
-        super().draw(screen)
+    def draw(self):
+        super().draw()
         self.clicked = False
         for event in TextButton.loop.get_events():
             if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
@@ -106,7 +108,7 @@ class Button:
             raise TypeError("Wrong arguments")
         
     # says draw, but it just updates, nothing is shown onscreen
-    def draw(self, screen):
+    def draw(self):
         self.clicked = False
         for event in TextButton.loop.get_events():
             if event.type == pygame.MOUSEBUTTONDOWN and not getattr(event, "used", False) and event.button == 1:
@@ -139,20 +141,22 @@ class ToggleButton(Button):
 
 # quick and dirty multiline text
 class LinedText:
-    def __init__(self, text, location, n_charwrap, spacing=1.25, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR):
+    def __init__(self, renderer, text, location, n_charwrap, spacing=1.25, size=DEFAULT_TEXTSIZE, color=DEFAULT_TEXTCOLOR):
         self.text = text
         self.location = location
         self.spacing = spacing
         self.space = size * spacing
-        self.images = [render_text(t, size, color)[0] for t in textwrap.wrap(text, n_charwrap)]        
+        self.images = [render_text(t, size, color)[0] for t in textwrap.wrap(text, n_charwrap)]
+        self.images = [video.Texture.from_surface(renderer, im) for im in self.images]
 
         #self.rect = pygame.Rect(self.location[0], self.location[1], self.image.get_width(), self.image.get_height())
 
-    def draw(self, screen):
+    def draw(self):
         x = self.location[0]
         y = self.location[1]
         for i, image in enumerate(self.images):
-            screen.blit(image, (x, y))
+            image.draw(None, (x,y))
+            #screen.blit(image, (x, y))
             #y += image.get_height() * self.spacing
             y += self.space
             

@@ -1,8 +1,10 @@
 import os
 
 import pygame
+import pygame._sdl2.video as video
 
 PATH = "data"
+RENDERER = None
 
 def handle_path(filepath):
     filepath = os.path.split(filepath)
@@ -10,6 +12,13 @@ def handle_path(filepath):
     return filepath
 
 def image(filepath):
+    #print(RENDERER, filepath)
+    filepath = handle_path(filepath)
+    im = pygame.image.load(filepath)
+    tex = video.Texture.from_surface(RENDERER, im)
+    return video.Image(tex)
+
+def surface(filepath):
     filepath = handle_path(filepath)
     return pygame.image.load(filepath)
 

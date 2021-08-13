@@ -3,6 +3,7 @@ import random
 random.seed(10)
 
 import pygame
+import pygame._sdl2.video as video
 
 import game.load as load
 import game.utils as utils
@@ -18,9 +19,9 @@ class Tile(ABC):
         self.x, self.y = x, y
     
     #renders at screen pos (Not tile grid pos)
-    def render(self, screen, x, y, offset):
+    def render(self, x, y, offset):
         if self.image != None:
-            screen.blit(self.image, (x + offset[0], y + offset[1]))
+            self.image.draw(None, (x + offset[0], y + offset[1]))
     
     #stuff that needs to happen after map creation
     def link(self, tilemap, x, y):
@@ -51,9 +52,9 @@ class MultiTile(Tile):
                     if (type(tilemap[self.x+ox, self.y+oy]) != type(self)):
                         tilemap.map[self.x+ox][self.y+oy] = type(self)(self.x+ox, self.y+oy)
     
-    def render(self, screen, x, y, offset):
+    def render(self, x, y, offset):
         if self.corner:
-            super().render(screen, x, y, offset)
+            super().render(x, y, offset)
 
 class NoTile(Tile):
     image = None
@@ -87,7 +88,9 @@ class Touching(Tile):
             num = int(strdir[::-1], 2)
             if num in (1,3,5,7,15):
                 img = self.images[(1,3,5,7,15).index(num)]
-                self.image = pygame.transform.rotate(img, 90*rot)
+                #self.image = pygame.transform.rotate(img, 90*rot)
+                self.image = video.Image(img)
+                self.image.angle = -90 * rot
                 return
 
 #
@@ -105,13 +108,6 @@ class Touching(Tile):
 class Road(Touching):
     # image = pygame.Surface((SCALE,SCALE))
     # image.fill((64,64,64))
-    images = [
-        load.image("road01.png"),
-        load.image("road03.png"),
-        load.image("road05.png"),
-        load.image("road07.png"),
-        load.image("road15.png"),
-    ]
     
     def __init__(self, x, y):
         super().__init__(x, y)
@@ -122,11 +118,7 @@ class Road(Touching):
         self.next[endgoal] = (newnext, dist)
         End.setnext(self, tilemap, endgoal, dist, x, y)
 
-class End(Tile):
-    image = pygame.Surface((SCALE,SCALE))
-    image.fill((0,38,255))
-    
-    
+class End(Tile):    
     # decides path for road tiles
     def link(self, tilemap, gx, gy):
         self.setnext(tilemap, self, 0, gx, gy)
@@ -138,8 +130,8 @@ class End(Tile):
                 tile.setnext(self, tilemap, endgoal, dist+1, gx+ox, gy+oy)
 
 class Start(Road):
-    image = pygame.Surface((SCALE, SCALE))
-    image.fill((255,0,0))
+    #image = pygame.Surface((SCALE, SCALE))
+    #image.fill((255,0,0))
     touchgroup = []
     
     def setnext(self, newnext, tilemap, endgoal, dist, x, y):
@@ -286,18 +278,20 @@ class Tower(Tile):
         self.fire_speed
         self.max_range
 
-        self.info_image = load.image("officer_original.png")
-        self.buy_icon = load.image("officer_head.png")
-        self.locked_icon = load.image("locked_head.png")
+        self.info_image = load.surface("officer_original.png")
+        self.buy_icon = load.surface("officer_head.png")
+        self.locked_icon = load.surface("locked_head.png")
 
     def update(self, deltatime):
         self.timer -= deltatime
         return self.timer < 0
 
-    def render(self, screen, x, y, offset):
+    def render(self, x, y, offset):
         if self.base_image != None:
-            screen.blit(self.base_image, (x + offset[0], y + offset[1]))
-            screen.blit(self.turret_image[self.turret_image_index], (x + 10 + offset[0], y + 10 + offset[1]))
+            self.base_image.draw(None, (x + offset[0], y + offset[1]))
+            #screen.blit(self.base_image, (x + offset[0], y + offset[1]))
+            #screen.blit(self.turret_image[self.turret_image_index], (x + 10 + offset[0], y + 10 + offset[1]))
+            self.turret_image[self.turret_image_index].draw(None, (x + 10 + offset[0], y + 10 + offset[1]))
 
     def fire(self, target):
         self.timer = self.fire_speed
@@ -339,8 +333,8 @@ class FastTower(Tower):
 
     def __init__(self, x, y):
         super().__init__(x,y)
-        self.info_image = load.image("redcop.png")
-        self.buy_icon = load.image("redcop_head.png")
+        self.info_image = load.surface("redcop.png")
+        self.buy_icon = load.surface("redcop_head.png")
 
 class SniperTower(Tower):
     name = "Sniper"
@@ -353,8 +347,8 @@ class SniperTower(Tower):
 
     def __init__(self, x, y):
         super().__init__(x,y)
-        self.info_image = load.image("greycop.png")
-        self.buy_icon = load.image("greycop_head.png")
+        self.info_image = load.surface("greycop.png")
+        self.buy_icon = load.surface("greycop_head.png")
 
 class StunTower(Tower):
     name = "TASER"
@@ -369,8 +363,8 @@ class StunTower(Tower):
 
     def __init__(self, x, y):
         super().__init__(x,y)
-        self.info_image = load.image("bluecop.png")
-        self.buy_icon = load.image("bluecop_head.png")
+        self.info_image = load.surface("bluecop.png")
+        self.buy_icon = load.surface("bluecop_head.png")
 
 def _replace_color(surf, old, new):
     surf = surf.copy()
@@ -381,66 +375,89 @@ def _replace_color(surf, old, new):
     return surf
 
 def ready_tiles():
-    Grass.image = load.image("grass3.png").convert_alpha()
-    ShortGrass.image = load.image("grass6.png").convert_alpha()
-    Sand.image = load.image("sand.png").convert_alpha()
-    Sidewalk.image = load.image("concrete.png").convert_alpha()
-    Farm.image = load.image("farm.png").convert_alpha()
+    Grass.image = load.image("grass3.png")
+    ShortGrass.image = load.image("grass6.png")
+    Sand.image = load.image("sand.png")
+    Sidewalk.image = load.image("concrete.png")
+    Farm.image = load.image("farm.png")
     
-    ParkingLot.image = load.image("parking.png").convert_alpha()
+    ParkingLot.image = load.image("parking.png")
     
-    SkyScraper.image = load.image("skyscraper.png").convert_alpha()
-    BSkyScraper.image = load.image("brickskyscraper.png").convert_alpha()
-    BSkyScraperT.image = load.image("brickskyscraper-top.png").convert_alpha()
-    BSkyScraperB.image = load.image("brickskyscraper-bottom.png").convert_alpha()
+    SkyScraper.image = load.image("skyscraper.png")
+    BSkyScraper.image = load.image("brickskyscraper.png")
+    BSkyScraperT.image = load.image("brickskyscraper-top.png")
+    BSkyScraperB.image = load.image("brickskyscraper-bottom.png")
     
-    CSkyScraper.image = load.image("concreteskyscraper.png").convert_alpha()
-    CSkyScraperT.image = load.image("concreteskyscraper-top.png").convert_alpha()
-    CSkyScraperB.image = load.image("concreteskyscraper-bottom.png").convert_alpha()
+    CSkyScraper.image = load.image("concreteskyscraper.png")
+    CSkyScraperT.image = load.image("concreteskyscraper-top.png")
+    CSkyScraperB.image = load.image("concreteskyscraper-bottom.png")
     
-    BlueApartment.image = load.image("bigblueapartments.png").convert_alpha()
-    GiantApartment.image = load.image("reallybigapartments.png").convert_alpha()
-    #CSkyScraperB.image = load.image("concreteskyscraper-bottom.png").convert_alpha()
+    BlueApartment.image = load.image("bigblueapartments.png")
+    GiantApartment.image = load.image("reallybigapartments.png")
     
-    BridgeRoad.image = load.image("bridgeroad.png").convert_alpha()
-    BridgeGrate.image = load.image("bridgegrate.png").convert_alpha()
-    BridgePillars.image = load.image("bridgepillars.png").convert_alpha()
+    BridgeRoad.image = load.image("bridgeroad.png")
+    BridgeGrate.image = load.image("bridgegrate.png")
+    BridgePillars.image = load.image("bridgepillars.png")
     
-    House.image = load.image("smallhouse.png").convert_alpha()
-    HouseVariant1.image = load.image("smallhouse2.png").convert_alpha()
-    BrickHouse.image = load.image("brickhouse.png").convert_alpha()
+    House.image = load.image("smallhouse.png")
+    HouseVariant1.image = load.image("smallhouse2.png")
+    BrickHouse.image = load.image("brickhouse.png")
     
-    BigHouse.image = load.image("garagehouse.png").convert_alpha()
-    BigHouse2.image = load.image("garagehouse2.png").convert_alpha()
-    BigHouse3.image = load.image("garagehouse3.png").convert_alpha()
-    BigHouse4.image = load.image("garagehouse4.png").convert_alpha()
+    BigHouse.image = load.image("garagehouse.png")
+    BigHouse2.image = load.image("garagehouse2.png")
+    BigHouse3.image = load.image("garagehouse3.png")
+    BigHouse4.image = load.image("garagehouse4.png")
     
-    Bush1.image = load.image("bush.png").convert_alpha()
-    Bush2.image = load.image("bush2.png").convert_alpha()
+    Bush1.image = load.image("bush.png")
+    Bush2.image = load.image("bush2.png")
 
-    Tower.base_image = load.image("box.png").convert_alpha()
-    officer = load.image("smofficer.png").convert_alpha()
-    Tower.turret_image = [pygame.transform.flip(officer, True, False), officer]
+    Tower.base_image = load.image("box.png")
+    officer = load.surface("smofficer.png")
+    officer_tex = video.Texture.from_surface(load.RENDERER, officer)
+    Tower.turret_image = [video.Image(officer_tex), video.Image(officer_tex)]
+    Tower.turret_image[0].flipX = True
 
     blue_officer = _replace_color(officer, (239,1,159), (61,61,207))
     blue_officer = _replace_color(blue_officer, (176,6,145), (19,19,133))
-    StunTower.turret_image = [pygame.transform.flip(blue_officer, True, False), blue_officer]
+    blue_officer_tex = video.Texture.from_surface(load.RENDERER, blue_officer)
+    StunTower.turret_image = [video.Image(blue_officer_tex), video.Image(blue_officer_tex)]
+    StunTower.turret_image[0].flipX = True
 
     red_officer = _replace_color(officer, (239,1,159), (176,16,29))
     red_officer = _replace_color(red_officer, (176,6,145), (127,9,17))
-    FastTower.turret_image = [pygame.transform.flip(red_officer, True, False), red_officer]
+    red_officer_tex = video.Texture.from_surface(load.RENDERER, red_officer)
+    FastTower.turret_image = [video.Image(red_officer_tex), video.Image(red_officer_tex)]
+    FastTower.turret_image[0].flipX = True
 
-    grey_officer = load.image("smofficer_sniper.png")
+    grey_officer = load.surface("smofficer_sniper.png")
     grey_officer = _replace_color(grey_officer, (239,1,159), (105,105,112))
     grey_officer = _replace_color(grey_officer, (176,6,145), (72,72,75))
-    SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
+    grey_officer_tex = video.Texture.from_surface(load.RENDERER, grey_officer)
+    SniperTower.turret_image = [video.Image(grey_officer_tex), video.Image(grey_officer_tex)]
+    SniperTower.turret_image[0].flipX = True
 
-    Water.image = load.image("watertilecenter.png").convert_alpha()
-    WaterLeft.image = load.image("watertileleftedge.png").convert_alpha()
-    WaterRight.image = load.image("watertilerightedge.png").convert_alpha()
+    Water.image = load.image("watertilecenter.png")
+    WaterLeft.image = load.image("watertileleftedge.png")
+    WaterRight.image = load.image("watertilerightedge.png")
     
-    Apartment.image = load.image("apartments.png").convert_alpha()
-    BigApartment.image = load.image("bigapartments.png").convert_alpha()
+    Apartment.image = load.image("apartments.png")
+    BigApartment.image = load.image("bigapartments.png")
+
+    Road.images = [
+        load.image("road01.png"),
+        load.image("road03.png"),
+        load.image("road05.png"),
+        load.image("road07.png"),
+        load.image("road15.png"),
+    ]
+
+    Start.image = pygame.Surface((SCALE, SCALE))
+    Start.image.fill((255,0,0))
+    Start.image = video.Texture.from_surface(load.RENDERER, Start.image)
+
+    End.image = pygame.Surface((SCALE, SCALE))
+    End.image.fill((0,38,255))
+    End.image = video.Texture.from_surface(load.RENDERER, End.image)   
 
 class TileArray():
     def __init__(self, tmap):
@@ -504,8 +521,8 @@ class TileMap():
     def __init__(self, map_surf, blocking_surf):
         self.map = []
         self.blocking = []
-        self.xdim = map_surf.get_width()
-        self.ydim = map_surf.get_height()
+        self.xdim = map_surf.get_rect().w
+        self.ydim = map_surf.get_rect().h
         self.starts = []
 
         self.build_map(self.map, map_surf)
@@ -525,12 +542,19 @@ class TileMap():
                 self.map[x][y].link(tmap, x, y)
                 self.blocking[x][y].link(tmapblock, x, y)
 
-        self.selector_open = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
+        self.selector_open = pygame.Surface((SCALE,SCALE))
         self.selector_open.fill((0,0,255))
         self.selector_open.set_alpha(128)
+        n = pygame.Surface((SCALE, SCALE), pygame.SRCALPHA)
+        n.blit(self.selector_open, (0,0))
+        self.selector_open = video.Texture.from_surface(load.RENDERER, n)
+
         self.selector_closed = pygame.Surface((SCALE,SCALE), pygame.SRCALPHA)
         self.selector_closed.fill((255,0,0))
         self.selector_closed.set_alpha(128)
+        n = pygame.Surface((SCALE, SCALE), pygame.SRCALPHA)
+        n.blit(self.selector_closed, (0,0))
+        self.selector_closed = video.Texture.from_surface(load.RENDERER, n)
 
     def build_map(self, map, surf):
         for x in range(self.xdim):
@@ -542,18 +566,21 @@ class TileMap():
                     self.starts.append(row[-1])
             map.append(row)
    
-    def render(self, screen, offset=[0,0]):
+    def render(self, renderer, offset=[0,0]):
         self.current_offset = offset
 
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.map[x][y].render(screen, x * SCALE, y * SCALE, offset)
+                self.map[x][y].render(x * SCALE, y * SCALE, offset)
         
         for x in range(self.xdim):
             for y in range(self.ydim):
-                self.blocking[x][y].render(screen, x * SCALE, y * SCALE, offset)
+                self.blocking[x][y].render(x * SCALE, y * SCALE, offset)
 
-        pygame.draw.rect(screen, (0,0,0), (offset, (self.xdim * SCALE, self.ydim * SCALE)), width=2)
+        renderer.draw_color = pygame.Color("black")
+        renderer.draw_rect((offset, (self.xdim * SCALE, self.ydim * SCALE)))
+
+        #pygame.draw.rect(screen, (0,0,0), (offset, (self.xdim * SCALE, self.ydim * SCALE)), width=2)
     
     # def __getitem__(self, tup):
     #     x,y = tup

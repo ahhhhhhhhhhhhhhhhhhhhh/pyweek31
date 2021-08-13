@@ -24,9 +24,7 @@ class ZombieBase:
         self.last_render_pos = [0,0]
 
         self.health = self.max_health
-
         self.max_health_bar_width = 30
-        self.update_health_bar()
 
         self.stun_timer = 0
         self.disp_offset = [random.random()/2-0.25, random.random()/2-0.25]
@@ -49,29 +47,33 @@ class ZombieBase:
             self.x += (self.dest.x - self.x)/dist * self.speed * deltatime
             self.y += (self.dest.y - self.y)/dist * self.speed * deltatime
     
-    def render(self, screen, off = [0,0]):
+    def render(self, off = [0,0]):
         off = [
-            off[0] + (SCALE - self.image.get_width())//2,
-            off[1] + (SCALE - self.image.get_height()) - SCALE//3
+            off[0] + (SCALE - self.image.texture.width)//2,
+            off[1] + (SCALE - self.image.texture.height) - SCALE//3
         ]
         tpos = [
             self.x + self.disp_offset[0],
             self.y + self.disp_offset[1]
         ]
         self.last_render_pos = (tpos[0]*SCALE + off[0], tpos[1]*SCALE + off[1])
-        screen.blit(self.image, self.last_render_pos)
 
-        self.update_health_bar()
+        self.image.draw(None, self.last_render_pos)
+
         center = self.center_pos()
 
         if self.health < self.max_health:
-            screen.blit(self.health_bar, [center[0] - self.health_bar.get_width() // 2, center[1] - self.healthbar_off_y])
+            r = load.RENDERER
+
+            r.draw_color = pygame.Color((0, 255, 0))
+            width = self.max_health_bar_width * (self.health / self.max_health)
+            r.fill_rect([center[0] - width// 2, center[1] - self.healthbar_off_y, width, 3])
     
     def render_pos(self):
         return self.last_render_pos
 
     def center_pos(self):
-        return [self.last_render_pos[0] + self.image.get_width() / 2, self.last_render_pos[1] + self.image.get_height() / 2]
+        return [self.last_render_pos[0] + self.image.texture.width / 2, self.last_render_pos[1] + self.image.texture.height / 2]
     
     def dist(self):
         return self.tile.next[self.goal][1]
@@ -82,24 +84,17 @@ class ZombieBase:
     def is_dead(self):
         return self.health <= 0
 
-    def update_health_bar(self):
-        self.health_bar = pygame.Surface((self.max_health_bar_width * (self.health / self.max_health), 3))
-        self.health_bar.fill((0, 255, 0))
-
     def stun(self, duration):
         self.stun_timer = duration
 
 class Zombie(ZombieBase):
-    image = load.image("smallzombie.png")
     speed = 1
 
 class FastZombie(ZombieBase):
-    image = load.image("fastzombie.png")
     speed = 1.75
     reward = 25
 
 class GiantZombie(ZombieBase):
-    image = load.image("buffzombie.png")
     speed = 0.6
     max_health = 2000
     reward = 100
@@ -107,14 +102,11 @@ class GiantZombie(ZombieBase):
     lives_impact = 5
 
 class BabyZombie(ZombieBase):
-    image = load.image("babyzombie.png")
     speed = 2.5
     max_health = 100
     reward = 30
 
 class ShieldZombie(ZombieBase):
-    image = load.image("smallzombie.png")
-    shieldimage = load.image("shield.png")
     speed = 1
     max_health = 300
     reward = 30
@@ -132,16 +124,13 @@ class ShieldZombie(ZombieBase):
             self.health -= damage
     
     def render(self, screen, off = [0,0]):
-        super().render(screen, off)
+        super().render(off)
         if self.shield > 0:
-            screen.blit(self.shieldimage, [
-                self.last_render_pos[0] + self.image.get_width()//3,
-                self.last_render_pos[1] + self.image.get_height()//3
-            ])
+            self.shieldimage.draw(None, [self.last_render_pos[0] + self.image.texture.width//3,
+                                         self.last_render_pos[1] + self.image.texture.height//3])
 
 
 class SummonerZombie(ZombieBase):
-    image = load.image("smartzombie.png")
     max_health = 500
     speed = 0.5
     spawn_rate = 5 # time between spawns
@@ -174,7 +163,6 @@ class SummonerZombie(ZombieBase):
 
 
 class CarryZombie(ZombieBase):
-    image = load.image("cart.png")
     max_health = 1000
     speed = 0.65
     reward = 50
@@ -191,6 +179,22 @@ class CarryZombie(ZombieBase):
                 self.game.zombies.append(zomb)
         super().hit(damage)
 
+
+def ready():
+    Zombie.image = load.image("smallzombie.png")
+
+    FastZombie.image = image = load.image("fastzombie.png")
+
+    GiantZombie.image = load.image("buffzombie.png")
+
+    BabyZombie.image = load.image("babyzombie.png")
+
+    ShieldZombie.image = load.image("smallzombie.png")
+    ShieldZombie.shieldimage = load.image("shield.png")
+    
+    SummonerZombie.image = load.image("smartzombie.png")
+    
+    CarryZombie.image = load.image("cart.png")
 
 class Waves:
     zombiemap = {"zombie": Zombie,
@@ -274,7 +278,7 @@ class ProjectileBase:
     def timestep(self, deltatime):
         self.lifetime -= deltatime
 
-    def render(self, screen):
+    def render(self):
         pass
 
     def is_done(self):
@@ -284,9 +288,12 @@ class BulletTrail(ProjectileBase):
     def __init__(self, start, end, color, lifetime=0.1):
         self.start = start
         self.end = end
-        self.color = color
+        self.color = pygame.Color(color)
         self.lifetime = lifetime
 
-    def render(self, screen, offset):
-        pygame.draw.line(screen, self.color, [self.start[0] + offset[0], self.start[1] + offset[1]], [self.end[0] + offset[0], self.end[1] + offset[1]], width=1)
+    def render(self, offset):
+        r = load.RENDERER
+
+        r.draw_color = self.color
+        r.draw_line([self.start[0] + offset[0], self.start[1] + offset[1]], [self.end[0] + offset[0], self.end[1] + offset[1]])
     
