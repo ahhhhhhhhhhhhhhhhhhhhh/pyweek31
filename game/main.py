@@ -504,7 +504,7 @@ class LevelSelect(Scene):
 
         self.back_button = TextButton(renderer, "[<- Back to Menu]", [10, 15], 26)
 
-        self.city_image = load.image("map_enlarged.png")
+        self.city_image = load.image("map.png")
         # self.city_image.set_colorkey((255,255,255))
 
         self.level1 = Game(
