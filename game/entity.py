@@ -134,7 +134,7 @@ class ShieldZombie(ZombieBase):
         else:
             self.health -= damage
 
-    def render(self, screen, off=[0, 0]):
+    def render(self, off=[0, 0]):
         super().render(off)
         if self.shield > 0:
             self.shieldimage.draw(
