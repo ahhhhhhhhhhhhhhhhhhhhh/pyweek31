@@ -255,15 +255,9 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            if isinstance(tower, SplashTower):
-                self.projectiles.append(entity.Grenade(tower_pos, target.game_pos(), tower.damage))
-                tower.fire(target)
-            else:
-                self.projectiles.append(entity.BulletTrail(tower_pos, target.game_pos(), tower.bullet_color, tower.bullet_duration))
-                tower.fire(target)
-                target.hit(tower.damage)
-
-
+            self.projectiles.append(tower.get_projectile(tower_pos, target.game_pos()))
+            tower.fire(target)
+            target.hit(tower.damage)
 
             if isinstance(tower, StunTower):
                 target.stun(tower.stun_duration)

@@ -6,6 +6,7 @@ import pygame
 
 import game.load as load
 import game.utils as utils
+from game.projectile import BulletTrail, Grenade
 
 SCALE = 50
 
@@ -331,6 +332,9 @@ class Tower(Tile):
         else:
             return object.__getattribute__(self, name)
 
+    def get_projectile(self, start, end):
+        return BulletTrail(start, end, self.bullet_color, self.bullet_duration)
+
 class FastTower(Tower):
     name = "Hotshot"
     text = "Takes down zombies quickly, but can only focus on what is right in front of them"
@@ -382,6 +386,9 @@ class SplashTower(Tower):
     fire_speed = [1, 0.9, 0.8]
     max_range = [125, 125, 125]
     cost = [200, 75, 100]
+
+    def get_projectile(self, start, end):
+        return Grenade(start, end, self.damage)
 
 def _replace_color(surf, old, new):
     surf = surf.copy()
