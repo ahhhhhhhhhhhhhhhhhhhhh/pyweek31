@@ -258,9 +258,9 @@ class Game(Scene):
             self.projectiles.append(tower.get_projectile(tower_pos, target.game_pos()))
             tower.fire(target)
             target.hit(tower.damage)
+            target.stun(tower.stun_duration)
 
             if isinstance(tower, StunTower):
-                target.stun(tower.stun_duration)
                 loop.soundManager.playTaserSound()
 
             if isinstance(tower, Tower):

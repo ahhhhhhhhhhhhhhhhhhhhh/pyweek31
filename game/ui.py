@@ -33,9 +33,13 @@ class TowerInfoPanel:
 
 		start_y = 383
 		spacing = 25
+
 		self.damage_text = Text("Damage: " + str(self.tower.damage), [self.pos[0] + 25, self.pos[1] + start_y], 22)
 		self.range_text = Text("Range: " + str(self.tower.max_range), [self.pos[0] + 25, self.pos[1] + start_y + spacing], 22)
 		self.speed_text = Text("Fire Speed: " + str(self.tower.fire_speed), [self.pos[0] + 25, self.pos[1] + start_y + spacing * 2], 22)
+
+		if self.tower.splash_damage > self.tower.damage:
+			self.damage_text.update_text("Splash Damage: " + str(self.tower.splash_damage))
 
 	def make_upgrade_button(self):
 		if not self.tower.is_max_level():

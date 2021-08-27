@@ -270,6 +270,9 @@ class Tower(Tile):
     bullet_color = (255,255,255)
     bullet_duration = 0.1
 
+    stun_duration = [0, 0, 0]
+    splash_damage = [0, 0, 0]
+
     cost = [100, 50, 75] # initial tower cost, then cost of upgrades
 
     base_image = None
@@ -326,7 +329,7 @@ class Tower(Tile):
             return self.cost[self.lvl + 1]
 
     def __getattribute__(self, name):
-        if name in ["damage", "max_range", "fire_speed", "stun_duration"]:
+        if name in ["damage", "max_range", "fire_speed", "stun_duration", "splash_damage"]:
             self.max_level = min(len(object.__getattribute__(self, name)), self.max_level)
             return object.__getattribute__(self, name)[self.lvl]
         else:
@@ -382,13 +385,14 @@ class StunTower(Tower):
 class SplashTower(Tower):
     name = "Grenade"
     text = "Everyone gives them a wide bearth, but they know their explosives"
-    damage = [50, 75, 100]
+    damage = [0, 0, 0]
     fire_speed = [1, 0.9, 0.8]
     max_range = [125, 125, 125]
     cost = [200, 75, 100]
+    splash_damage = [50, 75, 100]
 
     def get_projectile(self, start, end):
-        return Grenade(start, end, self.damage)
+        return Grenade(start, end, self.splash_damage)
 
 def _replace_color(surf, old, new):
     surf = surf.copy()
