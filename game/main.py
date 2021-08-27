@@ -260,17 +260,7 @@ class Game(Scene):
             target.hit(tower.damage)
             target.stun(tower.stun_duration)
 
-            if isinstance(tower, StunTower):
-                loop.soundManager.playTaserSound()
-
-            if isinstance(tower, Tower):
-                loop.soundManager.playBulletSound()
-
-            if isinstance(tower, FastTower):
-                loop.soundManager.playBulletSound()
-
-            if isinstance(tower, SniperTower):
-                loop.soundManager.playSniperSound()
+            loop.soundManager.playSound(tower.sound)
 
 
         # updating projectiles

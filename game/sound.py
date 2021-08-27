@@ -91,10 +91,25 @@ class SoundEffectsManager:
             load.sound("sound_files/levelLoseSound.wav"),
             load.sound("sound_files/failSound.wav"),
         ]
+        self.soundmap = { 
+            "button" : self.sounds[0],
+            "building" : self.sounds[1],
+            "bullet" : self.sounds[2],
+            "zombie_death" : self.sounds[3],
+            "zombie_end" : self.sounds[4],
+            "taser" : self.sounds[5],
+            "sniper" : self.sounds[6],
+            "level_win" : self.sounds[7],
+            "level_lose" : self.sounds[8],
+            "fail" : self.sounds[9],
+        }
         data = self.loadVolume()
         self.volume = data["Volume"]["soundVolume"]
         for i in self.sounds:
             pygame.mixer.Sound.set_volume(i, self.volume)
+
+    def playSound(self, name):
+        pygame.mixer.Sound.play(self.soundmap[name])
 
     def playButtonSound(self):
         pygame.mixer.Sound.play(self.sounds[0])

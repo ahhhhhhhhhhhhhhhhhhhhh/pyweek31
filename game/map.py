@@ -279,6 +279,8 @@ class Tower(Tile):
     turret_image = None
     turret_image_index = 0
 
+    sound = "bullet"
+
     def __init__(self, x, y):
         super().__init__(x, y)
         self.timer = 0
@@ -361,6 +363,8 @@ class SniperTower(Tower):
     bullet_color = (0, 0, 0)
     cost = [200, 150]
 
+    sound = "sniper"
+
     def __init__(self, x, y):
         super().__init__(x,y)
         self.info_image = load.image("greycop.png")
@@ -376,6 +380,8 @@ class StunTower(Tower):
     bullet_color = (0, 0, 255)
     bullet_duration = 0.5
     cost = [125, 100, 150]
+
+    sound = "taser"
 
     def __init__(self, x, y):
         super().__init__(x,y)
