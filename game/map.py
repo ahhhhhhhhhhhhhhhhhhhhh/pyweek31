@@ -307,8 +307,11 @@ class Tower(Tile):
         else:
             self.turret_image_index = 1
 
-    def center_pos(self, offset):
+    def render_pos(self, offset):
         return [self.x + offset[0] + SCALE / 2, self.y + offset[1] + SCALE / 2]
+
+    def center_pos(self):
+        return (self.x + SCALE / 2, self.y + SCALE / 2)
 
     def upgrade(self):
         if not self.is_max_level():
@@ -372,6 +375,14 @@ class StunTower(Tower):
         self.info_image = load.image("bluecop.png")
         self.buy_icon = load.image("bluecop_head.png")
 
+class SplashTower(Tower):
+    name = "Grenade"
+    text = "Everyone gives them a wide bearth, but they know their explosives"
+    damage = [50, 75, 100]
+    fire_speed = [1, 0.9, 0.8]
+    max_range = [125, 125, 125]
+    cost = [200, 75, 100]
+
 def _replace_color(surf, old, new):
     surf = surf.copy()
     for x in range(surf.get_width()):
@@ -434,6 +445,10 @@ def ready_tiles():
     grey_officer = _replace_color(grey_officer, (239,1,159), (105,105,112))
     grey_officer = _replace_color(grey_officer, (176,6,145), (72,72,75))
     SniperTower.turret_image = [pygame.transform.flip(grey_officer, True, False), grey_officer]
+
+    green_officer = _replace_color(officer, (239,1,159), (128,128,0))
+    green_officer = _replace_color(green_officer, (176,6,145), (44,140,31))
+    SplashTower.turret_image = [pygame.transform.flip(green_officer, True, False), green_officer]
 
     Water.image = load.image("watertilecenter.png").convert_alpha()
     WaterLeft.image = load.image("watertileleftedge.png").convert_alpha()

@@ -6,7 +6,7 @@ import json
 import pygame
 
 import game.load as load
-from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower
+from game.map import TileMap, Start, Road, ready_tiles, Tower, FastTower, SniperTower, StunTower, SplashTower
 from game.utils import Text, TextButton, LinedText
 from game.sound import MusicManager, SoundEffectsManager
 from game.ui import TowerInfoPanel, BuyPanel, LevelSelectButton, InfoDisplay, WavesDisplay
@@ -125,11 +125,11 @@ class Game(Scene):
         self.tower_info_panel = TowerInfoPanel(self.screen, self.selected_tower, (1030, 70))
 
         self.build_mode = False
-        self.towertypes = [Tower, FastTower, SniperTower, StunTower]
-        self.is_tower_unlocked = [True, True, False, False]
+        self.towertypes = [Tower, FastTower, SniperTower, StunTower, SplashTower]
+        self.is_tower_unlocked = [True, True, False, False, False]
         self.selected_towertype = Tower
         self.advanced_weapons_cost = 400
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0), SplashTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -152,8 +152,8 @@ class Game(Scene):
 
         self.selected_tower = None
         self.build_mode = False
-        self.is_tower_unlocked = [True, True, False, False]
-        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
+        self.is_tower_unlocked = [True, True, False, False, False]
+        self.buy_panel = BuyPanel(self.screen, (0, 520), [Tower(0,0), FastTower(0,0), SniperTower(0,0), StunTower(0,0), SplashTower(0,0)], self.is_tower_unlocked, load.image("weaponsicon.png"), self.advanced_weapons_cost)
 
         self.endWinTime = None
         self.endLoseTime = None
@@ -225,36 +225,26 @@ class Game(Scene):
             draw_coords = [coords[0] + self.tmap_offset[0], coords[1] + self.tmap_offset[1]]
             canbuild = self.tmap.can_build(tile)
 
-            
             if canbuild:
                 self.screen.blit(self.tmap.selector_open, draw_coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
+                pygame.draw.circle(self.screen, self.tmap.selector_open.get_at((0,0)), temp.render_pos(self.tmap_offset), temp.max_range, width=1)
             else:
                 self.screen.blit(self.tmap.selector_closed, draw_coords)
-                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.center_pos(self.tmap_offset), temp.max_range, width=1)
-
-        # updating zombies and deleting zombies that reach end
-        to_del = []
-        for zombie in self.zombies:
-            zombie.timestep(deltatime)
-            zombie.render(self.screen, self.tmap_offset)
-            if zombie.tile == None:
-                to_del.append(zombie)
-                self.lives -= zombie.lives_impact
-                loop.soundManager.playZombieEndSound()
-        for zombie in to_del:
-            self.zombies.remove(zombie)
+                pygame.draw.circle(self.screen, self.tmap.selector_closed.get_at((0,0)), temp.render_pos(self.tmap_offset), temp.max_range, width=1)
 
         # updating towers
         for tower in self.towers:
-            tower_pos = tower.center_pos(self.tmap_offset)
+            tower_pos = tower.center_pos()
             
             if not tower.update(deltatime):
                 continue
 
             in_range = []
             for z in self.zombies:
-                z_pos = z.center_pos()
+                if z.is_dead():
+                    continue
+
+                z_pos = z.game_pos()
                 dist = math.sqrt((z_pos[0] - tower_pos[0]) ** 2 + (z_pos[1] - tower_pos[1]) ** 2)
                 if dist <= tower.max_range:
                     in_range.append(z)
@@ -265,13 +255,15 @@ class Game(Scene):
             # targets zombie closest to end
             target = min(in_range, key=lambda z: z.dist())
 
-            # adjusted positions are so projectiles can move with offset
-            adjusted_tower_pos = [tower_pos[0] - self.tmap_offset[0], tower_pos[1] - self.tmap_offset[1]]
-            adjusted_target_pos = [target.center_pos()[0] - self.tmap_offset[0], target.center_pos()[1] - self.tmap_offset[1]]
+            if isinstance(tower, SplashTower):
+                self.projectiles.append(entity.Grenade(tower_pos, target.game_pos(), tower.damage))
+                tower.fire(target)
+            else:
+                self.projectiles.append(entity.BulletTrail(tower_pos, target.game_pos(), tower.bullet_color, tower.bullet_duration))
+                tower.fire(target)
+                target.hit(tower.damage)
 
-            self.projectiles.append(entity.BulletTrail(adjusted_tower_pos, adjusted_target_pos, tower.bullet_color, tower.bullet_duration))
-            tower.fire(target)
-            target.hit(tower.damage)
+
 
             if isinstance(tower, StunTower):
                 target.stun(tower.stun_duration)
@@ -286,20 +278,36 @@ class Game(Scene):
             if isinstance(tower, SniperTower):
                 loop.soundManager.playSniperSound()
 
-            if target.is_dead():
-                loop.soundManager.playZombieDeathSound()
-                self.currency += target.reward
-                self.zombies.remove(target)
 
         # updating projectiles
         to_del = []
         for p in self.projectiles:
-            p.timestep(deltatime)
+            p.timestep(deltatime, self.projectiles, self.zombies)
             p.render(self.screen, self.tmap_offset)
             if p.is_done():
                 to_del.append(p)
         for p in to_del:
             self.projectiles.remove(p)
+
+        # updating zombies and deleting zombies that reach end
+        to_del = []
+        for zombie in self.zombies:
+            zombie.timestep(deltatime)
+
+            if zombie.tile == None:
+                to_del.append(zombie)
+                self.lives -= zombie.lives_impact
+                loop.soundManager.playZombieEndSound()
+            elif zombie.is_dead():
+                to_del.append(zombie)
+                self.currency += zombie.reward
+                loop.soundManager.playZombieDeathSound()
+            else:
+                zombie.render(self.screen, self.tmap_offset)
+
+        for zombie in to_del:
+            self.zombies.remove(zombie)
+
 
         # updating ui (buy panel, tower info, lives/currency display, waves display)
         if self.selected_tower != self.tower_info_panel.tower:
@@ -327,6 +335,7 @@ class Game(Scene):
             self.currency -= self.advanced_weapons_cost
             self.is_tower_unlocked[2] = True # Sniper
             self.is_tower_unlocked[3] = True # TASER
+            self.is_tower_unlocked[4] = True # Splash
             self.buy_panel.unlock_advanced()
 
         # game end conditions

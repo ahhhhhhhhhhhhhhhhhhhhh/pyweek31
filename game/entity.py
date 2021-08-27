@@ -1,5 +1,6 @@
 import random
 import json
+import math
 
 import pygame
 
@@ -22,6 +23,7 @@ class ZombieBase:
         self.goal = random.choice(list(self.tile.next.keys()))
         self.dest = self.tile.next[self.goal][0]
         self.last_render_pos = [0,0]
+        self.last_pos = [0,0]
 
         self.health = self.max_health
 
@@ -50,15 +52,18 @@ class ZombieBase:
             self.y += (self.dest.y - self.y)/dist * self.speed * deltatime
     
     def render(self, screen, off = [0,0]):
-        off = [
-            off[0] + (SCALE - self.image.get_width())//2,
-            off[1] + (SCALE - self.image.get_height()) - SCALE//3
+        adjustment = [
+            (SCALE - self.image.get_width())//2,
+            (SCALE - self.image.get_height()) - SCALE//3
         ]
         tpos = [
             self.x + self.disp_offset[0],
             self.y + self.disp_offset[1]
         ]
-        self.last_render_pos = (tpos[0]*SCALE + off[0], tpos[1]*SCALE + off[1])
+
+        self.last_pos = (tpos[0] * SCALE + adjustment[0], tpos[1] * SCALE + adjustment[1])
+        self.last_render_pos = (self.last_pos[0] + off[0], self.last_pos[1] + off[1])
+
         screen.blit(self.image, self.last_render_pos)
 
         self.update_health_bar()
@@ -72,6 +77,10 @@ class ZombieBase:
 
     def center_pos(self):
         return [self.last_render_pos[0] + self.image.get_width() / 2, self.last_render_pos[1] + self.image.get_height() / 2]
+
+    # returns true position within gameworld, NOT where zombie was last rendered (which would include offset)
+    def game_pos(self):
+        return (self.last_pos[0] + self.image.get_width() / 2, self.last_pos[1] + self.image.get_height() / 2)
     
     def dist(self):
         return self.tile.next[self.goal][1]
@@ -183,13 +192,15 @@ class CarryZombie(ZombieBase):
     lives_impact = 5
     
     def hit(self, damage):
-        if self.health > 0 and self.health < damage:
+        super().hit(damage)
+
+        if self.is_dead():
             for i in range(self.spawn_group):
                 zomb = self.spawntype(self.game, self.tile)
                 zomb.x = self.x
                 zomb.y = self.y
                 self.game.zombies.append(zomb)
-        super().hit(damage)
+        
 
 
 class Waves:
@@ -267,11 +278,12 @@ class Waves:
     def get_progress(self): # returns (current_wave, total_waves)
         return self.current_wave, self.total_waves
 
+
 class ProjectileBase:
     image = None
     lifetime = 1
 
-    def timestep(self, deltatime):
+    def timestep(self, deltatime, projectiles, zombies):
         self.lifetime -= deltatime
 
     def render(self, screen):
@@ -290,3 +302,58 @@ class BulletTrail(ProjectileBase):
     def render(self, screen, offset):
         pygame.draw.line(screen, self.color, [self.start[0] + offset[0], self.start[1] + offset[1]], [self.end[0] + offset[0], self.end[1] + offset[1]], width=1)
     
+class Grenade(ProjectileBase):
+    speed = 175
+
+    def __init__(self, start, end, damage):
+        self.pos = start
+        self.end = end
+        self.damage = damage
+        
+        difference = (end[0] - start[0], end[1] - start[1])
+        a = math.sqrt(difference[0] ** 2 + difference[1] ** 2)
+        norm_vector = (difference[0] / a, difference[1] / a)
+
+        self.vector = (norm_vector[0] * self.speed, norm_vector[1] * self.speed)
+
+        self.prev_dist = 999999999999
+
+    def timestep(self, deltatime, projectiles, zombies):
+        self.pos = (self.pos[0] + self.vector[0] * deltatime, self.pos[1] + self.vector[1] * deltatime)
+
+        dist = math.sqrt((self.end[0] - self.pos[0]) ** 2 + (self.end[1] - self.pos[1]) ** 2)
+
+        # if distance is growing, it means projectile is past it's target. Works even with low framerates
+        if (dist > self.prev_dist):
+            self.lifetime = -1
+
+            projectiles.append(GrenadeExplosion(self.pos))
+
+            for z in zombies:
+                z_pos = z.game_pos()
+                dist = math.sqrt((z_pos[0] - self.pos[0]) ** 2 + (z_pos[1] - self.pos[1]) ** 2)
+
+                if dist <= 50:
+                    z.hit(self.damage)
+
+        self.prev_dist = dist
+
+    def render(self, screen, offset):
+        pygame.draw.circle(screen, (0,0,0), (self.pos[0] + offset[0], self.pos[1] + offset[1]), 5)
+
+class GrenadeExplosion(ProjectileBase):
+    max_radius = 60
+    speed = 300
+
+    def __init__(self, pos):
+        self.pos = pos
+        self.radius = 1
+
+    def timestep(self, deltatime, projectiles, zombies):
+        self.radius += self.speed * deltatime
+
+        if self.radius > self.max_radius:
+            self.lifetime = -1
+
+    def render(self, screen, offset):
+        pygame.draw.circle(screen, (255,0,0), (self.pos[0] + offset[0], self.pos[1] + offset[1]), self.radius, width=5)

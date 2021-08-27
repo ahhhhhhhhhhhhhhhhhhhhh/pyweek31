@@ -69,7 +69,7 @@ class TowerInfoPanel:
 			return
 
 		# drawing range circle
-		pygame.draw.circle(self.screen, (255,255,255), self.tower.center_pos(tmap_offset), self.tower.max_range, width=1)
+		pygame.draw.circle(self.screen, (255,255,255), self.tower.render_pos(tmap_offset), self.tower.max_range, width=1)
 		self.screen.blit(self.panel, self.pos) # has to redraw so panel is on top of range circle
 		pygame.draw.rect(self.screen, PANEL_BORDER_COLOR, (self.pos, self.size), width=4)
 
@@ -103,7 +103,7 @@ class BuyPanel:
 
 		self.buttons = []
 		for i in range(len(self.towers)):
-			b = BuyButton(self.screen, [self.pos[0] + 20 + 200 * i, self.pos[1] + 10], self.towers[i])
+			b = BuyButton(self.screen, [self.pos[0] + 20 + 150 * i, self.pos[1] + 10], self.towers[i])
 			self.buttons.append(b)
 
 		self.unlock_advanced_icon = unlock_advanced_icon
