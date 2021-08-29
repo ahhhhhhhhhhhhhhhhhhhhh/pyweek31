@@ -95,7 +95,7 @@ class ZombieBase:
         self.health_bar.fill((0, 255, 0))
 
     def stun(self, duration):
-        self.stun_timer = duration
+        self.stun_timer += duration
 
 class Zombie(ZombieBase):
     image = load.image("smallzombie.png")
