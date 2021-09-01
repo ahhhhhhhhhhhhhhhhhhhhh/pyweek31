@@ -91,20 +91,22 @@ class Scene(ABC):
         pass
 
 class Game(Scene):
-    def __init__(self, screen, image_name, wave_txt_path, starting_lives, starting_currency):
+    def __init__(self, screen, image_name, wave_txt_path, starting_lives, starting_currency, endless=False):
         self.id = "game"
         self.screen = screen
         self.image_name = image_name
         self.wave_txt_path = wave_txt_path
         self.starting_lives = starting_lives
         self.starting_currency = starting_currency
+        self.endless = endless
 
         self.description = ""
 
         bg_image_path = "maps/" + self.image_name + "_bg.png"
         blocking_image_path = "maps/" + self.image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
+        print("\nloading waves:", self.wave_txt_path)
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap, self.endless)
         self.waves_display = WavesDisplay(self.screen, (1030, 600))
 
         CENTER_AT = [515, 260]
@@ -140,7 +142,7 @@ class Game(Scene):
         bg_image_path = "maps/" + self.image_name + "_bg.png"
         blocking_image_path = "maps/" + self.image_name + "_blocking.png"
         self.tmap = TileMap(load.image(bg_image_path), load.image(blocking_image_path))
-        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap)
+        self.waves = entity.Waves(self, self.wave_txt_path, self.tmap, self.endless)
 
         self.zombies = []
 
@@ -206,7 +208,7 @@ class Game(Scene):
                     coords = self.tmap.tile_to_screen_coords(tile)
                     new_tower = self.selected_towertype(coords[0], coords[1])
                     if self.build_mode and self.tmap.can_build(tile) and self.currency >= new_tower.cost[0]:
-                        print("building tower", tile)
+                        #print("building tower", tile)
                         loop.soundManager.playBuildingSound()
                         self.tmap.blocking[tile[0]][tile[1]] = new_tower
                         self.towers.append(new_tower)
@@ -385,12 +387,16 @@ class LevelSelect(Scene):
         self.level4 = Game(screen, "level4", "maps/level4_waves.txt", 25, 1200) # downtown
         self.level4.description = "After a heated campaign, we've finally reached the city center, which has become a zombie stronghold since it started as the early epicenter of the virus. It looks to be the most dangerous challenge yet; what a way to get to know a new job! At least the scientists say they're close to a breakthrough."
 
+        self.endless = Game(screen, "endless", "maps/endless_start.txt", 25, 500, endless=True)
+        self.endless.description = "A challenge with no end"
+
         self.level1_b = LevelSelectButton(self.screen, self.level1, pygame.Rect(47, 302, 281, 220), "Level 1")
         self.level2_b = LevelSelectButton(self.screen, self.level2, pygame.Rect(353, 121, 318, 219), "Level 2")
         self.level3_b = LevelSelectButton(self.screen, self.level3, pygame.Rect(709, 93, 336, 196), "Level 3")
         self.level4_b = LevelSelectButton(self.screen, self.level4, pygame.Rect(1071, 101, 195, 316), "Level 4")
+        self.endless_b = LevelSelectButton(self.screen, self.endless, pygame.Rect(50, 550, 200, 100), "Endless")
 
-        self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b]
+        self.buttons = [self.level1_b, self.level2_b, self.level3_b, self.level4_b, self.endless_b]
 
         self.current_level = 0
         with open(load.handle_path("gamestate.json")) as file:
@@ -400,6 +406,8 @@ class LevelSelect(Scene):
             self.buttons[i].unlocked = True
             self.buttons[i].completed = True
 
+        self.endless_b.unlocked = True
+
         self.most_recent_played = None
 
     def reset(self):
@@ -408,6 +416,8 @@ class LevelSelect(Scene):
             b.completed = False
 
         self.buttons[0].unlocked = True
+
+        self.endless_b.unlocked = True
 
     def update(self, loop):
         self.screen.blit(self.city_image, (0, 0))

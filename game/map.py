@@ -393,8 +393,8 @@ class SplashTower(Tower):
     text = "Everyone gives them a wide bearth, but they know their explosives"
     damage = [0, 0, 0]
     fire_speed = [1, 0.9, 0.8]
-    max_range = [125, 125, 125]
-    cost = [200, 75, 100]
+    max_range = [125, 130, 135]
+    cost = [400, 150, 250]
     splash_damage = [50, 75, 100]
 
     def get_projectile(self, start, end):

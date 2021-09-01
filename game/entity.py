@@ -14,6 +14,8 @@ class ZombieBase:
     reward = 20
     healthbar_off_y = 20
     lives_impact = 1
+
+    difficulty = 1  # estimate of difficulty of zombie, used for generating random waves
     
     def __init__(self, game, tile):
         self.game = game
@@ -106,6 +108,8 @@ class FastZombie(ZombieBase):
     speed = 1.75
     reward = 25
 
+    difficulty = 1.25
+
 class GiantZombie(ZombieBase):
     image = load.image("buffzombie.png")
     speed = 0.6
@@ -114,11 +118,15 @@ class GiantZombie(ZombieBase):
     healthbar_off_y = 40
     lives_impact = 5
 
+    difficulty = 8
+
 class BabyZombie(ZombieBase):
     image = load.image("babyzombie.png")
     speed = 2.5
-    max_health = 100
+    max_health = 125
     reward = 30
+
+    difficulty = 2
 
 class ShieldZombie(ZombieBase):
     image = load.image("smallzombie.png")
@@ -127,6 +135,8 @@ class ShieldZombie(ZombieBase):
     max_health = 300
     reward = 30
     shield_health = 50
+
+    difficulty = 1.5
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
@@ -150,17 +160,19 @@ class ShieldZombie(ZombieBase):
 
 class SummonerZombie(ZombieBase):
     image = load.image("smartzombie.png")
-    max_health = 500
+    max_health = 1000
     speed = 0.5
     spawn_rate = 5 # time between spawns
-    spawn_group = 3
+    spawn_group = 5
     reward = 150
     spawntype = Zombie
     lives_impact = 10
+
+    difficulty = 25
     
     def __init__(self, game, tile):
         super().__init__(game, tile)
-        self.last_spawn = self.spawn_rate
+        self.last_spawn = 1
         self.spawns = self.spawn_group
     
     def timestep(self, deltatime):
@@ -189,6 +201,8 @@ class CarryZombie(ZombieBase):
     spawntype = BabyZombie
     spawn_group = 5
     lives_impact = 5
+
+    difficulty = 20
     
     def hit(self, damage):
         super().hit(damage)
@@ -211,8 +225,10 @@ class Waves:
                  "summoner": SummonerZombie,
                  "carry": CarryZombie}
 
-    def __init__(self, game, filepath, tmap):
+    def __init__(self, game, filepath, tmap, endless):
         self.game = game
+        self.starts = len(tmap.starts)
+        self.endless = endless
         filepath = load.handle_path(filepath)
 
         with open(filepath, "r") as file:
@@ -231,19 +247,35 @@ class Waves:
                     
         self.waves = waves
         for i, spawnwave in enumerate(waves):
-            if len(spawnwave) > len(tmap.starts):
+            if len(spawnwave) > self.starts:
                 print("WARNING: This wave file has too many spawnpoints on wave " + str(i+1))
         
-        self.zombies_to_spawn = [[] for _ in range(len(tmap.starts))]
+        self.zombies_to_spawn = [[] for _ in range(self.starts)]
         self.spawn_timers = [0 for _ in range(len(self.zombies_to_spawn))]
         self.spawn_last = [type(None) for _ in range(len(self.zombies_to_spawn))]
         self.time_threshold = 1
         self.total_waves = len(waves)
         self.current_wave = 0
 
+
+        for i, wave in enumerate(self.waves):
+            diff = 0
+            for route in wave:
+                for zombie in route:
+                    diff += zombie.difficulty
+            print(f"wave {i}, difficulty estimate: {diff}")
+
+
+
     def get_next(self):
         if self.waves:
             self.current_wave += 1
+
+            if self.endless:
+                wave_difficulty = (3 * self.current_wave ** 2) + (8 * self.current_wave)
+                print("generating new wave, difficulty:", wave_difficulty)
+                self.add_wave(self.generate_wave(min(self.starts, self.current_wave), wave_difficulty))
+
             return self.waves.pop(0)
         return False
 
@@ -275,4 +307,35 @@ class Waves:
                     self.spawn_last[i] = type(zombielist[i])
 
     def get_progress(self): # returns (current_wave, total_waves)
-        return self.current_wave, self.total_waves
+        if self.endless:
+            return self.current_wave, "???"
+        else:
+            return self.current_wave, self.total_waves
+
+
+    def add_wave(self, new_wave):
+        self.waves.append(new_wave)
+
+    def generate_wave(self, spawnpoints, difficulty):
+        ztypes = list(self.zombiemap.values())
+        weights = [10, 5, 5, 3, 5, 1, 1]
+
+        wave = [[] for _ in range(spawnpoints)]
+        d = 0
+
+        # prevents carry or summoners in easy waves
+        if difficulty < 150:
+            ztypes = ztypes[0:-2]
+            weights = weights[0:-2]
+
+        while d < difficulty:
+            for i in range(spawnpoints):
+                rand = random.choices(ztypes, weights=weights)[0]
+
+                wave[i].append(rand)
+                d += rand.difficulty
+
+        return wave
+
+    
+        
